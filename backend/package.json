@@ -1,12 +1,15 @@
 {
-  "name": "wbd-backend",
-  "version": "1.0.0",
-  "main": "index.js",
-  "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc"
   },
-  "author": "WBD",
-  "license": "ISC",
-  "description": ""
+  "devDependencies": {
+    "@types/node": "^22.9.1",
+    "tsx": "^4",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.7",
+    "hono": "^4.6.11"
+  }
 }
