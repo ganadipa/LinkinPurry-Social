@@ -33,10 +33,13 @@ export class Application {
       .bind<Controller>(CONFIG.Controllers)
       .to(AuthController)
       .inSingletonScope();
+
+    // if (process.env.ENVIRONMENT && process.env.ENVIRONMENT === "prod") {
     this.container
       .bind<Controller>(CONFIG.Controllers)
       .to(ServeStaticController)
       .inSingletonScope();
+    // }
 
     this.container
       .bind<EmailService>(CONFIG.EmailService)

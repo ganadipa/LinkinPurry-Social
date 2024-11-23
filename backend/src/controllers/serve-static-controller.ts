@@ -9,7 +9,7 @@ export class ServeStaticController implements Controller {
   constructor(@inject(CONFIG.HonoProvider) private hono: HonoProvider) {}
 
   public registerRoutes(): void {
-    const distRelativeToRoot = "../public";
+    const distRelativeToRoot = "../frontend/dist";
 
     // Serve all static files from `distRelativeToRoot` directory
     this.hono.app.use("/*", serveStatic({ root: distRelativeToRoot }));
