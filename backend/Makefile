@@ -1,7 +1,7 @@
 
 
 run:
-	npm run start	
+	npm run dev	
 
 install:
 	npm install

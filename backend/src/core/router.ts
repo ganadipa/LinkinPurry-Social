@@ -1,10 +1,14 @@
-import { Hono } from "hono";
-import { Controller } from "./controller";
+import { Controller } from "../controllers/controller";
+import { injectable, inject, multiInject } from "inversify";
+import { CONFIG } from "../ioc/config";
 
+@injectable()
 export class Router {
-  constructor(private app: Hono, private controller: Controller) {}
+  constructor(
+    @multiInject(CONFIG.Controllers) private controllers: Controller[]
+  ) {}
 
   public registerRoutes(): void {
-    this.app.get("/", this.controller.hello.bind(this.controller));
+    this.controllers.forEach((controller) => controller.registerRoutes());
   }
 }
