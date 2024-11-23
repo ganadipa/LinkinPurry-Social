@@ -11,7 +11,13 @@ export class ServeStaticController implements Controller {
   public registerRoutes(): void {
     const distRelativeToRoot = "../frontend/dist";
 
-    // Serve all static files from `distRelativeToRoot` directory
     this.hono.app.use("/*", serveStatic({ root: distRelativeToRoot }));
+
+    this.hono.app.get("*", async (c, next) => {
+      return await serveStatic({
+        root: distRelativeToRoot,
+        path: "index.html",
+      })(c, next);
+    });
   }
 }

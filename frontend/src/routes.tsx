@@ -4,6 +4,7 @@ import {
   createRouter,
   createRoute,
   createRootRoute,
+  useParams,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 
@@ -45,11 +46,11 @@ const aboutRoute = createRoute({
   },
 });
 
-// Add a catch-all 404 route
-const notFoundRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "*",
-  component: function NotFound() {
+const routeTree = rootRoute.addChildren([indexRoute, aboutRoute]);
+
+export const router = createRouter({
+  routeTree,
+  defaultNotFoundComponent: () => {
     return (
       <div className="p-2">
         <h2>404 - Page Not Found</h2>
@@ -61,14 +62,6 @@ const notFoundRoute = createRoute({
     );
   },
 });
-
-const routeTree = rootRoute.addChildren([
-  indexRoute,
-  aboutRoute,
-  notFoundRoute,
-]);
-
-export const router = createRouter({ routeTree });
 
 declare module "@tanstack/react-router" {
   interface Register {
