@@ -63,3 +63,9 @@ monorepo-clean: backend-clean frontend-clean tests-clean
 fe: frontend-run
 be: backend-run
 test: tests-run
+
+dev:
+	@echo "Starting development environment..."
+	@docker compose up be-dev
+	@echo "Development environment started"
+	

@@ -1,32 +1,12 @@
 services:
-  be-prod:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.prod
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db
-      - redis
-    env_file:
-      - .env.docker
-    environment:
-      - ENVIRONMENT=prod
-    networks:
-      - internal-network
-    volumes:
-      - ./frontend/dist:/app/frontend/dist
-
   be-dev:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.dev
+    build: ./backend
     ports:
       - "8000:8000"
     depends_on:
       - db
       - redis
-      - fe
+      - fe-dev
     env_file:
       - .env.docker
     environment:
@@ -37,11 +17,15 @@ services:
       - ./backend:/app/backend
       - /app/backend/node_modules
 
-  fe:
+  fe-dev:
     build: ./frontend
     ports:
-      - "3000:3000"
-
+      - "5173:5173"
+    env_file:
+      - .env.docker
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
     networks:
       - internal-network
 
@@ -58,6 +42,20 @@ services:
 
   redis:
     image: redis:latest
+
+  prod:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - internal-network
+    env_file:
+      - .env.docker
+    environment:
+      - ENVIRONMENT=prod
 
 networks:
   internal-network:
