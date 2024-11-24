@@ -4,9 +4,13 @@ import {
   createRouter,
   createRoute,
   createRootRoute,
-  useParams,
+//   useParams,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
+
+import UserListPage from "@/pages/UserListPage";
+import ConnectionRequestsPage from "@/pages/ConnectionRequestsPage";
+import ConnectionsPage from "@/pages/ConnectionsPage";
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -17,6 +21,15 @@ const rootRoute = createRootRoute({
         </Link>{" "}
         <Link to="/about" className="[&.active]:font-bold">
           About
+        </Link>
+        <Link to="/users" className="[&.active]:font-bold">
+          Users
+        </Link>
+        <Link to="/connections" className="[&.active]:font-bold">
+          Connections
+        </Link>
+        <Link to="/requests" className="[&.active]:font-bold">
+          Requests
         </Link>
       </div>
       <hr />
@@ -46,7 +59,31 @@ const aboutRoute = createRoute({
   },
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, aboutRoute]);
+const userListRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/users",
+    component: UserListPage,
+  });
+  
+  const connectionRequestsRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/requests",
+    component: ConnectionRequestsPage,
+  });
+  
+  const connectionsRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/connections",
+    component: ConnectionsPage,
+  });
+
+  const routeTree = rootRoute.addChildren([
+    indexRoute,
+    aboutRoute,
+    userListRoute,
+    connectionRequestsRoute,
+    connectionsRoute,
+  ]);
 
 export const router = createRouter({
   routeTree,
