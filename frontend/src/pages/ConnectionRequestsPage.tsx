@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { UserCard } from "@/components/ui/user-card";
-import { users, connectionRequests, connections } from "@/lib/dummyConnections";
+import { currentUser, users, connectionRequests, connections } from "@/lib/dummyConnections";
 
 export default function ConnectionRequestsPage() {
   const [requests, setRequests] = useState(
-    connectionRequests.filter((req) => req.request_to_id === "1") // User1 yang lagi login
+    connectionRequests
+        .filter((req) => req.request_to_id === currentUser.id)
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
   );
 
   const handleResponse = (requestId: string, accept: boolean) => {
     const requestIndex = connectionRequests.findIndex(
-      (req) => req.request_from_id === requestId && req.request_to_id === "1"
+      (req) => req.request_from_id === requestId && req.request_to_id === currentUser.id
     );
 
     if (accept) {
@@ -27,7 +29,11 @@ export default function ConnectionRequestsPage() {
     }
 
     connectionRequests.splice(requestIndex, 1);
-    setRequests(connectionRequests.filter((req) => req.request_to_id === "1"));
+    setRequests(
+        connectionRequests
+            .filter((req) => req.request_to_id === currentUser.id)
+            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    );
     alert(accept ? "Request accepted." : "Request declined.");
   };
 

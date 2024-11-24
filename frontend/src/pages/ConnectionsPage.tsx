@@ -1,15 +1,14 @@
 import { useState } from "react";
 import { UserCard } from "@/components/ui/user-card";
-import { users, connections } from "@/lib/dummyConnections";
+import { currentUser, users, connections } from "@/lib/dummyConnections";
 
 export default function ConnectionsPage() {
   const [connectionsList] = useState(
     connections
-      .filter(
-        (conn) => conn.from_id === "1"
-      )
+      .filter((conn) => conn.from_id === currentUser.id)
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
       .map((conn) => {
-        const userId = conn.from_id === "1" ? conn.to_id : conn.from_id;
+        const userId = conn.from_id === currentUser.id ? conn.to_id : conn.from_id;
         return users.find((user) => user.id === userId)!;
       })
   );
@@ -23,6 +22,7 @@ export default function ConnectionsPage() {
           description={connection.description}
           profilePhoto={connection.profilePhoto}
           status="connected"
+          hideStatus={true}
         />
       ))}
     </div>
