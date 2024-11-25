@@ -103,7 +103,10 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 //   );
 // }
 
-const router = createRouter({ routeTree });
+const router = createRouter({
+  routeTree,
+  caseSensitive: false,
+});
 
 declare module "@tanstack/react-router" {
   interface Register {

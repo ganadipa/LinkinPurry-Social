@@ -9,12 +9,15 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: 5173,
-    // proxy: {
-    //   "/api": {
-    //     target: "http://localhost:8000",
-    //     changeOrigin: true,
-    //   },
-    // },
+    proxy: {
+      "/api": {
+        target:
+          process.env.ENVIRONMENT === "dev"
+            ? "http://be-dev:8000"
+            : "http://localhost:8000",
+        changeOrigin: true,
+      },
+    },
   },
   resolve: {
     alias: {
