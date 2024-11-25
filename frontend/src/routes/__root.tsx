@@ -1,3 +1,4 @@
+import Header from "@/components/layout/header";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 import { Toaster } from "react-hot-toast";
 
@@ -9,6 +10,7 @@ function RootComponent() {
   return (
     <>
       <main>
+        <Header user={null} />
         <div>Root layout</div>
         <Outlet />
       </main>

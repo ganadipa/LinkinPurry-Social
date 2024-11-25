@@ -14,6 +14,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as publicIndexImport } from './routes/(public)/index'
+import { Route as profileProfileImport } from './routes/(profile)/profile'
 import { Route as connectionUsersImport } from './routes/(connection)/users'
 import { Route as connectionRequestsImport } from './routes/(connection)/requests'
 import { Route as connectionConnectionsImport } from './routes/(connection)/connections'
@@ -35,6 +36,12 @@ const authorizationRoute = authorizationImport.update({
 const publicIndexRoute = publicIndexImport.update({
   id: '/(public)/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const profileProfileRoute = profileProfileImport.update({
+  id: '/(profile)/profile',
+  path: '/profile',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -112,6 +119,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof connectionUsersImport
       parentRoute: typeof rootRoute
     }
+    '/(profile)/profile': {
+      id: '/(profile)/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof profileProfileImport
+      parentRoute: typeof rootRoute
+    }
     '/(public)/': {
       id: '/(public)/'
       path: '/'
@@ -168,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/connections': typeof connectionConnectionsRoute
   '/requests': typeof connectionRequestsRoute
   '/users': typeof connectionUsersRoute
+  '/profile': typeof profileProfileRoute
   '/signin': typeof authorizationAuthSigninRoute
   '/signup': typeof authorizationAuthSignupRoute
 }
@@ -177,6 +192,7 @@ export interface FileRoutesByTo {
   '/connections': typeof connectionConnectionsRoute
   '/requests': typeof connectionRequestsRoute
   '/users': typeof connectionUsersRoute
+  '/profile': typeof profileProfileRoute
   '/signin': typeof authorizationAuthSigninRoute
   '/signup': typeof authorizationAuthSignupRoute
 }
@@ -188,6 +204,7 @@ export interface FileRoutesById {
   '/(connection)/connections': typeof connectionConnectionsRoute
   '/(connection)/requests': typeof connectionRequestsRoute
   '/(connection)/users': typeof connectionUsersRoute
+  '/(profile)/profile': typeof profileProfileRoute
   '/(public)/': typeof publicIndexRoute
   '/(authorization)/_auth/signin': typeof authorizationAuthSigninRoute
   '/(authorization)/_auth/signup': typeof authorizationAuthSignupRoute
@@ -200,10 +217,18 @@ export interface FileRouteTypes {
     | '/connections'
     | '/requests'
     | '/users'
+    | '/profile'
     | '/signin'
     | '/signup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/connections' | '/requests' | '/users' | '/signin' | '/signup'
+  to:
+    | '/'
+    | '/connections'
+    | '/requests'
+    | '/users'
+    | '/profile'
+    | '/signin'
+    | '/signup'
   id:
     | '__root__'
     | '/(authorization)'
@@ -211,6 +236,7 @@ export interface FileRouteTypes {
     | '/(connection)/connections'
     | '/(connection)/requests'
     | '/(connection)/users'
+    | '/(profile)/profile'
     | '/(public)/'
     | '/(authorization)/_auth/signin'
     | '/(authorization)/_auth/signup'
@@ -222,6 +248,7 @@ export interface RootRouteChildren {
   connectionConnectionsRoute: typeof connectionConnectionsRoute
   connectionRequestsRoute: typeof connectionRequestsRoute
   connectionUsersRoute: typeof connectionUsersRoute
+  profileProfileRoute: typeof profileProfileRoute
   publicIndexRoute: typeof publicIndexRoute
 }
 
@@ -230,6 +257,7 @@ const rootRouteChildren: RootRouteChildren = {
   connectionConnectionsRoute: connectionConnectionsRoute,
   connectionRequestsRoute: connectionRequestsRoute,
   connectionUsersRoute: connectionUsersRoute,
+  profileProfileRoute: profileProfileRoute,
   publicIndexRoute: publicIndexRoute,
 }
 
@@ -247,6 +275,7 @@ export const routeTree = rootRoute
         "/(connection)/connections",
         "/(connection)/requests",
         "/(connection)/users",
+        "/(profile)/profile",
         "/(public)/"
       ]
     },
@@ -272,6 +301,9 @@ export const routeTree = rootRoute
     },
     "/(connection)/users": {
       "filePath": "(connection)/users.tsx"
+    },
+    "/(profile)/profile": {
+      "filePath": "(profile)/profile.tsx"
     },
     "/(public)/": {
       "filePath": "(public)/index.tsx"

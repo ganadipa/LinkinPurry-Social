@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import Header from "@/components/layout/header";
 import { MdEditSquare } from "react-icons/md";
 
 interface Experience {
@@ -67,8 +66,7 @@ export default function Profile() {
 
   return (
     <>
-    <Header user={null} />
-    <div className="max-w-5xl mx-auto mt-16 p-6 space-y-6">
+    <div className="max-w-5xl mx-auto mt-8 p-6 space-y-6">
       <div className="bg-white rounded-lg shadow border">
         <div className="relative h-52">
           <img
