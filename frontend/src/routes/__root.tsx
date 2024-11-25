@@ -1,4 +1,5 @@
 import { AuthContext } from "@/contexts/auth-context";
+import { useAuth } from "@/hooks/auth";
 import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 import { Toaster } from "react-hot-toast";
 
@@ -11,10 +12,16 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 });
 
 function RootComponent() {
+  const { user, isLoading } = useAuth();
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       <main>
         <div>Root layout</div>
+        <div>You are logged in as {user?.email ?? "guest"}</div>
         <Outlet />
       </main>
       <Toaster />
