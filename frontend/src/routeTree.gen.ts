@@ -14,10 +14,10 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as publicIndexImport } from './routes/(public)/index'
+import { Route as publicUsersImport } from './routes/(public)/users'
 import { Route as profileProfileImport } from './routes/(profile)/profile'
-import { Route as connectionUsersImport } from './routes/(connection)/users'
-import { Route as connectionRequestsImport } from './routes/(connection)/requests'
-import { Route as connectionConnectionsImport } from './routes/(connection)/connections'
+import { Route as connectionRequestsImport } from './routes/(authenticated)/requests'
+import { Route as connectionConnectionsImport } from './routes/(public)/connections'
 import { Route as authorizationAuthImport } from './routes/(authorization)/_auth'
 import { Route as authorizationAuthSignupImport } from './routes/(authorization)/_auth/signup'
 import { Route as authorizationAuthSigninImport } from './routes/(authorization)/_auth/signin'
@@ -39,15 +39,15 @@ const publicIndexRoute = publicIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const profileProfileRoute = profileProfileImport.update({
-  id: '/(profile)/profile',
-  path: '/profile',
+const publicUsersRoute = publicUsersImport.update({
+  id: '/(public)/users',
+  path: '/users',
   getParentRoute: () => rootRoute,
 } as any)
 
-const connectionUsersRoute = connectionUsersImport.update({
-  id: '/(connection)/users',
-  path: '/users',
+const profileProfileRoute = profileProfileImport.update({
+  id: '/(profile)/profile',
+  path: '/profile',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -112,18 +112,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof connectionRequestsImport
       parentRoute: typeof rootRoute
     }
-    '/(connection)/users': {
-      id: '/(connection)/users'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof connectionUsersImport
-      parentRoute: typeof rootRoute
-    }
     '/(profile)/profile': {
       id: '/(profile)/profile'
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof profileProfileImport
+      parentRoute: typeof rootRoute
+    }
+    '/(public)/users': {
+      id: '/(public)/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof publicUsersImport
       parentRoute: typeof rootRoute
     }
     '/(public)/': {
@@ -181,8 +181,8 @@ export interface FileRoutesByFullPath {
   '/': typeof publicIndexRoute
   '/connections': typeof connectionConnectionsRoute
   '/requests': typeof connectionRequestsRoute
-  '/users': typeof connectionUsersRoute
   '/profile': typeof profileProfileRoute
+  '/users': typeof publicUsersRoute
   '/signin': typeof authorizationAuthSigninRoute
   '/signup': typeof authorizationAuthSignupRoute
 }
@@ -191,8 +191,8 @@ export interface FileRoutesByTo {
   '/': typeof publicIndexRoute
   '/connections': typeof connectionConnectionsRoute
   '/requests': typeof connectionRequestsRoute
-  '/users': typeof connectionUsersRoute
   '/profile': typeof profileProfileRoute
+  '/users': typeof publicUsersRoute
   '/signin': typeof authorizationAuthSigninRoute
   '/signup': typeof authorizationAuthSignupRoute
 }
@@ -203,8 +203,8 @@ export interface FileRoutesById {
   '/(authorization)/_auth': typeof authorizationAuthRouteWithChildren
   '/(connection)/connections': typeof connectionConnectionsRoute
   '/(connection)/requests': typeof connectionRequestsRoute
-  '/(connection)/users': typeof connectionUsersRoute
   '/(profile)/profile': typeof profileProfileRoute
+  '/(public)/users': typeof publicUsersRoute
   '/(public)/': typeof publicIndexRoute
   '/(authorization)/_auth/signin': typeof authorizationAuthSigninRoute
   '/(authorization)/_auth/signup': typeof authorizationAuthSignupRoute
@@ -216,8 +216,8 @@ export interface FileRouteTypes {
     | '/'
     | '/connections'
     | '/requests'
-    | '/users'
     | '/profile'
+    | '/users'
     | '/signin'
     | '/signup'
   fileRoutesByTo: FileRoutesByTo
@@ -225,8 +225,8 @@ export interface FileRouteTypes {
     | '/'
     | '/connections'
     | '/requests'
-    | '/users'
     | '/profile'
+    | '/users'
     | '/signin'
     | '/signup'
   id:
@@ -235,8 +235,8 @@ export interface FileRouteTypes {
     | '/(authorization)/_auth'
     | '/(connection)/connections'
     | '/(connection)/requests'
-    | '/(connection)/users'
     | '/(profile)/profile'
+    | '/(public)/users'
     | '/(public)/'
     | '/(authorization)/_auth/signin'
     | '/(authorization)/_auth/signup'
@@ -247,8 +247,8 @@ export interface RootRouteChildren {
   authorizationRoute: typeof authorizationRouteWithChildren
   connectionConnectionsRoute: typeof connectionConnectionsRoute
   connectionRequestsRoute: typeof connectionRequestsRoute
-  connectionUsersRoute: typeof connectionUsersRoute
   profileProfileRoute: typeof profileProfileRoute
+  publicUsersRoute: typeof publicUsersRoute
   publicIndexRoute: typeof publicIndexRoute
 }
 
@@ -256,8 +256,8 @@ const rootRouteChildren: RootRouteChildren = {
   authorizationRoute: authorizationRouteWithChildren,
   connectionConnectionsRoute: connectionConnectionsRoute,
   connectionRequestsRoute: connectionRequestsRoute,
-  connectionUsersRoute: connectionUsersRoute,
   profileProfileRoute: profileProfileRoute,
+  publicUsersRoute: publicUsersRoute,
   publicIndexRoute: publicIndexRoute,
 }
 
@@ -274,8 +274,8 @@ export const routeTree = rootRoute
         "/(authorization)",
         "/(connection)/connections",
         "/(connection)/requests",
-        "/(connection)/users",
         "/(profile)/profile",
+        "/(public)/users",
         "/(public)/"
       ]
     },
@@ -299,11 +299,11 @@ export const routeTree = rootRoute
     "/(connection)/requests": {
       "filePath": "(connection)/requests.tsx"
     },
-    "/(connection)/users": {
-      "filePath": "(connection)/users.tsx"
-    },
     "/(profile)/profile": {
       "filePath": "(profile)/profile.tsx"
+    },
+    "/(public)/users": {
+      "filePath": "(public)/users.tsx"
     },
     "/(public)/": {
       "filePath": "(public)/index.tsx"
