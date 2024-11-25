@@ -19,7 +19,6 @@ export default function ConnectionsPage() {
         <UserCard
           key={connection.id}
           name={connection.name}
-          description={connection.description}
           profilePhoto={connection.profilePhoto}
           status="connected"
           hideStatus={true}

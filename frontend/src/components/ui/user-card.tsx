@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 
 interface UserCardProps {
   name: string;
-  description: string;
   profilePhoto: string;
   status: "connected" | "pending" | "not_connected";
   onConnect?: () => void;
@@ -13,7 +12,6 @@ interface UserCardProps {
 
 export function UserCard({
   name,
-  description,
   profilePhoto,
   status,
   onConnect,
@@ -30,7 +28,6 @@ export function UserCard({
       />
       <div className="flex-1">
         <h3 className="text-lg font-semibold">{name}</h3>
-        <p className="text-sm text-gray-600">{description}</p>
       </div>
       {!hideStatus && (
         <div>
