@@ -93,6 +93,7 @@ export class Application {
 
   public configureHono(): void {
     const hono = this.container.get<HonoProvider>(CONFIG.HonoProvider).app;
+
     hono.onError((err, c) => {
       console.error(err);
       if (err instanceof HTTPException) {
@@ -119,6 +120,14 @@ export class Application {
 
   public registerGlobalMiddlewares(): void {
     const hono = this.container.get<HonoProvider>(CONFIG.HonoProvider).app;
+    hono.use("*", async (c, next) => {
+      console.log("in seeing the path");
+      const path = c.req.path;
+      const method = c.req.method;
+      console.log(`{${method.toUpperCase()}} ${path}`);
+      await next();
+      console.log("out seeing the path");
+    });
 
     const authMiddleware = this.container.get<AuthMiddleware>(
       CONFIG.AuthMiddleware

@@ -1,3 +1,5 @@
+import { AuthProvider } from "./contexts/auth-context";
+import { useAuth } from "./hooks/auth";
 import { routeTree } from "./routeTree.gen";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 
@@ -103,6 +105,8 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 const router = createRouter({
   routeTree,
   caseSensitive: false,
+  defaultPreload: false,
+  context: { authentication: undefined! },
 });
 
 declare module "@tanstack/react-router" {
@@ -111,6 +115,16 @@ declare module "@tanstack/react-router" {
   }
 }
 
+function InnerApp() {
+  const auth = useAuth();
+  console.log("Auth", auth);
+  return <RouterProvider router={router} context={{ authentication: auth }} />;
+}
+
 export default function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <InnerApp />
+    </AuthProvider>
+  );
 }

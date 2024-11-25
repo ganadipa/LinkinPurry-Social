@@ -45,7 +45,7 @@ export class AuthController implements Controller {
     this.hono.app.post("/api/login", async (c) => {
       const payload = (await c.req.json()) as LoginPayload;
       const user = c.var.user;
-      console.log(user);
+      console.log("user", user);
       let token;
       if (!user) {
         token = await this.authService.login(payload);
@@ -102,6 +102,30 @@ export class AuthController implements Controller {
         }
         throw new InternalErrorException("Error registering user");
       }
+    });
+
+    this.hono.app.get("/api/me", async (c) => {
+      const user = c.var.user;
+      console.log("user", user);
+      if (!user) {
+        return c.json({
+          success: true,
+          message: "No user found",
+          body: null,
+        });
+      }
+      console.log("here");
+
+      return c.json({
+        success: true,
+        message: "User found",
+        body: {
+          id: user.id === undefined ? undefined : Number(user.id),
+          email: user.email,
+          name: user.full_name,
+          username: user.username,
+        },
+      });
     });
   }
 }
