@@ -5,15 +5,13 @@ import { Server } from "./server";
 import { Router } from "./router";
 import { CONFIG } from "../ioc/config";
 import { Hono } from "hono";
-import { EmailService } from "../services/email.service";
-import { UserService } from "../services/user.service";
 import { HonoProvider } from "./hono-provider";
 import { Controller } from "../controllers/controller";
 import { AuthController } from "../controllers/auth-controller";
 import { ServeStaticController } from "../controllers/serve-static-controller";
 import { HTTPException } from "hono/http-exception";
 import { IAuthStrategy } from "../interfaces/auth-strategy.interface";
-import { JwtAuthStrategy } from "../middlewares/auth/strategy/jwt.strategy";
+import { JwtAuthStrategy } from "../services/auth/strategy/jwt.strategy";
 import { AuthMiddleware } from "../middlewares/auth/auth.middleware";
 import { UserRepository } from "../interfaces/user-repository.interface";
 import { DbUserRepository } from "../repositories/db/user.repository";
@@ -50,15 +48,6 @@ export class Application {
       .to(ServeStaticController)
       .inSingletonScope();
     // }
-
-    this.container
-      .bind<EmailService>(CONFIG.EmailService)
-      .to(EmailService)
-      .inSingletonScope();
-    this.container
-      .bind<UserService>(CONFIG.UserService)
-      .to(UserService)
-      .inSingletonScope();
 
     this.container
       .bind<IAuthStrategy>(CONFIG.JwtAuthStrategy)
