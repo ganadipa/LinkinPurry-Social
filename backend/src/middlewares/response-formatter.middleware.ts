@@ -15,9 +15,11 @@ export class ResponseFormatterMiddleware {
   constructor() {}
 
   public intercept = createMiddleware(async (c, next) => {
+    console.log("in the response formatter middleware");
     await next();
+    console.log("out the response formatter middleware");
 
-    const response = c.res.json();
-    console.log(response);
+    // const response = await c.res.json();
+    // console.log("response is", response);
   });
 }
