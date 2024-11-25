@@ -6,4 +6,17 @@ export const CONFIG = {
 
   EmailService: Symbol.for("EmailService"),
   UserService: Symbol.for("UserService"),
+  JwtService: Symbol.for("JwtService"),
+  AuthService: Symbol.for("AuthService"),
+  ValidationService: Symbol.for("ValidationService"),
+
+  AuthStrategy: Symbol.for("Jwt"),
+  JwtAuthStrategy: Symbol.for("Jwt"),
+
+  UserRepository: Symbol.for("DbUserRepository"),
+  DbUserRepository: Symbol.for("DbUserRepository"),
+
+  PrismaProvider: Symbol.for("PrismaProvider"),
+
+  AuthMiddleware: Symbol.for("AuthMiddleware"),
 };

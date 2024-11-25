@@ -11,4 +11,16 @@ export class Router {
   public registerRoutes(): void {
     this.controllers.forEach((controller) => controller.registerRoutes());
   }
+
+  public registerMiddlewaresBeforeGlobal(): void {
+    this.controllers.forEach((controller) =>
+      controller.registerMiddlewaresbeforeGlobal()
+    );
+  }
+
+  public registerMiddlewaresAfterGlobal(): void {
+    this.controllers.forEach((controller) =>
+      controller.registerMiddlewaresAfterGlobal()
+    );
+  }
 }

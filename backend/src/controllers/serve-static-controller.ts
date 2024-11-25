@@ -8,6 +8,10 @@ import { serveStatic } from "@hono/node-server/serve-static";
 export class ServeStaticController implements Controller {
   constructor(@inject(CONFIG.HonoProvider) private hono: HonoProvider) {}
 
+  public registerMiddlewaresbeforeGlobal(): void {}
+
+  public registerMiddlewaresAfterGlobal(): void {}
+
   public registerRoutes(): void {
     const distRelativeToRoot = "../frontend/dist";
 
