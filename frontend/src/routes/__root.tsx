@@ -1,6 +1,6 @@
-import Header from "@/components/layout/header";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 import { Toaster } from "react-hot-toast";
+import Header from "@/components/layout/header";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -11,7 +11,6 @@ function RootComponent() {
     <>
       <main>
         <Header user={null} />
-        <div>Root layout</div>
         <Outlet />
       </main>
       <Toaster />
