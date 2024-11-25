@@ -3,13 +3,14 @@ import { UserRepository } from "../../interfaces/user-repository.interface";
 import { PrismaClient } from "@prisma/client";
 import { CONFIG } from "../../ioc/config";
 import { User } from "../../models/user.model";
+import { PrismaProvider } from "../../prisma/prisma";
 
 @injectable()
 export class DbUserRepository implements UserRepository {
-  constructor(@inject(CONFIG.PrismaProvider) private prisma: PrismaClient) {}
+  constructor(@inject(CONFIG.PrismaProvider) private prisma: PrismaProvider) {}
 
   public async findById(id: number) {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.prisma.users.findUnique({
       where: {
         id: id,
       },
@@ -18,7 +19,7 @@ export class DbUserRepository implements UserRepository {
   }
 
   public async findByEmail(email: string): Promise<User | null> {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.prisma.users.findUnique({
       where: {
         email: email,
       },
@@ -27,11 +28,12 @@ export class DbUserRepository implements UserRepository {
   }
 
   public async findByUsername(username: string): Promise<User | null> {
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.prisma.users.findUnique({
       where: {
         username: username,
       },
     });
+
     return user;
   }
 
@@ -43,7 +45,7 @@ export class DbUserRepository implements UserRepository {
   }
 
   public async create(user: User): Promise<User> {
-    const newUser = await this.prisma.users.create({
+    const newUser = await this.prisma.prisma.users.create({
       data: {
         email: user.email,
         full_name: user.full_name,
@@ -58,7 +60,7 @@ export class DbUserRepository implements UserRepository {
   }
 
   public async update(user: User): Promise<User> {
-    const updatedUser = await this.prisma.users.update({
+    const updatedUser = await this.prisma.prisma.users.update({
       where: {
         id: user.id,
       },

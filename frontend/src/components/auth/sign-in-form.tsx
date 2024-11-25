@@ -1,5 +1,3 @@
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
@@ -25,14 +23,22 @@ export function SignInForm() {
   const form = useForm<z.infer<typeof signInFormSchema>>({
     resolver: zodResolver(signInFormSchema),
     defaultValues: {
-      email_or_username: "",
+      identifier: "",
       password: "",
     },
     mode: "onBlur",
   });
 
-  function onSubmit(values: z.infer<typeof signInFormSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof signInFormSchema>) {
+    const resp = await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
+    });
+
+    console.log(resp);
   }
 
   return (
@@ -50,7 +56,7 @@ export function SignInForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="email_or_username"
+              name="identifier"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email or Username</FormLabel>

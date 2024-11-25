@@ -5,6 +5,8 @@ WORKDIR /app/backend
 
 # Install dependencies
 COPY package*.json ./
+
+COPY prisma ./prisma
 RUN npm install
 
 # Copy source code and config

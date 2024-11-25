@@ -1,6 +1,5 @@
 import { SignInForm } from "@/components/auth/sign-in-form";
 import { Link } from "@tanstack/react-router";
-import React from "react";
 
 export default function SignInPage() {
   return (
