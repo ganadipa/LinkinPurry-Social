@@ -25,7 +25,7 @@ export class AuthMiddleware {
       return;
     }
 
-    const user = this.authStrategy.validate(token);
+    const user = await this.authStrategy.validate(token);
     c.set("user", user);
     await next();
   });

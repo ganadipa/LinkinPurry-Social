@@ -65,7 +65,17 @@ be: backend-run
 test: tests-run
 
 dev:
-	@echo "Starting development environment..."
 	@docker compose up be-dev
-	@echo "Development environment started"
+
+down: 
+	@docker compose down
+
+dev-build:
+	@docker compose up be-dev --build
+
+prod:
+	@docker compose up prod
+
+prod-build:
+	@docker compose up prod --build
 	

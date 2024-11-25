@@ -1,4 +1,5 @@
-import { Outlet, createRootRoute, notFound } from "@tanstack/react-router";
+import { Outlet, createRootRoute } from "@tanstack/react-router";
+import { Toaster } from "react-hot-toast";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -6,9 +7,12 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <main>
-      <div>Root layout</div>
-      <Outlet />
-    </main>
+    <>
+      <main>
+        <div>Root layout</div>
+        <Outlet />
+      </main>
+      <Toaster />
+    </>
   );
 }

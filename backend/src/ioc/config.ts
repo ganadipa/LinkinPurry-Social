@@ -19,4 +19,5 @@ export const CONFIG = {
   PrismaProvider: Symbol.for("PrismaProvider"),
 
   AuthMiddleware: Symbol.for("AuthMiddleware"),
+  ResponseFormatterMiddleware: Symbol.for("ResponseFormatterMiddleware"),
 };

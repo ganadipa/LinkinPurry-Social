@@ -19,6 +19,7 @@ import { PrismaProvider } from "../prisma/prisma";
 import { JwtService } from "../services/auth/jwt.service";
 import { AuthService } from "../services/auth/auth.service";
 import { ValidationService } from "../services/validation.service";
+import { ResponseFormatterMiddleware } from "../middlewares/response-formatter.middleware";
 
 export class Application {
   private container: Container;
@@ -42,12 +43,13 @@ export class Application {
       .to(AuthController)
       .inSingletonScope();
 
-    // if (process.env.ENVIRONMENT && process.env.ENVIRONMENT === "prod") {
-    this.container
-      .bind<Controller>(CONFIG.Controllers)
-      .to(ServeStaticController)
-      .inSingletonScope();
-    // }
+    if (process.env.ENVIRONMENT && process.env.ENVIRONMENT === "prod") {
+      console.log("Production environment detected");
+      this.container
+        .bind<Controller>(CONFIG.Controllers)
+        .to(ServeStaticController)
+        .inSingletonScope();
+    }
 
     this.container
       .bind<IAuthStrategy>(CONFIG.JwtAuthStrategy)
@@ -57,6 +59,9 @@ export class Application {
     this.container
       .bind<AuthMiddleware>(CONFIG.AuthMiddleware)
       .to(AuthMiddleware);
+    this.container
+      .bind<ResponseFormatterMiddleware>(CONFIG.ResponseFormatterMiddleware)
+      .to(ResponseFormatterMiddleware);
 
     this.container
       .bind<UserRepository>(CONFIG.DbUserRepository)
@@ -89,9 +94,10 @@ export class Application {
   public configureHono(): void {
     const hono = this.container.get<HonoProvider>(CONFIG.HonoProvider).app;
     hono.onError((err, c) => {
+      console.error(err);
       if (err instanceof HTTPException) {
         const formattedResponse = {
-          status: "error",
+          success: false,
           message: err.message,
           body: null,
         };
@@ -104,7 +110,7 @@ export class Application {
       c.status(500);
 
       return c.json({
-        status: "error",
+        status: false,
         message: "Internal server error",
         body: null,
       });
@@ -113,10 +119,16 @@ export class Application {
 
   public registerGlobalMiddlewares(): void {
     const hono = this.container.get<HonoProvider>(CONFIG.HonoProvider).app;
+
     const authMiddleware = this.container.get<AuthMiddleware>(
       CONFIG.AuthMiddleware
     );
     hono.use("*", authMiddleware.intercept);
+
+    const responseFormatter = this.container.get<ResponseFormatterMiddleware>(
+      CONFIG.ResponseFormatterMiddleware
+    );
+    hono.use("*", responseFormatter.intercept);
   }
 
   public getApp() {

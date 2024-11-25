@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { signInFormSchema } from "@/schemas/auth/sign-in-form.schema";
+import toast from "react-hot-toast";
 
 export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -37,8 +38,11 @@ export function SignInForm() {
       },
       body: JSON.stringify(values),
     });
-
-    console.log(resp);
+    const data = await resp.json();
+    if (!resp.ok) {
+      toast.error(data.message);
+      return;
+    }
   }
 
   return (

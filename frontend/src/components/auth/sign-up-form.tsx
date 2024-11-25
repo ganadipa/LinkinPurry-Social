@@ -18,6 +18,7 @@ import {
   RegistrationFormValues,
   registrationFormSchema,
 } from "@/schemas/auth/sign-up-form.schema";
+import toast from "react-hot-toast";
 
 const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -28,15 +29,35 @@ const SignUpForm = () => {
     defaultValues: {
       username: "",
       email: "",
-      fullName: "",
+      name: "",
       password: "",
       confirmPassword: "",
     },
     mode: "onBlur",
   });
 
-  const onSubmit = (values: RegistrationFormValues) => {
-    console.log(values);
+  const onSubmit = async (values: RegistrationFormValues) => {
+    const toastId = toast.loading("Creating account...");
+    const resp = await fetch("/api/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
+    });
+    const data = await resp.json();
+    if (!resp.ok) {
+      toast.dismiss(toastId);
+      toast.error(data.message);
+      return;
+    } else {
+      toast.dismiss(toastId);
+      toast.success("Account created successfully");
+      toast.loading("Redirecting to login page...");
+      // setTimeout(() => {
+      //   window.location.href = "/signin";
+      // }, 2000);
+    }
   };
 
   return (
@@ -93,7 +114,7 @@ const SignUpForm = () => {
 
             <FormField
               control={form.control}
-              name="fullName"
+              name="name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Full Name</FormLabel>

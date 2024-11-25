@@ -1,7 +1,5 @@
-import { SignInForm } from "@/components/auth/sign-in-form";
 import SignUpForm from "@/components/auth/sign-up-form";
 import { Link } from "@tanstack/react-router";
-import React from "react";
 
 export default function SignUpPage() {
   return (

@@ -1,4 +1,3 @@
-import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import SignUpPage from "@/pages/auth/sign-up";
 

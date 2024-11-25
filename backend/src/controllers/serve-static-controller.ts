@@ -18,6 +18,7 @@ export class ServeStaticController implements Controller {
     this.hono.app.use("/*", serveStatic({ root: distRelativeToRoot }));
 
     this.hono.app.get("*", async (c, next) => {
+      console.log("here");
       return await serveStatic({
         root: distRelativeToRoot,
         path: "index.html",

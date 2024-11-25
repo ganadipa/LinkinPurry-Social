@@ -56,7 +56,9 @@ export class AuthService {
 
     const existingUsername = await this.userRepository.findByUsername(username);
     if (existingUsername) {
+      console.log(existingUsername);
       throw new BadRequestException("Username is already in use");
+      console.log("why am i even here");
     }
 
     const password_hash = bcrypt.hashSync(password, 10);

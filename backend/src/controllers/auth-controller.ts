@@ -5,6 +5,7 @@ import { HonoProvider } from "../core/hono-provider";
 import { AuthService } from "../services/auth/auth.service";
 import { ValidationService } from "../services/validation.service";
 import {
+  LoginPayload,
   loginPayloadChecker,
   registerPayloadChecker,
 } from "../constants/request-payload";
@@ -12,6 +13,7 @@ import { IAuthStrategy } from "../interfaces/auth-strategy.interface";
 import { setCookie } from "hono/cookie";
 import { BadRequestException } from "../exceptions/bad-request.exception";
 import { InternalErrorException } from "../exceptions/internal-error.exception";
+import { HTTPException } from "hono/http-exception";
 
 @injectable()
 export class AuthController implements Controller {
@@ -41,10 +43,12 @@ export class AuthController implements Controller {
 
   public registerRoutes(): void {
     this.hono.app.post("/api/login", async (c) => {
+      const payload = (await c.req.json()) as LoginPayload;
       const user = c.var.user;
+      console.log(user);
       let token;
       if (!user) {
-        token = await this.authService.login(await c.req.json());
+        token = await this.authService.login(payload);
       } else {
         if (!user.id) {
           throw new InternalErrorException(
@@ -52,10 +56,7 @@ export class AuthController implements Controller {
           );
         }
 
-        token = await this.authStrategy.getToken(
-          user.id.toString(),
-          user.email
-        );
+        token = await this.authService.login(payload);
       }
 
       const tokenPayload = this.authStrategy.getPayload(token);
@@ -64,6 +65,7 @@ export class AuthController implements Controller {
       }
 
       const { iat, exp } = tokenPayload;
+      console.log(tokenPayload);
 
       setCookie(c, "authorization", token, {
         httpOnly: true,
@@ -72,13 +74,34 @@ export class AuthController implements Controller {
         maxAge: exp - iat,
       });
 
-      return c.json({ token });
+      return c.json({
+        success: true,
+        message: "Successfully logged in",
+        body: {
+          token,
+        },
+      });
     });
 
     this.hono.app.post("/api/register", async (c) => {
-      const payload = await c.req.json();
-      const token = this.authService.register(payload);
-      return c.json({ token });
+      try {
+        const payload = await c.req.json();
+        const token = await this.authService.register(payload);
+
+        return c.json({
+          success: true,
+          message: "Successfully registered",
+          body: {
+            token,
+          },
+        });
+      } catch (exception) {
+        console.log(exception);
+        if (exception instanceof HTTPException) {
+          throw exception;
+        }
+        throw new InternalErrorException("Error registering user");
+      }
     });
   }
 }
