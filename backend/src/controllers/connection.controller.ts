@@ -20,7 +20,7 @@ export class ConnectionController implements Controller {
   public registerMiddlewaresbeforeGlobal(): void {}
 
   public registerMiddlewaresAfterGlobal(): void {
-    this.hono.app.get("/api/connection/check", async (c, next) => {
+    this.hono.app.post("/api/connection/check", async (c, next) => {
       const payload = await c.req.json();
       this.zodValidationService.validate(payload, fromId_toIdSchema);
       await next();
@@ -165,7 +165,7 @@ export class ConnectionController implements Controller {
     });
 
     // check connection
-    this.hono.app.get("/api/connection/check", async (c) => {
+    this.hono.app.post("/api/connection/check", async (c) => {
       const { from_id, to_id } = await c.req.json();
       const connection = await this.connectionService.checkConnection(
         from_id,
@@ -174,7 +174,9 @@ export class ConnectionController implements Controller {
       return c.json({
         success: true,
         message: "Connection checked successfully",
-        body: connection,
+        body: {
+          connected: connection,
+        },
       });
     });
   }
