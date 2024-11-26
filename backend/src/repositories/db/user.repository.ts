@@ -70,6 +70,7 @@ export class DbUserRepository implements UserRepository {
   }
 
   public async searchUsers(keyword: string): Promise<User[]> {
+    console.log("user repo, searching for users with keyword: ", keyword); // debug
     const users = await this.prisma.prisma.users.findMany({
       where: keyword
         ? {

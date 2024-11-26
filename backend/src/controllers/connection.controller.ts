@@ -20,6 +20,7 @@ export class ConnectionController implements Controller {
         // search users
         this.hono.app.get("/api/users", async (c) => {
             const searchQuery = c.req.query("search") || "";
+            console.log("searchQuery: ", searchQuery); // debug
             const users = await this.connectionService.searchUsers(searchQuery);
         
             return c.json({

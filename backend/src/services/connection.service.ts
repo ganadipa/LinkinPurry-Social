@@ -12,6 +12,7 @@ export class ConnectionService {
     ) {}
     
     async searchUsers(keyword: string) {
+        console.log("conn serv, searching for users with keyword: ", keyword); // debug
         return await this.userRepository.searchUsers(keyword);
     }    
 
