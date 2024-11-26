@@ -21,6 +21,11 @@ import { AuthService } from "../services/auth/auth.service";
 import { ValidationService } from "../services/validation.service";
 import { ResponseFormatterMiddleware } from "../middlewares/response-formatter.middleware";
 
+import { ConnectionController } from "../controllers/connection.controller";
+import { ConnectionService } from "../services/connection.service";
+import { ConnectionRepository } from "../interfaces/connection-repository.interface";
+import { DbConnectionRepository } from "../repositories/db/connection.repository";
+
 export class Application {
   private container: Container;
 
@@ -77,6 +82,20 @@ export class Application {
     this.container
       .bind<ValidationService>(CONFIG.ValidationService)
       .to(ValidationService);
+    
+    this.container
+      .bind<Controller>(CONFIG.Controllers)
+      .to(ConnectionController)
+      .inSingletonScope();
+
+    this.container
+      .bind<ConnectionService>(CONFIG.ConnectionService)
+      .to(ConnectionService)
+      .inSingletonScope();
+
+    this.container
+      .bind<ConnectionRepository>(CONFIG.ConnectionRepository)
+      .to(DbConnectionRepository);
   }
 
   public start(port: number): void {

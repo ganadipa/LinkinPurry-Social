@@ -45,7 +45,6 @@ export default function ConnectionRequestsPage() {
           <UserCard
             key={req.request_from_id}
             name={user?.name || ""}
-            description={user?.description || ""}
             profilePhoto={user?.profilePhoto || ""}
             status="pending"
             onAccept={() => handleResponse(user!.id, true)}

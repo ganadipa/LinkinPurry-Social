@@ -36,7 +36,6 @@ export default function UserListPage() {
                     <UserCard
                         key={user.id}
                         name={user.name}
-                        description={user.description}
                         profilePhoto={user.profilePhoto}
                         status={determineStatus(user.id, currentUser.id)}
                         onConnect={() => handleConnect(user.id)}

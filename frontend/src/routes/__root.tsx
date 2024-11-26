@@ -2,6 +2,7 @@ import { AuthContext } from "@/contexts/auth-context";
 import { useAuth } from "@/hooks/auth";
 import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 import { Toaster } from "react-hot-toast";
+import Header from "@/components/layout/header";
 
 type RouterContext = {
   authentication: AuthContext;
@@ -20,6 +21,7 @@ function RootComponent() {
   return (
     <>
       <main>
+        <Header user={null} />
         <div>Root layout</div>
         <div>You are logged in as {user?.email ?? "guest"}</div>
         <Outlet />
