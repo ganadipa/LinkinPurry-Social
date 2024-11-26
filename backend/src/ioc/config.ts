@@ -10,6 +10,7 @@ export const CONFIG = {
   AuthService: Symbol.for("AuthService"),
   ValidationService: Symbol.for("ValidationService"),
   ConnectionService: Symbol.for("ConnectionService"),
+  ProfileService: Symbol.for("ProfileService"),
 
   AuthStrategy: Symbol.for("Jwt"),
   JwtAuthStrategy: Symbol.for("Jwt"),

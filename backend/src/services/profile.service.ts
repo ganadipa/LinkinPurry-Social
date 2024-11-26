@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
 
 @injectable()
-export class ConnectionService {
+export class ProfileService {
     constructor() {}
 }

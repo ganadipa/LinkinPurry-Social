@@ -25,6 +25,7 @@ import { ConnectionController } from "../controllers/connection.controller";
 import { ConnectionService } from "../services/connection.service";
 import { ConnectionRepository } from "../interfaces/connection-repository.interface";
 import { DbConnectionRepository } from "../repositories/db/connection.repository";
+import { ProfileService } from "../services/profile.service";
 
 export class Application {
   private container: Container;
@@ -91,6 +92,11 @@ export class Application {
     this.container
       .bind<ConnectionService>(CONFIG.ConnectionService)
       .to(ConnectionService)
+      .inSingletonScope();
+
+    this.container
+      .bind<ProfileService>(CONFIG.ProfileService)
+      .to(ProfileService)
       .inSingletonScope();
 
     this.container
