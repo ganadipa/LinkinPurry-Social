@@ -15,7 +15,6 @@ export const CONFIG = {
   JwtAuthStrategy: Symbol.for("Jwt"),
 
   UserRepository: Symbol.for("DbUserRepository"),
-  DbUserRepository: Symbol.for("DbUserRepository"),
   ConnectionRepository: Symbol.for("DbConnectionRepository"),
 
   PrismaProvider: Symbol.for("PrismaProvider"),

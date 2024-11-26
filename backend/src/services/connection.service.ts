@@ -8,6 +8,7 @@ export class ConnectionService {
     constructor(
         @inject(CONFIG.ConnectionRepository)
         private connectionRepository: ConnectionRepository,
+        @inject(CONFIG.UserRepository)
         private userRepository: UserRepository
     ) {}
     
