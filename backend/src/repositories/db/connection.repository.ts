@@ -2,16 +2,17 @@ import { inject, injectable } from "inversify";
 import { PrismaProvider } from "../../prisma/prisma";
 import { ConnectionRepository } from "../../interfaces/connection-repository.interface";
 import { CONFIG } from "../../ioc/config";
+import { Connection, ConnectionRequest } from "../../models/connection.model";
 
 @injectable()
 export class DbConnectionRepository implements ConnectionRepository {
     constructor(@inject(CONFIG.PrismaProvider) private prisma: PrismaProvider) {}
     
-    async getConnectionsByUserId(userId: bigint): Promise<any[]> {
+    async getConnectionsByUserId(userId: bigint): Promise<Connection[]> {
         return await this.prisma.prisma.connection.findMany({
             where: { from_id: userId },
             include: {
-                users_connection_to_idTousers: true,
+                users_connection_to_idTousers: false,
             },
         });
     }
@@ -36,7 +37,7 @@ export class DbConnectionRepository implements ConnectionRepository {
         });
     }
     
-    async getConnectionRequests(userId: bigint): Promise<any[]> {
+    async getConnectionRequests(userId: bigint): Promise<ConnectionRequest[]> {
         return await this.prisma.prisma.connection_request.findMany({
             where: { to_id: userId },
             orderBy: { created_at: "desc" },
@@ -44,10 +45,27 @@ export class DbConnectionRepository implements ConnectionRepository {
     }
     
     async createConnectionRequest(fromId: bigint, toId: bigint): Promise<void> {
-        await this.prisma.prisma.connection_request.create({
-            data: { from_id: fromId, to_id: toId, created_at: new Date() },
+        const existingRequest = await this.prisma.prisma.connection_request.findUnique({
+            where: {
+                from_id_to_id: {
+                    from_id: fromId,
+                    to_id: toId,
+                },
+            },
         });
-    }
+    
+        if (existingRequest) {
+            throw new Error("Connection request already exists.");
+        }
+    
+        await this.prisma.prisma.connection_request.create({
+            data: {
+                from_id: fromId,
+                to_id: toId,
+                created_at: new Date(),
+            },
+        });
+    }    
     
     async removeConnectionRequest(fromId: bigint, toId: bigint): Promise<void> {
         await this.prisma.prisma.connection_request.delete({

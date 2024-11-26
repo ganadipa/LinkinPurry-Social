@@ -4,6 +4,7 @@ import { CONFIG } from "../ioc/config";
 import { HonoProvider } from "../core/hono-provider";
 import { ConnectionService } from "../services/connection.service";
 import { BadRequestException } from "../exceptions/bad-request.exception";
+import { json } from "stream/consumers";
 
 @injectable()
 export class ConnectionController implements Controller {
@@ -22,11 +23,20 @@ export class ConnectionController implements Controller {
             const searchQuery = c.req.query("search") || "";
             console.log("searchQuery: ", searchQuery); // debug
             const users = await this.connectionService.searchUsers(searchQuery);
+
+            const jsonFriendlyUsers = users.map((user) => {
+                return {
+                    ...user,
+                    id: Number(user.id),
+                }}
+            );
+
+            console.log("jsonFriendlyUsers: ", jsonFriendlyUsers); // debug
         
             return c.json({
                 success: true,
                 message: "Users retrieved successfully",
-                body: users,
+                body: jsonFriendlyUsers,
             });
         });
 
@@ -38,10 +48,19 @@ export class ConnectionController implements Controller {
             }
             const userId = BigInt(user.id);
             const connections = await this.connectionService.getConnections(userId);
+            console.log("connections: ", connections); // debug
+
+            const jsonFriendlyConnections = connections.map((conn) => ({
+                ...conn,
+                from_id: Number(conn.from_id),
+                to_id: Number(conn.to_id),
+            }));
+            console.log("jsonFriendlyConnections: ", jsonFriendlyConnections); // debug
+
             return c.json({
                 success: true,
                 message: "Connections retrieved successfully",
-                body: connections,
+                body: jsonFriendlyConnections,
             });
         });
         
@@ -94,10 +113,17 @@ export class ConnectionController implements Controller {
             }
             const userId = BigInt(user.id);
             const requests = await this.connectionService.getConnectionRequests(userId);
+
+            const jsonFriendlyRequests = requests.map((req) => ({
+                ...req,
+                from_id: Number(req.from_id),
+                to_id: Number(req.to_id),
+            }));
+
             return c.json({
                 success: true,
                 message: "Connection requests retrieved successfully",
-                body: requests,
+                body: jsonFriendlyRequests,
             });
         });
         
