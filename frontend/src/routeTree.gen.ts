@@ -19,6 +19,7 @@ import { Route as publicConnectionsImport } from './routes/(public)/connections'
 import { Route as profileProfileImport } from './routes/(profile)/profile'
 import { Route as authorizationAuthImport } from './routes/(authorization)/_auth'
 import { Route as authenticatedRequestsImport } from './routes/(authenticated)/requests'
+import { Route as publicProfileIdImport } from './routes/(public)/profile.$id'
 import { Route as authorizationAuthSignupImport } from './routes/(authorization)/_auth/signup'
 import { Route as authorizationAuthSigninImport } from './routes/(authorization)/_auth/signin'
 
@@ -65,6 +66,12 @@ const authorizationAuthRoute = authorizationAuthImport.update({
 const authenticatedRequestsRoute = authenticatedRequestsImport.update({
   id: '/(authenticated)/requests',
   path: '/requests',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const publicProfileIdRoute = publicProfileIdImport.update({
+  id: '/(public)/profile/$id',
+  path: '/profile/$id',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -147,6 +154,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authorizationAuthSignupImport
       parentRoute: typeof authorizationAuthImport
     }
+    '/(public)/profile/$id': {
+      id: '/(public)/profile/$id'
+      path: '/profile/$id'
+      fullPath: '/profile/$id'
+      preLoaderRoute: typeof publicProfileIdImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -185,6 +199,7 @@ export interface FileRoutesByFullPath {
   '/users': typeof publicUsersRoute
   '/signin': typeof authorizationAuthSigninRoute
   '/signup': typeof authorizationAuthSignupRoute
+  '/profile/$id': typeof publicProfileIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -195,6 +210,7 @@ export interface FileRoutesByTo {
   '/users': typeof publicUsersRoute
   '/signin': typeof authorizationAuthSigninRoute
   '/signup': typeof authorizationAuthSignupRoute
+  '/profile/$id': typeof publicProfileIdRoute
 }
 
 export interface FileRoutesById {
@@ -208,6 +224,7 @@ export interface FileRoutesById {
   '/(public)/': typeof publicIndexRoute
   '/(authorization)/_auth/signin': typeof authorizationAuthSigninRoute
   '/(authorization)/_auth/signup': typeof authorizationAuthSignupRoute
+  '/(public)/profile/$id': typeof publicProfileIdRoute
 }
 
 export interface FileRouteTypes {
@@ -220,6 +237,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/signin'
     | '/signup'
+    | '/profile/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/requests'
@@ -229,6 +247,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/signin'
     | '/signup'
+    | '/profile/$id'
   id:
     | '__root__'
     | '/(authenticated)/requests'
@@ -240,6 +259,7 @@ export interface FileRouteTypes {
     | '/(public)/'
     | '/(authorization)/_auth/signin'
     | '/(authorization)/_auth/signup'
+    | '/(public)/profile/$id'
   fileRoutesById: FileRoutesById
 }
 
@@ -250,6 +270,7 @@ export interface RootRouteChildren {
   publicConnectionsRoute: typeof publicConnectionsRoute
   publicUsersRoute: typeof publicUsersRoute
   publicIndexRoute: typeof publicIndexRoute
+  publicProfileIdRoute: typeof publicProfileIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -259,6 +280,7 @@ const rootRouteChildren: RootRouteChildren = {
   publicConnectionsRoute: publicConnectionsRoute,
   publicUsersRoute: publicUsersRoute,
   publicIndexRoute: publicIndexRoute,
+  publicProfileIdRoute: publicProfileIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -276,7 +298,8 @@ export const routeTree = rootRoute
         "/(profile)/profile",
         "/(public)/connections",
         "/(public)/users",
-        "/(public)/"
+        "/(public)/",
+        "/(public)/profile/$id"
       ]
     },
     "/(authenticated)/requests": {
@@ -315,6 +338,9 @@ export const routeTree = rootRoute
     "/(authorization)/_auth/signup": {
       "filePath": "(authorization)/_auth/signup.tsx",
       "parent": "/(authorization)/_auth"
+    },
+    "/(public)/profile/$id": {
+      "filePath": "(public)/profile.$id.tsx"
     }
   }
 }
