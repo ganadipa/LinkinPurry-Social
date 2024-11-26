@@ -78,6 +78,6 @@ export type fromId_toId = {
 };
 
 export const fromId_toIdSchema = z.object({
-  fromId: z.number(),
-  toId: z.number(),
+  from_id: z.number(),
+  to_id: z.number(),
 });

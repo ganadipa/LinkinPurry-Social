@@ -19,15 +19,34 @@ export const registerResponse = z.object({
 });
 
 export const getUsersResponse = z.object({
-    success: z.boolean(),
-    message: z.string(),
-    body: z.array(
-        z.object({
-            id: z.number(),
-            full_name: z.string(),
-            profile_photo_path: z.string(),
-        })
-    )
-})
+  success: z.boolean(),
+  message: z.string(),
+  body: z.array(
+    z.object({
+      id: z.number(),
+      full_name: z.string(),
+      profile_photo_path: z.string(),
+    })
+  ),
+});
 
-
+export const profileResponse = z.object({
+  success: z.boolean(),
+  message: z.string(),
+  body: z.object({
+    username: z.string(),
+    name: z.string(),
+    work_history: z.string().nullable(),
+    skills: z.string().nullable(),
+    connection_count: z.number(),
+    profile_photo: z.string(),
+    relevant_posts: z.array(
+      z.object({
+        created_at: z.string().nullable(),
+        id: z.number().nullable(),
+        content: z.string(),
+        updated_at: z.string().nullable(),
+      })
+    ),
+  }),
+});

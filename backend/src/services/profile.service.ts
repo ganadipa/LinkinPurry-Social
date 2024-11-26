@@ -79,7 +79,7 @@ export class ProfileService {
       skills: user.skills,
       connection_count: countConnections,
       profile_photo: user.profile_photo_path,
-      relevant_posts: [],
+      relevant_posts: posts,
     };
   }
 }

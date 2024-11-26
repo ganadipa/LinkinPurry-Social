@@ -1,12 +1,11 @@
-import * as React from 'react'
-import { createFileRoute } from '@tanstack/react-router'
-import ProfilePage from '@/pages/ProfilePage'
+import ProfilePage2 from "@/pages/ProfilePage2";
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/(public)/profile/$id')({
+export const Route = createFileRoute("/(public)/profile/$id")({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-    const { id } = Route.useParams()
-  return <ProfilePage id={Number(id)} />
+  const { id } = Route.useParams();
+  return <ProfilePage2 id={Number(id)} />;
 }
