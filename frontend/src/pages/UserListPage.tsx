@@ -47,7 +47,6 @@ export default function UserListPage() {
                         statusMap[user.id] = "not_connected";
                     } else {
                         statusMap[user.id] = await determineStatus(user.id, currentUser.id || 0);
-                        alert("statusMap user.id" + user.id + statusMap[user.id]); // debug
                     }
                 });
 

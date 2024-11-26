@@ -21,7 +21,6 @@ export async function determineStatus(
         }
         
         const connectionsData = await connectionsResponse.json();
-        alert("connectionsData: " + connectionsData); // debug
         const requestsData = await requestsResponse.json();
         
         const connections = connectionsData.body || [];

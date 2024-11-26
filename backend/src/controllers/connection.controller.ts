@@ -52,20 +52,28 @@ export class ConnectionController implements Controller {
 
     // get connections
     this.hono.app.get("/api/connections", async (c) => {
+      const userIdQuery = c.req.query("user_id");
       const user = c.var.user;
-      if (!user || user.id === undefined) {
-        throw new BadRequestException("User not found or user ID is undefined");
+
+      const targetUserId = userIdQuery
+        ? BigInt(userIdQuery)
+        : user?.id !== undefined
+        ? BigInt(user.id)
+        : undefined;
+
+      if (!targetUserId) {
+        throw new BadRequestException("User ID is undefined");
       }
-      const userId = BigInt(user.id);
-      const connections = await this.connectionService.getConnections(userId);
-      console.log("connections: ", connections); // debug
+
+      const connections = await this.connectionService.getConnections(
+        targetUserId
+      );
 
       const jsonFriendlyConnections = connections.map((conn) => ({
         ...conn,
         from_id: Number(conn.from_id),
         to_id: Number(conn.to_id),
       }));
-      console.log("jsonFriendlyConnections: ", jsonFriendlyConnections); // debug
 
       return c.json({
         success: true,
@@ -174,9 +182,7 @@ export class ConnectionController implements Controller {
       return c.json({
         success: true,
         message: "Connection checked successfully",
-        body: {
-          connected: connection,
-        },
+        body: connection,
       });
     });
   }
