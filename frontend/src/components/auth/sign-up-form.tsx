@@ -19,6 +19,7 @@ import {
   registrationFormSchema,
 } from "@/schemas/auth/sign-up-form.schema";
 import toast from "react-hot-toast";
+import { redirect } from "@/lib/utils";
 
 const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -55,7 +56,9 @@ const SignUpForm = () => {
       toast.success("Account created successfully");
       toast.loading("Redirecting to login page...");
       setTimeout(() => {
-        window.location.href = "/signin";
+        redirect({
+          to: "/signin",
+        });
       }, 2000);
     }
   };
