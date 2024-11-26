@@ -21,7 +21,7 @@ function RootComponent() {
   return (
     <>
       <main>
-        <Header user={null} />
+        <Header />
         <div>Root layout</div>
         <div>You are logged in as {user?.email ?? "guest"}</div>
         <Outlet />

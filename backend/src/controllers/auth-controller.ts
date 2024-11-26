@@ -10,7 +10,7 @@ import {
   registerPayloadChecker,
 } from "../constants/request-payload";
 import { IAuthStrategy } from "../interfaces/auth-strategy.interface";
-import { setCookie } from "hono/cookie";
+import { deleteCookie, setCookie } from "hono/cookie";
 import { BadRequestException } from "../exceptions/bad-request.exception";
 import { InternalErrorException } from "../exceptions/internal-error.exception";
 import { HTTPException } from "hono/http-exception";
@@ -114,7 +114,6 @@ export class AuthController implements Controller {
           body: null,
         });
       }
-      console.log("here");
 
       return c.json({
         success: true,
@@ -125,6 +124,15 @@ export class AuthController implements Controller {
           name: user.full_name,
           username: user.username,
         },
+      });
+    });
+
+    this.hono.app.post("/api/logout", async (c) => {
+      deleteCookie(c, "authorization");
+      return c.json({
+        success: true,
+        message: "Successfully logged out",
+        body: null,
       });
     });
   }

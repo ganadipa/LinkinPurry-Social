@@ -1,11 +1,21 @@
+import { loginResponse } from "@/types/response";
 import { User } from "@/types/user";
 import React, { useEffect, useState } from "react";
 
 export interface AuthContext {
   user: User | null;
   isLoading: boolean;
-  login: (identifier: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
+  login: (
+    identifier: string,
+    password: string
+  ) => Promise<{
+    ok: boolean;
+    message: string;
+  }>;
+  logout: () => Promise<{
+    ok: boolean;
+    message: string;
+  }>;
 }
 
 export const AuthContext = React.createContext<AuthContext | null>(null);
@@ -46,22 +56,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     const json = await response.json();
-    if (response.ok) {
+    const expected = loginResponse.safeParse(json);
+    if (expected.success) {
       setUser(json);
       setIsLoading(false);
+      return {
+        ok: true,
+        message: expected.data.message,
+      };
     } else {
-      throw new Error(json.message);
+      return {
+        ok: false,
+        message: "Something went wrong",
+      };
     }
   };
 
   const logout = async () => {
     setIsLoading(true);
-    await fetch("/api/logout", {
+    const resp = await fetch("/api/logout", {
       method: "POST",
     });
 
-    setUser(null);
-    setIsLoading(false);
+    if (resp.ok) {
+      setUser(null);
+      setIsLoading(false);
+      return {
+        ok: true,
+        message: "Successfully logged out",
+      };
+    } else {
+      return {
+        ok: false,
+        message: "Something went wrong",
+      };
+    }
   };
 
   return (

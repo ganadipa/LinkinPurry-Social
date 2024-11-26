@@ -17,9 +17,11 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { signInFormSchema } from "@/schemas/auth/sign-in-form.schema";
 import toast from "react-hot-toast";
+import { useAuth } from "@/hooks/auth";
 
 export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const { login } = useAuth();
 
   const form = useForm<z.infer<typeof signInFormSchema>>({
     resolver: zodResolver(signInFormSchema),
@@ -31,17 +33,11 @@ export function SignInForm() {
   });
 
   async function onSubmit(values: z.infer<typeof signInFormSchema>) {
-    const resp = await fetch("/api/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values),
-    });
-    const data = await resp.json();
-    if (!resp.ok) {
-      toast.error(data.message);
-      return;
+    const { ok, message } = await login(values.identifier, values.password);
+    if (!ok) {
+      toast.error(message);
+    } else {
+      toast.success("Signed in successfully");
     }
   }
 
