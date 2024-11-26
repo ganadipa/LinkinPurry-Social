@@ -1,3 +1,4 @@
+import Loading from "@/components/loading";
 import { useAuth } from "@/hooks/auth";
 import { redirect } from "@/lib/utils";
 import { Outlet, createFileRoute } from "@tanstack/react-router";
@@ -10,16 +11,17 @@ function RouteComponent() {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
+  console.log("user", user);
   if (user) {
-    redirect({ to: "/" });
+    // redirect({ to: "/" });
     return;
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col gap-4 items-center justify-center p-4">
+    <div className="min-h-screen bg-[#f4f2ee] flex flex-col gap-4 items-center justify-center p-4">
       <Outlet />
     </div>
   );

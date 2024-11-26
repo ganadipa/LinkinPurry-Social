@@ -58,10 +58,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const json = await response.json();
     const expected = loginResponse.safeParse(json);
     if (expected.success) {
-      setUser(json);
+      setUser(json.body);
       setIsLoading(false);
       return {
-        ok: true,
+        ok: expected.data.success,
         message: expected.data.message,
       };
     } else {

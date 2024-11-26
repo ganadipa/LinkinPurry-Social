@@ -1,3 +1,4 @@
+import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./contexts/auth-context";
 import { useAuth } from "./hooks/auth";
 import { routeTree } from "./routeTree.gen";
@@ -24,8 +25,18 @@ function InnerApp() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <InnerApp />
-    </AuthProvider>
+    <>
+      <Toaster
+        position="bottom-right"
+        reverseOrder={false}
+        gutter={8}
+        toastOptions={{
+          duration: 5000,
+        }}
+      />
+      <AuthProvider>
+        <InnerApp />
+      </AuthProvider>
+    </>
   );
 }

@@ -1,5 +1,6 @@
 import { useAuth } from "@/hooks/auth";
 import { useState } from "react";
+import homeImage from "../../assets/home.png";
 
 const Header = () => {
   const [isSidenavOpen, setSidenavOpen] = useState(false);
@@ -8,8 +9,8 @@ const Header = () => {
   const toggleSidenav = () => setSidenavOpen((prev) => !prev);
 
   return (
-    <header className="bg-white fixed top-0 left-0 right-0 z-50 shadow-md">
-      <nav className="flex justify-between items-center max-w-screen-xl mx-auto h-14 px-4">
+    <header className="bg-white sticky top-0 left-0 right-0 z-50 shadow-md">
+      <nav className="flex justify-between items-center max-w-screen-xl mx-auto h-14 px-4 ">
         <div className="flex items-center space-x-4">
           <a href="/" aria-label="LinkedIn Home">
             <img
@@ -35,7 +36,7 @@ const Header = () => {
         <div className="hidden md:flex items-center space-x-6">
           <a href="/" className="flex flex-col items-center text-gray-500">
             <img
-              src="/public/images/home.png"
+              src={homeImage}
               alt="Home"
               className="w-6 h-6 mb-1 invert-[0.5]"
             />
