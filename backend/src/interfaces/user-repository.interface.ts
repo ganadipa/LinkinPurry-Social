@@ -7,4 +7,5 @@ export interface UserRepository {
   create(user: User): Promise<User>;
   update(user: User): Promise<User>;
   save(user: User): Promise<User>;
+  searchUsers(keyword: string): Promise<User[]>; 
 }
