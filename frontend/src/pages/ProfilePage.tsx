@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { MdAdd, MdEditSquare } from "react-icons/md";
+import { MdAdd, MdDelete, MdEditSquare, MdFileUpload } from "react-icons/md";
 import { useAuth } from "@/hooks/auth";
 import { Link } from "@tanstack/react-router";
 import { Profile } from "@/types/profile";
@@ -19,33 +19,48 @@ import { User } from "@/types/user";
 export default function ProfilePage({ id }: { id: number }) {
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
   const [photoModalOpen, setPhotoModalOpen] = useState<boolean>(false);
-  const [experienceModalOpen, setExperienceModalOpen] =
-    useState<boolean>(false);
+  const [workHistoryModalOpen, setWorkHistoryModalOpen] = useState<boolean>(false);
   const [skillModalOpen, setSkillModalOpen] = useState<boolean>(false);
   const [newSkill, setNewSkill] = useState<string>("");
   const authenticated = useAuth();
   const [connected, setConnected] = useState<boolean>(true);
-
-  const [user, setUser] = useState<User | null>(authenticated.user);
+  
+  const [user] = useState<User | null>(authenticated.user);
 
   const [profile, setProfile] = useState<Profile>({
     username: "ahmadmudabbir",
-    profile_photo: new File([], "/public/images/img-placeholder.jpg"),
+    profile_photo: "/public/images/img-placeholder.svg",
     name: "Ahmad Mudabbir Arif",
     work_history:
       "Software Engineer at Tech Corp (2020 - Present)\nJunior Developer at Startup Inc (2018 - 2020)",
     skills: "React, Node.js, TypeScript, GraphQL, AWS",
+    connection_count: 100,
   });
 
-  const skillsArray = profile.skills.split(",").map((skill) => skill.trim());
+  const skillsArray = (profile.skills ?? "").split(",").map((skill) => skill.trim());
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
   };
+  
+  const handleEditPhoto = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const imageUrl = URL.createObjectURL(file);
+      setProfile({ ...profile, profile_photo: imageUrl });
+      setPhotoModalOpen(false);
+
+      console.log("Uploading photo:", file);
+      // Example: Perform API request to upload
+      // uploadPhoto(file).then((url) => {
+      //   setProfile({ ...profile, profile_photo: url });
+      // });
+    }
+  };
 
   const handleDeletePhoto = () => {
-    setProfile({ ...profile, profile_photo: new File([], "placeholder.jpg") });
+    setProfile({ ...profile, profile_photo: "/public/images/img-placeholder.svg" });
     setPhotoModalOpen(false);
   };
 
@@ -75,7 +90,7 @@ export default function ProfilePage({ id }: { id: number }) {
 
   return (
     <>
-      <div className="max-w-5xl mx-auto mt-16 p-6 space-y-6">
+      <div className="max-w-5xl mx-auto p-6 space-y-6">
         <div className="bg-white rounded-lg shadow border">
           <div className="relative h-52">
             <img
@@ -98,7 +113,7 @@ export default function ProfilePage({ id }: { id: number }) {
             <div className="flex flex-col items-start">
               <div className="relative">
                 <img
-                  src={profile.profile_photo.name}
+                  src={profile.profile_photo}
                   alt="Profile Picture"
                   className="w-40 h-40 rounded-full border-4 border-white shadow-lg object-cover cursor-pointer"
                   onClick={() => setPhotoModalOpen(true)}
@@ -109,9 +124,9 @@ export default function ProfilePage({ id }: { id: number }) {
               <h1 className="text-2xl font-semibold">{user?.name}</h1>
               <p className="text-gray-600">{user?.email}</p>
               {/* <p className="text-gray-600">{profile.location}</p> */}
-              <Link to="/connections" className="text-blue-500 hover:underline">
+              <Link to={`/connections/${id}`} className="text-blue-500 hover:underline">
                 <p className="text-blue-500">
-                  <b>100</b> connections
+                  <b>{profile.connection_count}</b> connections
                 </p>
               </Link>
             </div>
@@ -135,7 +150,7 @@ export default function ProfilePage({ id }: { id: number }) {
 
         <div className="bg-white rounded-lg shadow border p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Experience</h2>
+            <h2 className="text-xl font-semibold">Work History</h2>
             <div className="space-x-2">
               {authenticated.user?.id === id && (
                 <Button
@@ -143,7 +158,7 @@ export default function ProfilePage({ id }: { id: number }) {
                   className="bg-white shadow-sm"
                   onClick={() => {
                     // setCurrentExperience(null);
-                    setExperienceModalOpen(true);
+                    setWorkHistoryModalOpen(true);
                   }}
                 >
                   Edit
@@ -159,14 +174,16 @@ export default function ProfilePage({ id }: { id: number }) {
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Skills</h2>
             {authenticated.user?.id === id && (
-              <Button
-                variant="ghost"
-                className="bg-white shadow-sm"
-                onClick={() => setSkillModalOpen(true)}
-              >
-                <MdAdd />
-                Add Skill
-              </Button>
+              <div className="space-x-2">
+                <Button
+                  variant="ghost"
+                  className="bg-white shadow-sm"
+                  onClick={() => setSkillModalOpen(true)}
+                >
+                  <MdAdd />
+                  Add Skill
+                </Button>
+              </div>
             )}
           </div>
           <div className="flex flex-wrap gap-2">
@@ -174,7 +191,7 @@ export default function ProfilePage({ id }: { id: number }) {
               <Badge
                 key={index}
                 variant="default"
-                className="cursor-pointer hover:bg-red-500"
+                className="cursor-pointer bg-[#0a66c2] text-white hover:bg-[#004182] rounded-full px-4 py-2"
                 onClick={() => authenticated ?? handleDeleteSkill(skill)}
               >
                 {skill}
@@ -192,15 +209,24 @@ export default function ProfilePage({ id }: { id: number }) {
             <DialogDescription />
             <div className="flex flex-col items-center gap-4">
               <img
-                src={profile.profile_photo.name}
+                src={profile.profile_photo}
                 alt="Profile"
-                className="w-48 h-48 rounded-full object-cover"
+                className="w-48 h-48 object-cover"
               />
               {authenticated.user?.id === id && (
                 <div className="flex gap-4">
-                  <Button onClick={() => setPhotoModalOpen(false)}>Edit</Button>
-                  <Button variant="destructive" onClick={handleDeletePhoto}>
-                    Delete
+                  <Button onClick={() => document.getElementById('fileInput')?.click()} className="bg-[#0a66c2] text-white hover:bg-[#004182]">
+                    Upload Image
+                    <MdFileUpload />
+                  </Button>
+                  <input
+                    type="file"
+                    id="fileInput"
+                    style={{ display: 'none' }}
+                    onChange={handleEditPhoto}
+                  />
+                  <Button variant="destructive" onClick={handleDeletePhoto} className="bg-red-500 text-white hover:bg-red-600">
+                    <MdDelete />
                   </Button>
                 </div>
               )}
@@ -257,11 +283,8 @@ export default function ProfilePage({ id }: { id: number }) {
           </DialogContent>
         </Dialog>
 
-        {/* Experience Modal */}
-        <Dialog
-          open={experienceModalOpen}
-          onOpenChange={setExperienceModalOpen}
-        >
+        {/* Work History Modal */}
+        <Dialog open={workHistoryModalOpen} onOpenChange={setWorkHistoryModalOpen}>
           <DialogContent className="bg-white">
             <DialogHeader>
               <DialogTitle>Edit Company Profile</DialogTitle>
@@ -274,7 +297,7 @@ export default function ProfilePage({ id }: { id: number }) {
                 <label className="block font-medium text-gray-700">Name</label>
                 <Input
                   name="name"
-                  value={profile.work_history}
+                  value={profile.work_history ?? ""}
                   onChange={handleChange}
                   required
                 />
@@ -305,6 +328,19 @@ export default function ProfilePage({ id }: { id: number }) {
             <DialogHeader>
               <DialogTitle>Add Skill</DialogTitle>
             </DialogHeader>
+            <div className="flex flex-wrap gap-2">
+              {skillsArray.map((skill: string, index: number) => (
+                <Badge
+                  key={index}
+                  variant="default"
+                  className="cursor-pointer bg-[#0a66c2] text-white hover:bg-[#004182] rounded-full px-4 py-2"
+                  onClick={() => handleDeleteSkill(skill)}
+                >
+                  {skill}
+                  <span className="pl-2">&#x2715;</span>
+                </Badge>
+              ))}
+            </div>
             <form onSubmit={handleAddSkill} className="space-y-4">
               <div>
                 <label className="block font-medium text-gray-700">

@@ -1,21 +1,13 @@
-import { useState, ChangeEvent, FormEvent } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { MdAdd, MdEditSquare } from "react-icons/md";
+import { MdEditSquare } from "react-icons/md";
 import { useAuth } from "@/hooks/auth";
 import { Link } from "@tanstack/react-router";
 import Loading from "@/components/loading";
 import { useProfile } from "@/hooks/profile";
 import { useConnectionStatus } from "@/hooks/connection-status";
+import EditModals from "@/components/specific/edit-modals";
+import EditPhotoModals from "@/components/specific/edit-photo";
 
 export default function ProfilePage2({ id }: { id: number }) {
   const { user, isLoading: isAuthLoading } = useAuth();
@@ -23,6 +15,11 @@ export default function ProfilePage2({ id }: { id: number }) {
   console.log("id is", id);
   const { profile, posts, loading: isProfileLoading } = useProfile(id);
   const { status, loading } = useConnectionStatus(user?.id || null, id);
+
+  const [photoModalOpen, setPhotoModalOpen] = useState<boolean>(false);
+  const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
+  const [workHistoryModalOpen, setWorkHistoryModalOpen] = useState<boolean>(false);
+  const [skillModalOpen, setSkillModalOpen] = useState<boolean>(false);
 
   const isLoading = isAuthLoading || isProfileLoading;
   if (isLoading) {
@@ -35,7 +32,7 @@ export default function ProfilePage2({ id }: { id: number }) {
 
   return (
     <>
-      <div className="max-w-5xl mx-auto mt-16 p-6 space-y-6">
+      <div className="max-w-5xl mx-auto p-6 space-y-6">
         <div className="bg-white rounded-lg shadow border">
           <div className="relative h-52">
             <img
@@ -47,7 +44,7 @@ export default function ProfilePage2({ id }: { id: number }) {
               <Button
                 variant="ghost"
                 className="absolute right-0 bg-white rounded-md m-2 p-2 shadow-sm hover:bg-gray-100"
-                // onClick={() => setEditModalOpen(true)}
+                onClick={() => setEditModalOpen(true)}
               >
                 Edit
                 <MdEditSquare />
@@ -61,7 +58,7 @@ export default function ProfilePage2({ id }: { id: number }) {
                   src={profile.profile_photo}
                   alt="Profile Picture"
                   className="w-40 h-40 rounded-full border-4 border-white shadow-lg object-cover cursor-pointer"
-                  // onClick={() => setPhotoModalOpen(true)}
+                  onClick={() => setPhotoModalOpen(true)}
                 />
               </div>
             </div>
@@ -69,7 +66,7 @@ export default function ProfilePage2({ id }: { id: number }) {
               <h1 className="text-2xl font-semibold">{profile?.name}</h1>
               <p className="text-gray-600">{profile?.username}</p>
               {/* <p className="text-gray-600">{profile.location}</p> */}
-              <Link to="/connections" className="text-blue-500 hover:underline">
+              <Link to={`/connections/${id}`} className="text-blue-500 hover:underline">
                 <p className="text-blue-500">
                   <b>100</b> connections
                 </p>
@@ -94,7 +91,7 @@ export default function ProfilePage2({ id }: { id: number }) {
         </div>
         <div className="bg-white rounded-lg shadow border p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Experience</h2>
+            <h2 className="text-xl font-semibold">Work History</h2>
             <div className="space-x-2">
               {user?.id === id && (
                 <Button
@@ -102,7 +99,7 @@ export default function ProfilePage2({ id }: { id: number }) {
                   className="bg-white shadow-sm"
                   onClick={() => {
                     // setCurrentExperience(null);
-                    // setExperienceModalOpen(true); // Tadi yang ini sih sebelum di komen - gana
+                    setWorkHistoryModalOpen(true); // Tadi yang ini sih sebelum di komen - gana
                   }}
                 >
                   Edit
@@ -120,10 +117,10 @@ export default function ProfilePage2({ id }: { id: number }) {
               <Button
                 variant="ghost"
                 className="bg-white shadow-sm"
-                // onClick={() => setSkillModalOpen(true)}
+                onClick={() => setSkillModalOpen(true)}
               >
-                <MdAdd />
-                Add Skill
+                Edit
+                <MdEditSquare />
               </Button>
             )}
           </div>
@@ -142,147 +139,16 @@ export default function ProfilePage2({ id }: { id: number }) {
           </div>
         </div>
         {/* Profile Photo Modal */}
-        {/* <Dialog open={photoModalOpen} onOpenChange={setPhotoModalOpen}>
-          <DialogContent className="bg-white">
-            <DialogHeader>
-              <DialogTitle>Profile Photo</DialogTitle>
-            </DialogHeader>
-            <DialogDescription />
-            <div className="flex flex-col items-center gap-4">
-              <img
-                src={profile.profile_photo.name}
-                alt="Profile"
-                className="w-48 h-48 rounded-full object-cover"
-              />
-              {user?.id === id && (
-                <div className="flex gap-4">
-                  <Button onClick={() => setPhotoModalOpen(false)}>Edit</Button>
-                  <Button variant="destructive" onClick={handleDeletePhoto}>
-                    Delete
-                  </Button>
-                </div>
-              )}
-            </div>
-          </DialogContent>
-        </Dialog> */}
+        <EditPhotoModals photoModalOpen={photoModalOpen} setPhotoModalOpen={setPhotoModalOpen} profilePhoto={profile.profile_photo} userId={user?.id || ""} profileId={id || ""} onEditPhoto={() => {}} onDeletePhoto={() => {}} />
+
         {/* Main Edit Modal */}
-        {/* <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
-          <DialogContent className="bg-white">
-            <DialogHeader>
-              <DialogTitle>Edit Company Profile</DialogTitle>
-              <DialogDescription>
-                Make changes to your profile here.
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block font-medium text-gray-700">Name</label>
-                <Input
-                  name="name"
-                  value={user?.name}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block font-medium text-gray-700">Email</label>
-                <Input
-                  type="email"
-                  name="email"
-                  value={user?.email}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <DialogFooter className="mt-6 flex justify-end gap-2">
-                <Button
-                  variant="ghost"
-                  onClick={() => setEditModalOpen(false)}
-                  className="text-gray-600 hover:text-gray-800"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="default"
-                  className="bg-[#0a66c2] text-white rounded-full hover:bg-[#004182]"
-                >
-                  Save Changes
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog> */}
-        {/* Experience Modal */}
-        {/* <Dialog
-          open={experienceModalOpen}
-          onOpenChange={setExperienceModalOpen}
-        >
-          <DialogContent className="bg-white">
-            <DialogHeader>
-              <DialogTitle>Edit Company Profile</DialogTitle>
-              <DialogDescription>
-                Make changes to your profile here.
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block font-medium text-gray-700">Name</label>
-                <Input
-                  name="name"
-                  value={profile.work_history}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <DialogFooter className="mt-6 flex justify-end gap-2">
-                <Button
-                  variant="ghost"
-                  onClick={() => setEditModalOpen(false)}
-                  className="text-gray-600 hover:text-gray-800"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="default"
-                  className="bg-[#0a66c2] text-white rounded-full hover:bg-[#004182]"
-                >
-                  Save Changes
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog> */}
+        <EditModals labelModal="Name" value={profile.name || ""} isModalOpen={editModalOpen} setIsModalOpen={setEditModalOpen} userId={user?.id ?? 0} field="name" />
+        
+        {/* Work History Modal */}
+        <EditModals labelModal="Work History" value={profile.work_history || ""} isModalOpen={workHistoryModalOpen} setIsModalOpen={setWorkHistoryModalOpen} userId={user?.id ?? 0} field="work_history" />
+        
         {/* Skills Modal */}
-        {/* <Dialog open={skillModalOpen} onOpenChange={setSkillModalOpen}>
-          <DialogContent className="bg-white">
-            <DialogHeader>
-              <DialogTitle>Add Skill</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleAddSkill} className="space-y-4">
-              <div>
-                <label className="block font-medium text-gray-700">
-                  Skill Name
-                </label>
-                <Input
-                  value={newSkill}
-                  onChange={(e) => setNewSkill(e.target.value)}
-                  required
-                />
-              </div>
-              <DialogFooter>
-                <Button
-                  type="submit"
-                  variant="default"
-                  className="bg-[#0a66c2] text-white rounded-full hover:bg-[#004182]"
-                >
-                  Add Skill
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog> */}
+        <EditModals labelModal="Skill" value={profile.skills || ""} isModalOpen={skillModalOpen} setIsModalOpen={setSkillModalOpen} userId={user?.id ?? 0} field="skills" />
       </div>
     </>
   );

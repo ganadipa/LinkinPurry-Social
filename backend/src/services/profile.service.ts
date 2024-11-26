@@ -36,6 +36,30 @@ export class ProfileService {
     return this.getProfileDataFromAuthenticated(userId);
   }
 
+  public async updateProfile(
+    userId: number, 
+    updateData: User
+  ): Promise<TGetProfileBodyResponseByAuthenticated> {
+    const user = await this.userRepository.findById(userId);
+    if (!user || !user.id === undefined) {
+      throw new BadRequestException("User not found");
+    }
+    console.log("updateData", updateData);
+
+    if (updateData.full_name) {
+      user.full_name = updateData.full_name;
+    }
+    if (updateData.work_history) {
+      user.work_history = updateData.work_history;
+    }
+    if (updateData.skills) {
+      user.skills = updateData.skills;
+    }
+
+    await this.userRepository.save(user);
+    return this.getProfileDataFromAuthenticated(userId);
+  }
+
   private async getProfileDataFromGuest(
     userId: number
   ): Promise<TGetProfileBodyResponseByPublic> {

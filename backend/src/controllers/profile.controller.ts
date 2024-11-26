@@ -34,5 +34,25 @@ export class ProfileController implements Controller {
         body: profileData,
       });
     });
+
+    this.hono.app.put("/api/profile/:user_id", async (c) => {
+      const userId = c.req.param("user_id");
+      console.log("userId", userId);
+      const updateData = await c.req.json();
+      const updateUser = c.var.user;
+
+      
+      console.log("updateData", updateData);
+      const profileData = await this.profileService.updateProfile(
+        Number(userId),
+        updateData
+      );
+
+      return c.json({
+        success: true,
+        message: "Profile data updated",
+        body: profileData,
+      });
+    });
   }
 }
