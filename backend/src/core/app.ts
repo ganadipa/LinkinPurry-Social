@@ -43,6 +43,7 @@ export class Application {
       .to(AuthController)
       .inSingletonScope();
 
+    console.log("Environment: ", process.env.ENVIRONMENT);
     if (process.env.ENVIRONMENT && process.env.ENVIRONMENT === "prod") {
       console.log("Production environment detected");
       this.container
