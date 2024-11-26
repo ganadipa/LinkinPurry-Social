@@ -3,12 +3,8 @@ import { Controller } from "./controller";
 import { CONFIG } from "../ioc/config";
 import { HonoProvider } from "../core/hono-provider";
 import { AuthService } from "../services/auth/auth.service";
-import { ValidationService } from "../services/validation.service";
-import {
-  LoginPayload,
-  loginPayloadChecker,
-  registerPayloadChecker,
-} from "../constants/request-payload";
+import { ZodValidationService } from "../services/zod-validation.service";
+import { LoginPayload, loginPayloadSchema } from "../constants/request-payload";
 import { IAuthStrategy } from "../interfaces/auth-strategy.interface";
 import { deleteCookie, setCookie } from "hono/cookie";
 import { BadRequestException } from "../exceptions/bad-request.exception";
@@ -21,7 +17,7 @@ export class AuthController implements Controller {
     @inject(CONFIG.HonoProvider) private hono: HonoProvider,
     @inject(CONFIG.AuthService) private readonly authService: AuthService,
     @inject(CONFIG.ValidationService)
-    private readonly validationService: ValidationService,
+    private readonly zodValidationService: ZodValidationService,
     @inject(CONFIG.AuthStrategy) private readonly authStrategy: IAuthStrategy
   ) {}
 
@@ -30,13 +26,13 @@ export class AuthController implements Controller {
   public registerMiddlewaresAfterGlobal(): void {
     this.hono.app.post("/api/login", async (c, next) => {
       const payload = await c.req.json();
-      this.validationService.validate(payload, loginPayloadChecker);
+      this.zodValidationService.validate(payload, loginPayloadSchema);
       await next();
     });
 
     this.hono.app.post("/api/register", async (c, next) => {
       const payload = await c.req.json();
-      this.validationService.validate(payload, registerPayloadChecker);
+      this.zodValidationService.validate(payload, loginPayloadSchema);
       await next();
     });
   }

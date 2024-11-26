@@ -18,7 +18,7 @@ import { DbUserRepository } from "../repositories/db/user.repository";
 import { PrismaProvider } from "../prisma/prisma";
 import { JwtService } from "../services/auth/jwt.service";
 import { AuthService } from "../services/auth/auth.service";
-import { ValidationService } from "../services/validation.service";
+import { ZodValidationService } from "../services/zod-validation.service";
 import { ResponseFormatterMiddleware } from "../middlewares/response-formatter.middleware";
 
 import { ConnectionController } from "../controllers/connection.controller";
@@ -81,9 +81,9 @@ export class Application {
     this.container.bind<JwtService>(CONFIG.JwtService).to(JwtService);
     this.container.bind<AuthService>(CONFIG.AuthService).to(AuthService);
     this.container
-      .bind<ValidationService>(CONFIG.ValidationService)
-      .to(ValidationService);
-    
+      .bind<ZodValidationService>(CONFIG.ValidationService)
+      .to(ZodValidationService);
+
     this.container
       .bind<Controller>(CONFIG.Controllers)
       .to(ConnectionController)

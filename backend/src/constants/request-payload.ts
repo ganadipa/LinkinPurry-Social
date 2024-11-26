@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { BadRequestException } from "../exceptions/bad-request.exception";
 
 export type LoginPayload = {
@@ -5,41 +6,28 @@ export type LoginPayload = {
   password: string;
 };
 
-export const loginPayloadChecker = {
-  identifier: (value: any) => {
-    if (typeof value !== "string") {
-      throw new BadRequestException("identifier must be a string");
-    }
-
-    if (value.length >= 50) {
-      throw new BadRequestException(
-        "identifier must be less than 50 characters"
-      );
-    }
-
-    if (value.length == 0) {
-      throw new BadRequestException("identifier must not be empty");
-    }
-
-    return true;
-  },
-
-  password: (value: any) => {
-    if (typeof value !== "string") {
-      throw new BadRequestException("Password must be a string");
-    }
-
-    if (value.length >= 50) {
-      throw new BadRequestException("Password must be less than 50 characters");
-    }
-
-    if (value.length == 0) {
-      throw new BadRequestException("Password must not be empty");
-    }
-
-    return true;
-  },
-};
+export const loginPayloadSchema = z.object({
+  identifier: z
+    .string({
+      message: "Identifier must be a string",
+    })
+    .min(1, {
+      message: "Identifier must not be empty",
+    })
+    .max(50, {
+      message: "Identifier must be less than 50 characters",
+    }),
+  password: z
+    .string({
+      message: "Password must be a string",
+    })
+    .min(6, {
+      message: "Password must be at least 6 characters",
+    })
+    .max(50, {
+      message: "Password must be less than 50 characters",
+    }),
+});
 
 export type RegisterPayload = {
   username: string;
@@ -48,72 +36,38 @@ export type RegisterPayload = {
   password: string;
 };
 
-export const registerPayloadChecker = {
-  username: (value: any) => {
-    if (typeof value !== "string") {
-      throw new BadRequestException("Username must be a string");
-    }
-
-    if (value.length >= 50) {
-      throw new BadRequestException("Username must be less than 50 characters");
-    }
-
-    if (value.length == 0) {
-      throw new BadRequestException("Username must not be empty");
-    }
-
-    return true;
-  },
-
-  email: (value: any) => {
-    if (typeof value !== "string") {
-      throw new BadRequestException("Email must be a string");
-    }
-
-    if (value.length >= 50) {
-      throw new BadRequestException("Email must be less than 50 characters");
-    }
-
-    if (value.length == 0) {
-      throw new BadRequestException("Email must not be empty");
-    }
-
-    return true;
-  },
-
-  name: (value: any) => {
-    if (typeof value !== "string") {
-      throw new BadRequestException("Name must be a string");
-    }
-
-    if (value.length >= 50) {
-      throw new BadRequestException("Name must be less than 50 characters");
-    }
-
-    if (value.length == 0) {
-      throw new BadRequestException("Name must not be empty");
-    }
-
-    return true;
-  },
-
-  password: (value: any) => {
-    if (typeof value !== "string") {
-      throw new BadRequestException("Password must be a string");
-    }
-
-    if (value.length >= 50) {
-      throw new BadRequestException("Password must be less than 20 characters");
-    }
-
-    if (value.length < 6) {
-      throw new BadRequestException("Password must be at least 6 characters");
-    }
-
-    if (value.length == 0) {
-      throw new BadRequestException("Password must not be empty");
-    }
-
-    return true;
-  },
-};
+export const registerPayloadSchema = z.object({
+  username: z
+    .string({
+      message: "Username must be a string",
+    })
+    .min(1, {
+      message: "Username must not be empty",
+    })
+    .max(50, {
+      message: "Username must be less than 50 characters",
+    }),
+  email: z
+    .string({
+      message: "Email must be a string",
+    })
+    .min(1, {
+      message: "Email must not be empty",
+    })
+    .max(50, {
+      message: "Email must be less than 50 characters",
+    }),
+  name: z.string({
+    message: "Name must be a string",
+  }),
+  password: z
+    .string({
+      message: "Password must be a string",
+    })
+    .min(6, {
+      message: "Password must be at least 6 characters",
+    })
+    .max(50, {
+      message: "Password must be less than 50 characters",
+    }),
+});
