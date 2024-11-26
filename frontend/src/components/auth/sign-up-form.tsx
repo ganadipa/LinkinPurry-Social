@@ -54,9 +54,9 @@ const SignUpForm = () => {
       toast.dismiss(toastId);
       toast.success("Account created successfully");
       toast.loading("Redirecting to login page...");
-      // setTimeout(() => {
-      //   window.location.href = "/signin";
-      // }, 2000);
+      setTimeout(() => {
+        window.location.href = "/signin";
+      }, 2000);
     }
   };
 

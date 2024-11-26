@@ -17,3 +17,17 @@ export const registerResponse = z.object({
     token: z.string(),
   }),
 });
+
+export const getUsersResponse = z.object({
+    success: z.boolean(),
+    message: z.string(),
+    body: z.array(
+        z.object({
+            id: z.number(),
+            full_name: z.string(),
+            profile_photo_path: z.string(),
+        })
+    )
+})
+
+
