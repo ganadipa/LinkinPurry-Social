@@ -70,7 +70,7 @@ export class Application {
       .to(ResponseFormatterMiddleware);
 
     this.container
-      .bind<UserRepository>(CONFIG.DbUserRepository)
+      .bind<UserRepository>(CONFIG.UserRepository)
       .to(DbUserRepository);
 
     this.container
