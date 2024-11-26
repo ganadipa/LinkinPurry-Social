@@ -49,4 +49,8 @@ export class ConnectionService {
   async checkConnection(fromId: bigint, toId: bigint) {
     return await this.connectionRepository.checkConnection(fromId, toId);
   }
+
+    async getConnectionRequestsFrom(userId: bigint) {
+        return await this.connectionRepository.getConnectionRequestsFrom(userId);
+    }
 }

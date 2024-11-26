@@ -4,7 +4,7 @@ import { CONFIG } from "../ioc/config";
 import { HonoProvider } from "../core/hono-provider";
 import { AuthService } from "../services/auth/auth.service";
 import { ZodValidationService } from "../services/zod-validation.service";
-import { LoginPayload, loginPayloadSchema } from "../constants/request-payload";
+import { LoginPayload, loginPayloadSchema, registerPayloadSchema } from "../constants/request-payload";
 import { IAuthStrategy } from "../interfaces/auth-strategy.interface";
 import { deleteCookie, setCookie } from "hono/cookie";
 import { BadRequestException } from "../exceptions/bad-request.exception";
@@ -30,9 +30,9 @@ export class AuthController implements Controller {
       await next();
     });
 
-    this.hono.app.post("/api/register", async (c, next) => {
+    this.hono.app.post("/api/register", async (c, next) => { 
       const payload = await c.req.json();
-      this.zodValidationService.validate(payload, loginPayloadSchema);
+      this.zodValidationService.validate(payload, registerPayloadSchema);
       await next();
     });
   }

@@ -9,4 +9,5 @@ export interface ConnectionRepository {
   removeConnectionRequest(fromId: bigint, toId: bigint): Promise<void>;
   countConnections(userId: bigint): Promise<number>;
   checkConnection(fromId: bigint, toId: bigint): Promise<boolean>;
+  getConnectionRequestsFrom(userId: bigint): Promise<ConnectionRequest[]>;
 }

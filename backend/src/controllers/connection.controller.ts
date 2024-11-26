@@ -185,5 +185,29 @@ export class ConnectionController implements Controller {
         body: connection,
       });
     });
+
+    // get connection requests from current user
+    this.hono.app.get("/api/connections/requests-from", async (c) => {
+        const user = c.var.user;
+        if (!user || user.id === undefined) {
+          throw new BadRequestException("User not found or user ID is undefined");
+        }
+        const userId = BigInt(user.id);
+        const requests = await this.connectionService.getConnectionRequestsFrom(
+          userId
+        );
+  
+        const jsonFriendlyRequests = requests.map((req) => ({
+          ...req,
+          from_id: Number(req.from_id),
+          to_id: Number(req.to_id),
+        }));
+  
+        return c.json({
+          success: true,
+          message: "Connection requests from this user retrieved successfully",
+          body: jsonFriendlyRequests,
+        });
+      });
   }
 }

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { UserCard } from "@/components/ui/user-card";
 import { useAuth } from "@/hooks/auth";
-import { determineStatus } from "@/lib/connectionUtils";
 import { getUsersResponse } from "@/types/response";
+import { determineStatus } from "@/lib/connectionUtils";
 
 export default function UserListPage() {
     const { user: currentUser } = useAuth();
@@ -40,17 +40,41 @@ export default function UserListPage() {
                 const validatedUsers = parsed.data.body;
                 setUsers(validatedUsers);
 
-                // update status
-                const statusMap: { [key: number]: "connected" | "pending" | "not_connected" } = {};
-                const statusPromises = validatedUsers.map(async (user) => {
-                    if (!currentUser) {
-                        statusMap[user.id] = "not_connected";
-                    } else {
-                        statusMap[user.id] = await determineStatus(user.id, currentUser.id || 0);
-                    }
+                const connectionsResponse = await fetch("/api/connections", {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
+                });
+                const requestsResponse = await fetch("/api/connections/requests", {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
+                });
+                const requestsFromResponse = await fetch("/api/connections/requests-from", {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
                 });
 
-                await Promise.all(statusPromises);
+                if (!connectionsResponse.ok || !requestsResponse.ok || !requestsFromResponse.ok) {
+                    throw new Error("Failed to fetch connection data");
+                }
+
+                const connectionsData = await connectionsResponse.json();
+                const requestsData = await requestsResponse.json();
+                const requestsFromData = await requestsFromResponse.json();
+
+                const connections = connectionsData.body || [];
+                const connectionRequests = requestsData.body || [];
+                const connectionRequestsFrom = requestsFromData.body || [];
+
+                const statusMap: { [key: number]: "connected" | "pending" | "not_connected" } = {};
+                validatedUsers.forEach((user) => {
+                    statusMap[user.id] = determineStatus(
+                        user.id,
+                        currentUser?.id || 0,
+                        connections,
+                        connectionRequests,
+                        connectionRequestsFrom
+                    );
+                });
 
                 setStatuses(statusMap);
             } catch (error) {
@@ -80,6 +104,8 @@ export default function UserListPage() {
             }
 
             alert("Connection request sent successfully!");
+
+            // update status locally
             setStatuses((prev) => ({ ...prev, [userId]: "pending" }));
         } catch (error) {
             console.error("Error sending connection request:", error);
