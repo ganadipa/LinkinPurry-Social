@@ -10,6 +10,7 @@ import {
 import { ConnectionRepository } from "../interfaces/connection-repository.interface";
 import { InternalErrorException } from "../exceptions/internal-error.exception";
 import { FeedRepository } from "../interfaces/feed-repository.interface";
+import { ForbiddenException } from "../exceptions/forbidden.exception";
 
 @injectable()
 export class ProfileService {
@@ -37,26 +38,20 @@ export class ProfileService {
   }
 
   public async updateProfile(
-    userId: number, 
+    userId: number,
     updateData: User
   ): Promise<TGetProfileBodyResponseByAuthenticated> {
-    const user = await this.userRepository.findById(userId);
-    if (!user || !user.id === undefined) {
-      throw new BadRequestException("User not found");
-    }
-    console.log("updateData", updateData);
-
-    if (updateData.full_name) {
-      user.full_name = updateData.full_name;
-    }
-    if (updateData.work_history) {
-      user.work_history = updateData.work_history;
-    }
-    if (updateData.skills) {
-      user.skills = updateData.skills;
+    if (!updateData.id) {
+      throw new InternalErrorException(
+        "User ID somehow missing from the context!"
+      );
     }
 
-    await this.userRepository.save(user);
+    if (Number(updateData.id) !== userId) {
+      throw new ForbiddenException("Cannot update another user's profile");
+    }
+
+    await this.userRepository.save(updateData);
     return this.getProfileDataFromAuthenticated(userId);
   }
 

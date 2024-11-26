@@ -81,3 +81,31 @@ export const fromId_toIdSchema = z.object({
   from_id: z.number(),
   to_id: z.number(),
 });
+
+export const updateProfilePayloadSchema = z.object({
+  name: z
+    .string({
+      message: "Name must be a string",
+    })
+    .optional(),
+  username: z
+    .string({
+      message: "Username must be a string",
+    })
+    .optional(),
+  profile_photo: z
+    .string({
+      message: "Profile photo must be a string",
+    })
+    .optional(),
+  work_history: z
+    .string({
+      message: "Work history must be a string",
+    })
+    .optional(),
+  skills: z
+    .string({
+      message: "skills must be a string",
+    })
+    .optional(),
+});

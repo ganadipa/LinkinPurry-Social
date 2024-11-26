@@ -1,3 +1,4 @@
+import { JsonArray, JsonObject } from "@prisma/client/runtime/library";
 import { Feed } from "../models/feed.model";
 
 export type BaseResponse = {
@@ -14,3 +15,11 @@ export type SuccessResponse<T> = BaseResponse & {
 };
 
 export type Post = Omit<Feed, "user_id">;
+
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonObject
+  | JsonArray;
