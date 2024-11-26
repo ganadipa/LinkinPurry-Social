@@ -182,7 +182,9 @@ export class ConnectionController implements Controller {
       return c.json({
         success: true,
         message: "Connection checked successfully",
-        body: connection,
+        body: {
+          connected: connection,
+        },
       });
     });
 

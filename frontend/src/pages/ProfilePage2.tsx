@@ -14,12 +14,22 @@ export default function ProfilePage2({ id }: { id: number }) {
   console.log("user: ", user); // debug
   console.log("id is", id);
   const { profile, posts, loading: isProfileLoading } = useProfile(id);
-  const { status, loading } = useConnectionStatus(user?.id || null, id);
+  const { status, loading, toggleConnection } = useConnectionStatus(user?.id || null, id);
+  const [statuses, setStatuses] = useState<{ [key: number]: "connected" | "pending" | "not_connected" }>({});
 
   const [photoModalOpen, setPhotoModalOpen] = useState<boolean>(false);
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
   const [workHistoryModalOpen, setWorkHistoryModalOpen] = useState<boolean>(false);
   const [skillModalOpen, setSkillModalOpen] = useState<boolean>(false);
+
+  const handleConnect = () => {
+    toggleConnection();
+    if (status) {
+      setStatuses({ ...statuses, [id]: "connected" });
+    } else {
+      setStatuses({ ...statuses, [id]: "pending" });
+    }
+  }
 
   const isLoading = isAuthLoading || isProfileLoading;
   if (isLoading) {
@@ -68,7 +78,7 @@ export default function ProfilePage2({ id }: { id: number }) {
               {/* <p className="text-gray-600">{profile.location}</p> */}
               <Link to={`/connections/${id}`} className="text-blue-500 hover:underline">
                 <p className="text-blue-500">
-                  <b>100</b> connections
+                  <b>{profile.connection_count}</b> connections
                 </p>
               </Link>
             </div>
@@ -81,7 +91,7 @@ export default function ProfilePage2({ id }: { id: number }) {
                       ? "bg-white text-[#0a66c2] border border-[#0a66c2] hover:bg-[#0a66c2] hover:text-white"
                       : "bg-[#0a66c2] text-white hover:bg-[#004182]"
                   }`}
-                  // onClick={() => setConnected(!connected)}
+                  onClick={() => handleConnect()}
                 >
                   {status ? "Connected" : "Connect"}
                 </Button>

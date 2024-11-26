@@ -37,8 +37,49 @@ export function useConnectionStatus(
     setLoading(false);
   };
 
+  const toggleConnection = async () => {
+    if (status === null) return;
+  
+    setLoading(true);
+  
+    // Tentukan apakah akan menggunakan POST atau DELETE
+    const method = status ? "DELETE" : "POST";
+  
+    // Tentukan URL dan body berdasarkan metode
+    const url = status 
+      ? `/api/connections/${otherUserId}` 
+      : `/api/connections/request`;
+  
+    const options = {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      ...(method === "POST" && {
+        body: JSON.stringify({ to_id: otherUserId }),
+      }),
+    };
+  
+    try {
+      const response = await fetch(url, options);
+  
+      if (response.ok) {
+        setStatus(!status);
+      } else {
+        const data = await response.json();
+        console.log(`Failed to update connection: ${data.message}`);
+      }
+    } catch (error) {
+      console.error("Error updating connection:", error);
+      console.log("Failed to update connection.");
+    } finally {
+      setLoading(false);
+    }
+  };  
+
   return {
     status,
     loading,
+    toggleConnection,
   };
 }
