@@ -108,6 +108,11 @@ export class Application {
       .inSingletonScope();
 
     this.container
+      .bind<Controller>(CONFIG.Controllers)
+      .to(ProfileController)
+      .inSingletonScope();
+
+    this.container
       .bind<ConnectionService>(CONFIG.ConnectionService)
       .to(ConnectionService)
       .inSingletonScope();
