@@ -7,6 +7,27 @@ export default function ConnectionRequestsPage() {
     const [requests, setRequests] = useState<{ id: number; full_name: string; profile_photo_path: string; from_id: number }[]>([]);
     const [loading, setLoading] = useState(false);
 
+    const fetchUserDetails = async (userId: number) => {
+        try {
+            const response = await fetch(`/api/users/${userId}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch user details for ID: ${userId}`);
+            }
+
+            const data = await response.json();
+            return data.body;
+        } catch (error) {
+            console.error("Error fetching user details:", error);
+            return null;
+        }
+    };
+
     useEffect(() => {
         const fetchRequests = async () => {
             setLoading(true);
@@ -23,13 +44,20 @@ export default function ConnectionRequestsPage() {
                 }
 
                 const data = await response.json();
-                const parsedRequests = data.body.map((request: any) => ({
-                    ...request,
-                    from_id: Number(request.from_id),
-                    to_id: Number(request.to_id),
-                }));
+                const detailedRequests = await Promise.all(
+                    data.body.map(async (request: any) => {
+                        const user = await fetchUserDetails(Number(request.from_id));
+                        return {
+                            ...request,
+                            full_name: user?.full_name || "Unknown User",
+                            profile_photo_path: user?.profile_photo_path || "",
+                            from_id: Number(request.from_id),
+                            to_id: Number(request.to_id),
+                        };
+                    })
+                );
 
-                setRequests(parsedRequests);
+                setRequests(detailedRequests);
             } catch (error) {
                 console.error("Error fetching connection requests:", error);
             } finally {

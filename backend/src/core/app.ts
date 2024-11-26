@@ -29,6 +29,8 @@ import { ProfileService } from "../services/profile.service";
 import { ProfileController } from "../controllers/profile.controller";
 import { FeedRepository } from "../interfaces/feed-repository.interface";
 import { DbFeedRepository } from "../repositories/db/feed.repository";
+import { UserController } from "../controllers/user.controller";
+import { UserService } from "../services/user.service";
 
 export class Application {
   private container: Container;
@@ -56,6 +58,9 @@ export class Application {
       .bind<Controller>(CONFIG.Controllers)
       .to(ProfileController)
       .inSingletonScope();
+    
+      this.container
+      .bind<Controller>(CONFIG.Controllers).to(UserController).inSingletonScope();
 
     console.log("Environment: ", process.env.ENVIRONMENT);
     if (process.env.ENVIRONMENT && process.env.ENVIRONMENT === "prod") {
@@ -95,6 +100,7 @@ export class Application {
     this.container
       .bind<ZodValidationService>(CONFIG.ZodValidationService)
       .to(ZodValidationService);
+    this.container.bind<UserService>(CONFIG.UserService).to(UserService);
 
     this.container
       .bind<Controller>(CONFIG.Controllers)

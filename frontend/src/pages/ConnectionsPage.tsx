@@ -13,6 +13,27 @@ export default function ConnectionsPage({ id }: ConnectionsPageProps) {
     >([]);
     const [loading, setLoading] = useState(false);
 
+    const fetchUserDetails = async (userId: number) => {
+        try {
+            const response = await fetch(`/api/users/${userId}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch user details for ID: ${userId}`);
+            }
+
+            const data = await response.json();
+            return data.body;
+        } catch (error) {
+            console.error(`Error fetching user details for ID: ${userId}`, error);
+            return null;
+        }
+    };
+
     useEffect(() => {
         const fetchConnections = async () => {
             if (!id && !currentUser) return;
@@ -31,19 +52,25 @@ export default function ConnectionsPage({ id }: ConnectionsPageProps) {
                 }
 
                 const data = await response.json();
-                const parsedConnections = data.body.map((connection: any) => {
-                    const userId =
-                        connection.from_id === (id || currentUser?.id)
-                            ? connection.to_id
-                            : connection.from_id;
-                    return {
-                        id: userId,
-                        full_name: connection.full_name,
-                        profile_photo_path: connection.profile_photo_path,
-                    };
-                });
 
-                setConnectionsList(parsedConnections);
+                const detailedConnections = await Promise.all(
+                    data.body.map(async (connection: any) => {
+                        const userId =
+                            connection.from_id === (id || currentUser?.id)
+                                ? connection.to_id
+                                : connection.from_id;
+
+                        const userDetails = await fetchUserDetails(userId);
+
+                        return {
+                            id: userId,
+                            full_name: userDetails?.full_name || "Unknown User",
+                            profile_photo_path: userDetails?.profile_photo_path || "",
+                        };
+                    })
+                );
+
+                setConnectionsList(detailedConnections);
             } catch (error) {
                 console.error("Error fetching connections:", error);
             } finally {
