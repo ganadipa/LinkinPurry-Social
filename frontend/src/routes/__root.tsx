@@ -22,7 +22,7 @@ function RootComponent() {
     <>
       <main>
         <Header />
-        <div>Root layout</div>
+        <div className="mt-16">Root layout</div>
         <div>You are logged in as {user?.email ?? "guest"}</div>
         <Outlet />
       </main>
