@@ -8,7 +8,7 @@ export class User {
   public updated_at?: Date;
   public work_history: string | null;
   public skills: string | null;
-  public full_name: string | null;
+  public full_name: string;
 
   constructor(
     username: string,

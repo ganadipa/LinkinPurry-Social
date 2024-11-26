@@ -26,6 +26,9 @@ import { ConnectionService } from "../services/connection.service";
 import { ConnectionRepository } from "../interfaces/connection-repository.interface";
 import { DbConnectionRepository } from "../repositories/db/connection.repository";
 import { ProfileService } from "../services/profile.service";
+import { ProfileController } from "../controllers/profile.controller";
+import { FeedRepository } from "../interfaces/feed-repository.interface";
+import { DbFeedRepository } from "../repositories/db/feed.repository";
 
 export class Application {
   private container: Container;
@@ -47,6 +50,11 @@ export class Application {
     this.container
       .bind<Controller>(CONFIG.Controllers)
       .to(AuthController)
+      .inSingletonScope();
+
+    this.container
+      .bind<Controller>(CONFIG.Controllers)
+      .to(ProfileController)
       .inSingletonScope();
 
     console.log("Environment: ", process.env.ENVIRONMENT);
@@ -71,8 +79,12 @@ export class Application {
       .to(ResponseFormatterMiddleware);
 
     this.container
-      .bind<UserRepository>(CONFIG.UserRepository)
+      .bind<UserRepository>(CONFIG.DbUserRepository)
       .to(DbUserRepository);
+
+    this.container
+      .bind<FeedRepository>(CONFIG.DbFeedRepository)
+      .to(DbFeedRepository);
 
     this.container
       .bind<PrismaProvider>(CONFIG.PrismaProvider)
@@ -81,7 +93,7 @@ export class Application {
     this.container.bind<JwtService>(CONFIG.JwtService).to(JwtService);
     this.container.bind<AuthService>(CONFIG.AuthService).to(AuthService);
     this.container
-      .bind<ZodValidationService>(CONFIG.ValidationService)
+      .bind<ZodValidationService>(CONFIG.ZodValidationService)
       .to(ZodValidationService);
 
     this.container
@@ -100,7 +112,7 @@ export class Application {
       .inSingletonScope();
 
     this.container
-      .bind<ConnectionRepository>(CONFIG.ConnectionRepository)
+      .bind<ConnectionRepository>(CONFIG.DbConnectionRepository)
       .to(DbConnectionRepository);
   }
 

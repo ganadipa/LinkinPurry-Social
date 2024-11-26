@@ -16,7 +16,7 @@ export class AuthController implements Controller {
   constructor(
     @inject(CONFIG.HonoProvider) private hono: HonoProvider,
     @inject(CONFIG.AuthService) private readonly authService: AuthService,
-    @inject(CONFIG.ValidationService)
+    @inject(CONFIG.ZodValidationService)
     private readonly zodValidationService: ZodValidationService,
     @inject(CONFIG.AuthStrategy) private readonly authStrategy: IAuthStrategy
   ) {}

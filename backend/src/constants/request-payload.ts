@@ -71,3 +71,13 @@ export const registerPayloadSchema = z.object({
       message: "Password must be less than 50 characters",
     }),
 });
+
+export type fromId_toId = {
+  fromId: string;
+  toId: string;
+};
+
+export const fromId_toIdSchema = z.object({
+  fromId: z.number(),
+  toId: z.number(),
+});

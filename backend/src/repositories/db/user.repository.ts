@@ -1,6 +1,5 @@
 import { inject, injectable } from "inversify";
 import { UserRepository } from "../../interfaces/user-repository.interface";
-import { PrismaClient } from "@prisma/client";
 import { CONFIG } from "../../ioc/config";
 import { User } from "../../models/user.model";
 import { PrismaProvider } from "../../prisma/prisma";
@@ -9,13 +8,20 @@ import { PrismaProvider } from "../../prisma/prisma";
 export class DbUserRepository implements UserRepository {
   constructor(@inject(CONFIG.PrismaProvider) private prisma: PrismaProvider) {}
 
-  public async findById(id: number) {
+  public async findById(id: number): Promise<User | null> {
     const user = await this.prisma.prisma.users.findUnique({
       where: {
         id: id,
       },
     });
-    return user;
+    if (!user) {
+      return null;
+    }
+
+    return {
+      ...user,
+      full_name: user?.full_name || "",
+    };
   }
 
   public async findByEmail(email: string): Promise<User | null> {
@@ -24,7 +30,14 @@ export class DbUserRepository implements UserRepository {
         email: email,
       },
     });
-    return user;
+    if (!user) {
+      return null;
+    }
+
+    return {
+      ...user,
+      full_name: user?.full_name || "",
+    };
   }
 
   public async findByUsername(username: string): Promise<User | null> {
@@ -34,7 +47,14 @@ export class DbUserRepository implements UserRepository {
       },
     });
 
-    return user;
+    if (!user) {
+      return null;
+    }
+
+    return {
+      ...user,
+      full_name: user?.full_name || "",
+    };
   }
 
   public async save(user: User): Promise<User> {
@@ -56,7 +76,11 @@ export class DbUserRepository implements UserRepository {
         updated_at: new Date(),
       },
     });
-    return newUser;
+
+    return {
+      ...newUser,
+      full_name: newUser?.full_name || "",
+    };
   }
 
   public async update(user: User): Promise<User> {
@@ -66,7 +90,11 @@ export class DbUserRepository implements UserRepository {
       },
       data: user,
     });
-    return updatedUser;
+
+    return {
+      ...updatedUser,
+      full_name: updatedUser?.full_name || "",
+    };
   }
 
   public async searchUsers(keyword: string): Promise<User[]> {
@@ -81,6 +109,12 @@ export class DbUserRepository implements UserRepository {
           }
         : {},
     });
-    return users;
-  }  
+
+    return users.map((user) => {
+      return {
+        ...user,
+        full_name: user?.full_name || "",
+      };
+    });
+  }
 }

@@ -8,7 +8,7 @@ export const CONFIG = {
   UserService: Symbol.for("UserService"),
   JwtService: Symbol.for("JwtService"),
   AuthService: Symbol.for("AuthService"),
-  ValidationService: Symbol.for("ValidationService"),
+  ZodValidationService: Symbol.for("ZodValidationService"),
   ConnectionService: Symbol.for("ConnectionService"),
   ProfileService: Symbol.for("ProfileService"),
 
@@ -16,7 +16,13 @@ export const CONFIG = {
   JwtAuthStrategy: Symbol.for("Jwt"),
 
   UserRepository: Symbol.for("DbUserRepository"),
+  DbUserRepository: Symbol.for("DbUserRepository"),
+
   ConnectionRepository: Symbol.for("DbConnectionRepository"),
+  DbConnectionRepository: Symbol.for("DbConnectionRepository"),
+
+  FeedRepository: Symbol.for("DbFeedRepository"),
+  DbFeedRepository: Symbol.for("DbFeedRepository"),
 
   PrismaProvider: Symbol.for("PrismaProvider"),
 
