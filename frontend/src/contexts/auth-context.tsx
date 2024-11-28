@@ -1,3 +1,4 @@
+import { wait } from "@/lib/utils";
 import { loginResponse } from "@/types/response";
 import { User } from "@/types/user";
 import React, { useEffect, useState } from "react";
@@ -46,7 +47,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const login = async (identifier: string, password: string) => {
-    setIsLoading(true);
     const response = await fetch("/api/login", {
       method: "POST",
       headers: {
@@ -55,42 +55,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       body: JSON.stringify({ identifier, password }),
     });
 
+    await wait(1000);
+
     const json = await response.json();
     const expected = loginResponse.safeParse(json);
     if (expected.success) {
-      setUser(json.body);
-      setIsLoading(false);
-      return {
-        ok: expected.data.success,
-        message: expected.data.message,
-      };
-    } else {
-      return {
-        ok: false,
-        message: "Something went wrong",
-      };
+      if (expected.data.success) {
+        setIsLoading(true);
+        checkAuth();
+
+        return {
+          ok: true,
+          message: "Successfully logged in",
+        };
+      }
+
+      throw new Error(expected.data.message);
     }
+
+    throw new Error("Something went wrong");
   };
 
   const logout = async () => {
-    setIsLoading(true);
     const resp = await fetch("/api/logout", {
       method: "POST",
     });
 
     if (resp.ok) {
       setUser(null);
-      setIsLoading(false);
       return {
         ok: true,
         message: "Successfully logged out",
       };
-    } else {
-      return {
-        ok: false,
-        message: "Something went wrong",
-      };
     }
+
+    throw new Error("Something went wrong");
   };
 
   return (

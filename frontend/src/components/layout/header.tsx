@@ -4,7 +4,11 @@ import homeImage from "../../assets/home.png";
 
 const Header = () => {
   const [isSidenavOpen, setSidenavOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
+
+  if (isLoading) {
+    return null;
+  }
 
   const toggleSidenav = () => setSidenavOpen((prev) => !prev);
 

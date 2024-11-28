@@ -10,3 +10,6 @@ export function redirect({ to }: { to: string }) {
   red({ to });
   window.location.href = to;
 }
+
+export const wait = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));

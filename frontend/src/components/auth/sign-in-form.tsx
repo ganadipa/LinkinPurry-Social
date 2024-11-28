@@ -34,15 +34,20 @@ export function SignInForm() {
   });
 
   async function onSubmit(values: z.infer<typeof signInFormSchema>) {
-    const { ok, message } = await login(values.identifier, values.password);
-    if (!ok) {
-      toast.error(message);
-    } else {
-      toast.success("Signed in successfully");
-      redirect({
-        to: "/",
-      });
-    }
+    const promise = login(values.identifier, values.password);
+    toast.promise(promise, {
+      loading: "Signing in...",
+      success: (data) => data.message,
+      error: (err) => err.message,
+    });
+
+    promise.then((result) => {
+      if (result.ok) {
+        redirect({
+          to: "/",
+        });
+      }
+    });
   }
 
   return (
