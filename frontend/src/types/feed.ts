@@ -1,3 +1,4 @@
+import { FeedRelatedSchemas } from "@/schemas/feed.schema";
 import { z } from "zod";
 
 export type Post = {
@@ -24,3 +25,5 @@ export const FeedSchema = z.intersection(
     user_id: z.number(),
   })
 );
+
+export type FeedRelated = z.infer<typeof FeedRelatedSchemas>;

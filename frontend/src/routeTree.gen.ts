@@ -13,7 +13,8 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as publicIndexImport } from './routes/(public)/index'
+import { Route as AuthenticatedImport } from './routes/_authenticated'
+import { Route as authenticatedIndexImport } from './routes/(authenticated)/index'
 import { Route as publicUsersImport } from './routes/(public)/users'
 import { Route as authorizationAuthImport } from './routes/(authorization)/_auth'
 import { Route as authenticatedRequestsImport } from './routes/(authenticated)/requests'
@@ -33,8 +34,13 @@ const authorizationRoute = authorizationImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const publicIndexRoute = publicIndexImport.update({
-  id: '/(public)/',
+const AuthenticatedRoute = AuthenticatedImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const authenticatedIndexRoute = authenticatedIndexImport.update({
+  id: '/(authenticated)/',
   path: '/',
   getParentRoute: () => rootRoute,
 } as any)
@@ -84,6 +90,13 @@ const authorizationAuthSigninRoute = authorizationAuthSigninImport.update({
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedImport
+      parentRoute: typeof rootRoute
+    }
     '/(authenticated)/requests': {
       id: '/(authenticated)/requests'
       path: '/requests'
@@ -112,11 +125,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof publicUsersImport
       parentRoute: typeof rootRoute
     }
-    '/(public)/': {
-      id: '/(public)/'
+    '/(authenticated)/': {
+      id: '/(authenticated)/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof publicIndexImport
+      preLoaderRoute: typeof authenticatedIndexImport
       parentRoute: typeof rootRoute
     }
     '/(authorization)/_auth/signin': {
@@ -178,8 +191,9 @@ const authorizationRouteWithChildren = authorizationRoute._addFileChildren(
 )
 
 export interface FileRoutesByFullPath {
+  '': typeof AuthenticatedRoute
   '/requests': typeof authenticatedRequestsRoute
-  '/': typeof publicIndexRoute
+  '/': typeof authenticatedIndexRoute
   '/users': typeof publicUsersRoute
   '/signin': typeof authorizationAuthSigninRoute
   '/signup': typeof authorizationAuthSignupRoute
@@ -188,8 +202,9 @@ export interface FileRoutesByFullPath {
 }
 
 export interface FileRoutesByTo {
+  '': typeof AuthenticatedRoute
   '/requests': typeof authenticatedRequestsRoute
-  '/': typeof publicIndexRoute
+  '/': typeof authenticatedIndexRoute
   '/users': typeof publicUsersRoute
   '/signin': typeof authorizationAuthSigninRoute
   '/signup': typeof authorizationAuthSignupRoute
@@ -199,11 +214,12 @@ export interface FileRoutesByTo {
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
+  '/_authenticated': typeof AuthenticatedRoute
   '/(authenticated)/requests': typeof authenticatedRequestsRoute
   '/(authorization)': typeof authorizationRouteWithChildren
   '/(authorization)/_auth': typeof authorizationAuthRouteWithChildren
   '/(public)/users': typeof publicUsersRoute
-  '/(public)/': typeof publicIndexRoute
+  '/(authenticated)/': typeof authenticatedIndexRoute
   '/(authorization)/_auth/signin': typeof authorizationAuthSigninRoute
   '/(authorization)/_auth/signup': typeof authorizationAuthSignupRoute
   '/(public)/connections/$id': typeof publicConnectionsIdRoute
@@ -213,6 +229,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | ''
     | '/requests'
     | '/'
     | '/users'
@@ -222,6 +239,7 @@ export interface FileRouteTypes {
     | '/profile/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | ''
     | '/requests'
     | '/'
     | '/users'
@@ -231,11 +249,12 @@ export interface FileRouteTypes {
     | '/profile/$id'
   id:
     | '__root__'
+    | '/_authenticated'
     | '/(authenticated)/requests'
     | '/(authorization)'
     | '/(authorization)/_auth'
     | '/(public)/users'
-    | '/(public)/'
+    | '/(authenticated)/'
     | '/(authorization)/_auth/signin'
     | '/(authorization)/_auth/signup'
     | '/(public)/connections/$id'
@@ -244,19 +263,21 @@ export interface FileRouteTypes {
 }
 
 export interface RootRouteChildren {
+  AuthenticatedRoute: typeof AuthenticatedRoute
   authenticatedRequestsRoute: typeof authenticatedRequestsRoute
   authorizationRoute: typeof authorizationRouteWithChildren
   publicUsersRoute: typeof publicUsersRoute
-  publicIndexRoute: typeof publicIndexRoute
+  authenticatedIndexRoute: typeof authenticatedIndexRoute
   publicConnectionsIdRoute: typeof publicConnectionsIdRoute
   publicProfileIdRoute: typeof publicProfileIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  AuthenticatedRoute: AuthenticatedRoute,
   authenticatedRequestsRoute: authenticatedRequestsRoute,
   authorizationRoute: authorizationRouteWithChildren,
   publicUsersRoute: publicUsersRoute,
-  publicIndexRoute: publicIndexRoute,
+  authenticatedIndexRoute: authenticatedIndexRoute,
   publicConnectionsIdRoute: publicConnectionsIdRoute,
   publicProfileIdRoute: publicProfileIdRoute,
 }
@@ -271,13 +292,17 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
+        "/_authenticated",
         "/(authenticated)/requests",
         "/(authorization)",
         "/(public)/users",
-        "/(public)/",
+        "/(authenticated)/",
         "/(public)/connections/$id",
         "/(public)/profile/$id"
       ]
+    },
+    "/_authenticated": {
+      "filePath": "_authenticated.tsx"
     },
     "/(authenticated)/requests": {
       "filePath": "(authenticated)/requests.tsx"
@@ -299,8 +324,8 @@ export const routeTree = rootRoute
     "/(public)/users": {
       "filePath": "(public)/users.tsx"
     },
-    "/(public)/": {
-      "filePath": "(public)/index.tsx"
+    "/(authenticated)/": {
+      "filePath": "(authenticated)/index.tsx"
     },
     "/(authorization)/_auth/signin": {
       "filePath": "(authorization)/_auth/signin.tsx",

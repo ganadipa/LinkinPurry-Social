@@ -89,7 +89,7 @@ export class DbFeedRepository implements FeedRepository {
         created_at: "desc",
       },
       include: {
-        users: true, // This will include the user data in the response
+        users: true,
       },
     });
 
