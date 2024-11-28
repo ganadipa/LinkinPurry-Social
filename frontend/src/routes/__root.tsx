@@ -1,9 +1,7 @@
 import { AuthContext } from "@/contexts/auth-context";
 import { useAuth } from "@/hooks/auth";
 import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
-import { Toaster } from "react-hot-toast";
 import Header from "@/components/layout/header";
-import Loading from "@/components/loading";
 
 type RouterContext = {
   authentication: AuthContext;
