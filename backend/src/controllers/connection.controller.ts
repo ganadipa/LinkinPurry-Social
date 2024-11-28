@@ -82,7 +82,6 @@ export class ConnectionController implements Controller {
       });
     });
 
-    // send connection request
     this.hono.app.post("/api/connections/request", async (c) => {
       const { to_id } = await c.req.json();
       const user = c.var.user;

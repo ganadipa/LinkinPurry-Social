@@ -90,10 +90,20 @@ export class DbConnectionRepository implements ConnectionRepository {
     return !!connection;
   }
 
-  async getConnectionRequestsFrom(userId: bigint): Promise<ConnectionRequest[]> {
+  async getConnectionRequestsFrom(
+    userId: bigint
+  ): Promise<ConnectionRequest[]> {
     return await this.prisma.prisma.connection_request.findMany({
       where: { from_id: userId },
       orderBy: { created_at: "desc" },
     });
+  }
+
+  async getFriendsId(userId: bigint): Promise<bigint[]> {
+    const connections = await this.prisma.prisma.connection.findMany({
+      where: { from_id: userId },
+    });
+
+    return connections.map((connection) => connection.to_id);
   }
 }

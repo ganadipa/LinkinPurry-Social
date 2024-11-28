@@ -31,6 +31,8 @@ import { UserController } from "../controllers/user.controller";
 import { UserService } from "../services/user.service";
 import { IOCContainer } from "../ioc/container";
 import { SwaggerUIController } from "../controllers/swagger-ui.controller";
+import { FeedService } from "../services/feed.service";
+import { FeedController } from "../controllers/feed.controller";
 
 export class Application {
   private ioc: IOCContainer;
@@ -126,6 +128,7 @@ class MainBindingConfigurator {
     this.ioc.bind<Controller>(CONFIG.Controllers, ServeStaticController);
     this.ioc.bind<Controller>(CONFIG.Controllers, ConnectionController);
     this.ioc.bind<Controller>(CONFIG.Controllers, SwaggerUIController);
+    this.ioc.bind<Controller>(CONFIG.Controllers, FeedController);
   }
 
   private configureProviders(): void {
@@ -186,5 +189,6 @@ class MainBindingConfigurator {
       CONFIG.ConnectionService,
       ConnectionService
     );
+    this.ioc.bind<FeedService>(CONFIG.FeedService, FeedService);
   }
 }

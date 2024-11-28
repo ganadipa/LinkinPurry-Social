@@ -1,3 +1,4 @@
+import { FeedRelated } from "../schemas/feed.schema";
 import { Feed } from "../models/feed.model";
 
 export interface FeedRepository {
@@ -9,4 +10,9 @@ export interface FeedRepository {
   delete(id: number): Promise<void>;
   getFeedsByPage(page?: number, limit?: number): Promise<Feed[]>;
   searchFeeds(keyword: string): Promise<Feed[]>;
+  getPaginatedFeeds(
+    visible: BigInt[],
+    limit: number | undefined,
+    cursor: number | undefined
+  ): Promise<FeedRelated[]>;
 }

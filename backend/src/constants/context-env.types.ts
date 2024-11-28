@@ -11,3 +11,10 @@ export type RegisterEnv = {
     registerPayload: RegisterPayload;
   };
 };
+
+export type GetFeedEnv = {
+  Variables: {
+    limit?: number;
+    cursor?: number;
+  };
+};

@@ -12,6 +12,7 @@ export const CONFIG = {
   ZodValidationService: Symbol.for("ZodValidationService"),
   ConnectionService: Symbol.for("ConnectionService"),
   ProfileService: Symbol.for("ProfileService"),
+  FeedService: Symbol.for("FeedService"),
 
   AuthStrategy: Symbol.for("Jwt"),
   JwtAuthStrategy: Symbol.for("Jwt"),

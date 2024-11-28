@@ -3,6 +3,7 @@ import { CONFIG } from "../../ioc/config";
 import { Feed } from "../../models/feed.model";
 import { PrismaProvider } from "../../prisma/prisma";
 import { FeedRepository } from "../../interfaces/feed-repository.interface";
+import { FeedRelated } from "../../schemas/feed.schema";
 
 @injectable()
 export class DbFeedRepository implements FeedRepository {
@@ -114,5 +115,54 @@ export class DbFeedRepository implements FeedRepository {
     });
 
     return feeds;
+  }
+
+  public async getPaginatedFeeds(
+    visible: bigint[],
+    limit: number,
+    cursor: number
+  ): Promise<FeedRelated[]> {
+    const feeds = await this.prisma.prisma.feed.findMany({
+      where: {
+        user_id: {
+          in: visible,
+        },
+      },
+      orderBy: {
+        created_at: "desc",
+      },
+      cursor: cursor ? { id: cursor } : undefined,
+      skip: cursor ? 1 : 0,
+      take: limit,
+      select: {
+        id: true,
+        created_at: true,
+        updated_at: true,
+        content: true,
+        users: {
+          select: {
+            username: true,
+            full_name: true,
+            profile_photo_path: true,
+          },
+        },
+      },
+    });
+
+    const ret = feeds.map((feed) => ({
+      post: {
+        id: Number(feed.id),
+        created_at: feed.created_at.getTime(),
+        updated_at: feed.updated_at.getTime(),
+        content: feed.content,
+      },
+      user: {
+        username: feed.users.username,
+        fullname: feed.users.full_name ?? "",
+        profile_photo_path: feed.users.profile_photo_path,
+      },
+    }));
+
+    return ret;
   }
 }

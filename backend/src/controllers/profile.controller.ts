@@ -55,7 +55,7 @@ export class ProfileController implements Controller {
       path: "/api/profile/{user_id}",
       security: [{ BearerAuth: [] }],
       request: {
-        params: GetProfileURLParamSchema,
+        // params: GetProfileURLParamSchema,
       },
       responses: {
         200: {
@@ -69,7 +69,7 @@ export class ProfileController implements Controller {
             },
           },
         },
-        401: {
+        400: {
           description: "Unauthorized",
           content: {
             "application/json": {
@@ -107,10 +107,10 @@ export class ProfileController implements Controller {
         );
       } catch (exception) {
         if (exception instanceof HTTPException) {
-          let status: 401 | 500;
+          let status: 400 | 500;
           switch (exception.status) {
-            case 401:
-              status = 401;
+            case 400:
+              status = 400;
               break;
             default:
               status = 500;

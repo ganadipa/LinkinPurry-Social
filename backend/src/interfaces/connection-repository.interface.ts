@@ -10,4 +10,5 @@ export interface ConnectionRepository {
   countConnections(userId: bigint): Promise<number>;
   checkConnection(fromId: bigint, toId: bigint): Promise<boolean>;
   getConnectionRequestsFrom(userId: bigint): Promise<ConnectionRequest[]>;
+  getFriendsId(userId: bigint): Promise<bigint[]>;
 }
