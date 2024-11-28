@@ -17,6 +17,7 @@ export class AuthService {
   ) {}
 
   public async login({ identifier, password }: LoginPayload) {
+    console.log("heree");
     let user = null;
     if (identifier.includes("@")) {
       user = await this.userRepository.findByEmail(identifier);
@@ -24,6 +25,7 @@ export class AuthService {
       user = await this.userRepository.findByUsername(identifier);
     }
 
+    console.log("hereee");
     if (!user) {
       throw new BadRequestException("Identifier or password is incorrect");
     }
@@ -34,6 +36,7 @@ export class AuthService {
       );
     }
 
+    console.log("herrr");
     const match = bcrypt.compareSync(password, user.password_hash);
     if (!match) {
       throw new BadRequestException("Identifier or password is incorrect");
@@ -44,6 +47,8 @@ export class AuthService {
       user.id.toString(),
       user.email
     );
+
+    console.log("final");
 
     return token;
   }

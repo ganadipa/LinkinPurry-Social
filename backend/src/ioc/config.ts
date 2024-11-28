@@ -1,5 +1,6 @@
 export const CONFIG = {
   HonoProvider: Symbol.for("HonoProvider"),
+  OpenApiHonoProvider: Symbol.for("OpenApiHonoProvider"),
   Server: Symbol.for("Server"),
   Router: Symbol.for("Router"),
   Controllers: Symbol.for("Controllers"),

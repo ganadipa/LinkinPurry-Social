@@ -1,18 +1,23 @@
 import { JsonArray, JsonObject } from "@prisma/client/runtime/library";
 import { Feed } from "../models/feed.model";
+import { z } from "zod";
 
-export type BaseResponse = {
-  success: boolean;
-  message: string;
-};
+export const BaseResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});
 
-export type ErrorResponse = BaseResponse & {
-  error: null | Object;
-};
+export const ErrorResponseSchema = z.object({
+  success: z.literal(false),
+  message: z.string(),
+  error: z.record(z.any()).nullable(),
+});
 
-export type SuccessResponse<T> = BaseResponse & {
-  body: T;
-};
+export const SuccessResponseSchema = z.object({
+  success: z.literal(true),
+  message: z.string(),
+  body: z.object({}).passthrough().nullable(),
+});
 
 export type Post = Omit<Feed, "user_id">;
 

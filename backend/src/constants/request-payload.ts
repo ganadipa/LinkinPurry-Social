@@ -6,7 +6,7 @@ export type LoginPayload = {
   password: string;
 };
 
-export const loginPayloadSchema = z.object({
+export const LoginPayloadSchema = z.object({
   identifier: z
     .string({
       message: "Identifier must be a string",
@@ -36,7 +36,7 @@ export type RegisterPayload = {
   password: string;
 };
 
-export const registerPayloadSchema = z.object({
+export const RegisterPayloadSchema = z.object({
   username: z
     .string({
       message: "Username must be a string",
@@ -82,7 +82,7 @@ export const fromId_toIdSchema = z.object({
   to_id: z.number(),
 });
 
-export const updateProfilePayloadSchema = z.object({
+export const UpdateProfilePayloadSchema = z.object({
   name: z
     .string({
       message: "Name must be a string",

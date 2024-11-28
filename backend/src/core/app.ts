@@ -3,9 +3,9 @@ import "reflect-metadata";
 import { Server } from "./server";
 import { Router } from "./router";
 import { CONFIG } from "../ioc/config";
-import { HonoProvider } from "./hono-provider";
+import { HonoProvider, OpenApiHonoProvider } from "./hono-provider";
 import { Controller } from "../controllers/controller";
-import { AuthController } from "../controllers/auth-controller";
+import { AuthController } from "../controllers/auth.controller";
 import { ServeStaticController } from "../controllers/serve-static-controller";
 import { HTTPException } from "hono/http-exception";
 import { IAuthStrategy } from "../interfaces/auth-strategy.interface";
@@ -30,6 +30,7 @@ import { DbFeedRepository } from "../repositories/db/feed.repository";
 import { UserController } from "../controllers/user.controller";
 import { UserService } from "../services/user.service";
 import { IOCContainer } from "../ioc/container";
+import { SwaggerUIController } from "../controllers/swagger-ui.controller";
 
 export class Application {
   private ioc: IOCContainer;
@@ -58,7 +59,9 @@ export class Application {
   }
 
   public configureHono(): void {
-    const hono = this.ioc.get<HonoProvider>(CONFIG.HonoProvider).app;
+    const hono = this.ioc.get<OpenApiHonoProvider>(
+      CONFIG.OpenApiHonoProvider
+    ).app;
 
     hono.onError((err, c) => {
       console.error(err);
@@ -85,22 +88,15 @@ export class Application {
   }
 
   public registerGlobalMiddlewares(): void {
-    const hono = this.ioc.get<HonoProvider>(CONFIG.HonoProvider).app;
-    hono.use("*", async (c, next) => {
-      console.log("in seeing the path");
-      const path = c.req.path;
-      const method = c.req.method;
-      console.log(`{${method.toUpperCase()}} ${path}`);
-      await next();
-      console.log("out seeing the path");
-    });
-
+    const hono = this.ioc.get<OpenApiHonoProvider>(
+      CONFIG.OpenApiHonoProvider
+    ).app;
     const authMiddleware = this.ioc.get<AuthMiddleware>(CONFIG.AuthMiddleware);
     hono.use("*", authMiddleware.intercept);
   }
 
   public getApp() {
-    return this.ioc.get<HonoProvider>(CONFIG.HonoProvider).app;
+    return this.ioc.get<OpenApiHonoProvider>(CONFIG.OpenApiHonoProvider).app;
   }
 }
 
@@ -129,11 +125,16 @@ class MainBindingConfigurator {
     this.ioc.bind<Controller>(CONFIG.Controllers, ProfileController);
     this.ioc.bind<Controller>(CONFIG.Controllers, ServeStaticController);
     this.ioc.bind<Controller>(CONFIG.Controllers, ConnectionController);
+    this.ioc.bind<Controller>(CONFIG.Controllers, SwaggerUIController);
   }
 
   private configureProviders(): void {
     // Register Providers
     this.ioc.bind<HonoProvider>(CONFIG.HonoProvider, HonoProvider);
+    this.ioc.bind<OpenApiHonoProvider>(
+      CONFIG.OpenApiHonoProvider,
+      OpenApiHonoProvider
+    );
     this.ioc.bind<PrismaProvider>(CONFIG.PrismaProvider, PrismaProvider);
   }
 
