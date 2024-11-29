@@ -18,6 +18,7 @@ import { Route as authenticatedIndexImport } from './routes/(authenticated)/inde
 import { Route as publicUsersImport } from './routes/(public)/users'
 import { Route as authorizationAuthImport } from './routes/(authorization)/_auth'
 import { Route as authenticatedRequestsImport } from './routes/(authenticated)/requests'
+import { Route as authenticatedChatImport } from './routes/(authenticated)/chat'
 import { Route as publicProfileIdImport } from './routes/(public)/profile.$id'
 import { Route as publicConnectionsIdImport } from './routes/(public)/connections.$id'
 import { Route as authorizationAuthSignupImport } from './routes/(authorization)/_auth/signup'
@@ -62,6 +63,12 @@ const authenticatedRequestsRoute = authenticatedRequestsImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const authenticatedChatRoute = authenticatedChatImport.update({
+  id: '/(authenticated)/chat',
+  path: '/chat',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const publicProfileIdRoute = publicProfileIdImport.update({
   id: '/(public)/profile/$id',
   path: '/profile/$id',
@@ -95,6 +102,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: ''
       preLoaderRoute: typeof AuthenticatedImport
+      parentRoute: typeof rootRoute
+    }
+    '/(authenticated)/chat': {
+      id: '/(authenticated)/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof authenticatedChatImport
       parentRoute: typeof rootRoute
     }
     '/(authenticated)/requests': {
@@ -192,6 +206,7 @@ const authorizationRouteWithChildren = authorizationRoute._addFileChildren(
 
 export interface FileRoutesByFullPath {
   '': typeof AuthenticatedRoute
+  '/chat': typeof authenticatedChatRoute
   '/requests': typeof authenticatedRequestsRoute
   '/': typeof authenticatedIndexRoute
   '/users': typeof publicUsersRoute
@@ -203,6 +218,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '': typeof AuthenticatedRoute
+  '/chat': typeof authenticatedChatRoute
   '/requests': typeof authenticatedRequestsRoute
   '/': typeof authenticatedIndexRoute
   '/users': typeof publicUsersRoute
@@ -215,6 +231,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_authenticated': typeof AuthenticatedRoute
+  '/(authenticated)/chat': typeof authenticatedChatRoute
   '/(authenticated)/requests': typeof authenticatedRequestsRoute
   '/(authorization)': typeof authorizationRouteWithChildren
   '/(authorization)/_auth': typeof authorizationAuthRouteWithChildren
@@ -230,6 +247,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | ''
+    | '/chat'
     | '/requests'
     | '/'
     | '/users'
@@ -240,6 +258,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | ''
+    | '/chat'
     | '/requests'
     | '/'
     | '/users'
@@ -250,6 +269,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_authenticated'
+    | '/(authenticated)/chat'
     | '/(authenticated)/requests'
     | '/(authorization)'
     | '/(authorization)/_auth'
@@ -264,6 +284,7 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRoute
+  authenticatedChatRoute: typeof authenticatedChatRoute
   authenticatedRequestsRoute: typeof authenticatedRequestsRoute
   authorizationRoute: typeof authorizationRouteWithChildren
   publicUsersRoute: typeof publicUsersRoute
@@ -274,6 +295,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRoute,
+  authenticatedChatRoute: authenticatedChatRoute,
   authenticatedRequestsRoute: authenticatedRequestsRoute,
   authorizationRoute: authorizationRouteWithChildren,
   publicUsersRoute: publicUsersRoute,
@@ -293,6 +315,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/_authenticated",
+        "/(authenticated)/chat",
         "/(authenticated)/requests",
         "/(authorization)",
         "/(public)/users",
@@ -303,6 +326,9 @@ export const routeTree = rootRoute
     },
     "/_authenticated": {
       "filePath": "_authenticated.tsx"
+    },
+    "/(authenticated)/chat": {
+      "filePath": "(authenticated)/chat.tsx"
     },
     "/(authenticated)/requests": {
       "filePath": "(authenticated)/requests.tsx"

@@ -15,8 +15,8 @@ function RootComponent() {
   return (
     <>
       <Header />
-      <main className="w-full">
-        <div className="min-h-[700px] max-w-[1120px] mx-auto">
+      <main className="w-full flex-col flex-1">
+        <div className="mx-auto overflow-y w-full md:w-[1120px]">
           <Outlet />
         </div>
       </main>
