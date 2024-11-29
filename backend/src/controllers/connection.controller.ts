@@ -1,214 +1,626 @@
 import { inject, injectable } from "inversify";
 import { Controller } from "./controller";
 import { CONFIG } from "../ioc/config";
-import { HonoProvider } from "../core/hono-provider";
+import { OpenApiHonoProvider } from "../core/hono-provider";
 import { ConnectionService } from "../services/connection.service";
 import { BadRequestException } from "../exceptions/bad-request.exception";
-import { ZodValidationService } from "../services/zod-validation.service";
-import { fromId_toIdSchema } from "../constants/request-payload";
+import { createRoute } from "@hono/zod-openapi";
+import { HTTPException } from "hono/http-exception";
+import { z } from "zod";
+import { ErrorResponseSchema } from "../constants/types";
+import {
+  GetUsersResponseSchema,
+  GetConnectionsResponseSchema,
+  RequestConnectionSchema,
+  RespondToConnectionRequestSchema,
+  GetConnectionRequestsResponseSchema,
+  UnconnectSchema,
+  CheckConnectionRequestSchema,
+  CheckConnectionResponseSchema,
+  GetConnectionRequestsFromResponseSchema,
+} from "../schemas/connection.schema";
 
 @injectable()
 export class ConnectionController implements Controller {
   constructor(
-    @inject(CONFIG.HonoProvider) private hono: HonoProvider,
+    @inject(CONFIG.OpenApiHonoProvider) private hono: OpenApiHonoProvider,
     @inject(CONFIG.ConnectionService)
-    private connectionService: ConnectionService,
-    @inject(CONFIG.ZodValidationService)
-    private zodValidationService: ZodValidationService
+    private connectionService: ConnectionService
   ) {}
 
   public registerMiddlewaresbeforeGlobal(): void {}
 
-  public registerMiddlewaresAfterGlobal(): void {
-    this.hono.app.post("/api/connection/check", async (c, next) => {
-      const payload = await c.req.json();
-      this.zodValidationService.validate(payload, fromId_toIdSchema);
-      await next();
-    });
-  }
+  public registerMiddlewaresAfterGlobal(): void {}
 
   public registerRoutes(): void {
     // search users
-    this.hono.app.get("/api/users", async (c) => {
-      const searchQuery = c.req.query("search") || "";
-      console.log("searchQuery: ", searchQuery); // debug
-      const users = await this.connectionService.searchUsers(searchQuery);
+    this.registerGetUsersRoute();
+    // get all connections
+    this.registerGetConnectionsRoute();
+    // send connection request
+    this.registerRequestConnectionRoute();
+    // respond to connection request
+    this.registerRespondToConnectionRequestRoute();
+    // get all connection requests
+    this.registerGetConnectionRequestsRoute();
+    // unconnect
+    this.registerUnconnectRoute();
+    // check connection
+    this.registerCheckConnectionRoute();
+    // get all connection requests from current user
+    this.registerGetConnectionRequestsFromRoute();
+  }
 
-      const jsonFriendlyUsers = users.map((user) => {
-        return {
+  // search users
+  private registerGetUsersRoute() {
+    const route = createRoute({
+      method: "get",
+      path: "/api/users",
+      responses: {
+        200: {
+          description: "Users retrieved successfully",
+          content: {
+            "application/json": {
+              schema: GetUsersResponseSchema,
+            },
+          },
+        },
+        400: {
+          description: "Bad Request",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+        500: {
+          description: "Internal Server Error",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+      },
+    });
+
+    this.hono.app.openapi(route, async (c) => {
+      try {
+        const searchQuery = c.req.query("search") || "";
+        console.log("searchQuery: ", searchQuery); // debug
+        const users = await this.connectionService.searchUsers(searchQuery);
+
+        const jsonFriendlyUsers = users.map((user) => ({
           ...user,
           id: Number(user.id),
-        };
-      });
+        }));
 
-      console.log("jsonFriendlyUsers: ", jsonFriendlyUsers); // debug
+        console.log("jsonFriendlyUsers: ", jsonFriendlyUsers); // debug
 
-      return c.json({
-        success: true,
-        message: "Users retrieved successfully",
-        body: jsonFriendlyUsers,
-      });
-    });
-
-    // get connections
-    this.hono.app.get("/api/connections", async (c) => {
-      const userIdQuery = c.req.query("user_id");
-      const user = c.var.user;
-
-      const targetUserId = userIdQuery
-        ? BigInt(userIdQuery)
-        : user?.id !== undefined
-        ? BigInt(user.id)
-        : undefined;
-
-      if (!targetUserId) {
-        throw new BadRequestException("User ID is undefined");
-      }
-
-      const connections = await this.connectionService.getConnections(
-        targetUserId
-      );
-
-      const jsonFriendlyConnections = connections.map((conn) => ({
-        ...conn,
-        from_id: Number(conn.from_id),
-        to_id: Number(conn.to_id),
-      }));
-
-      return c.json({
-        success: true,
-        message: "Connections retrieved successfully",
-        body: jsonFriendlyConnections,
-      });
-    });
-
-    this.hono.app.post("/api/connections/request", async (c) => {
-      const { to_id } = await c.req.json();
-      const user = c.var.user;
-      if (!user || user.id === undefined) {
-        throw new BadRequestException("User not found or user ID is undefined");
-      }
-      const from_id = BigInt(user.id);
-
-      if (!to_id) {
-        throw new BadRequestException("Missing 'to_id' in request body");
-      }
-
-      await this.connectionService.sendConnectionRequest(
-        from_id,
-        BigInt(to_id)
-      );
-      return c.json({
-        success: true,
-        message: "Connection request sent successfully",
-      });
-    });
-
-    // respond to connection request
-    this.hono.app.patch("/api/connections/requests/:from_id", async (c) => {
-      const { action } = await c.req.json();
-      const from_id = BigInt(c.req.param("from_id"));
-      const user = c.var.user;
-      if (!user || user.id === undefined) {
-        throw new BadRequestException("User not found or user ID is undefined");
-      }
-      const to_id = BigInt(user.id);
-
-      if (!["accept", "reject"].includes(action)) {
-        throw new BadRequestException(
-          "Invalid action. Use 'accept' or 'reject'."
+        return c.json(
+          {
+            success: true,
+            message: "Users retrieved successfully",
+            body: jsonFriendlyUsers,
+          },
+          200
         );
+      } catch (exception) {
+        return this.handleException(c, exception);
       }
-
-      await this.connectionService.respondToConnectionRequest(
-        from_id,
-        to_id,
-        action
-      );
-      return c.json({
-        success: true,
-        message: `Connection request ${action}ed successfully`,
-      });
     });
+  }
 
-    // get connection requests
-    this.hono.app.get("/api/connections/requests", async (c) => {
-      const user = c.var.user;
-      if (!user || user.id === undefined) {
-        throw new BadRequestException("User not found or user ID is undefined");
-      }
-      const userId = BigInt(user.id);
-      const requests = await this.connectionService.getConnectionRequests(
-        userId
-      );
-
-      const jsonFriendlyRequests = requests.map((req) => ({
-        ...req,
-        from_id: Number(req.from_id),
-        to_id: Number(req.to_id),
-      }));
-
-      return c.json({
-        success: true,
-        message: "Connection requests retrieved successfully",
-        body: jsonFriendlyRequests,
-      });
-    });
-
-    // unconnect
-    this.hono.app.delete("/api/connections/:user_id", async (c) => {
-      const to_id = BigInt(c.req.param("user_id"));
-      const user = c.var.user;
-      if (!user || user.id === undefined) {
-        throw new BadRequestException("User not found or user ID is undefined");
-      }
-      const from_id = BigInt(user.id);
-
-      await this.connectionService.unconnect(from_id, to_id);
-      return c.json({
-        success: true,
-        message: "Connection removed successfully",
-      });
-    });
-
-    // check connection
-    this.hono.app.post("/api/connection/check", async (c) => {
-      const { from_id, to_id } = await c.req.json();
-      const connection = await this.connectionService.checkConnection(
-        from_id,
-        to_id
-      );
-      return c.json({
-        success: true,
-        message: "Connection checked successfully",
-        body: {
-          connected: connection,
+  // get all connections
+  private registerGetConnectionsRoute() {
+    const route = createRoute({
+      method: "get",
+      path: "/api/connections",
+      security: [{ BearerAuth: [] }],
+      responses: {
+        200: {
+          description: "Connections retrieved successfully",
+          content: {
+            "application/json": {
+              schema: GetConnectionsResponseSchema,
+            },
+          },
         },
-      });
+        400: {
+          description: "Bad Request",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+        500: {
+          description: "Internal Server Error",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+      },
     });
 
-    // get connection requests from current user
-    this.hono.app.get("/api/connections/requests-from", async (c) => {
-      const user = c.var.user;
-      if (!user || user.id === undefined) {
-        throw new BadRequestException("User not found or user ID is undefined");
+    this.hono.app.openapi(route, async (c) => {
+      try {
+        const userIdQuery = c.req.query("user_id");
+        const user = c.var.user;
+
+        const targetUserId = userIdQuery
+          ? BigInt(userIdQuery)
+          : user?.id !== undefined
+          ? BigInt(user.id)
+          : undefined;
+
+        if (!targetUserId) {
+          throw new BadRequestException("User ID is undefined");
+        }
+
+        const connections = await this.connectionService.getConnections(
+          targetUserId
+        );
+
+        const jsonFriendlyConnections = connections.map((conn) => ({
+          ...conn,
+          from_id: Number(conn.from_id),
+          to_id: Number(conn.to_id),
+        }));
+
+        return c.json(
+          {
+            success: true,
+            message: "Connections retrieved successfully",
+            body: jsonFriendlyConnections,
+          },
+          200
+        );
+      } catch (exception) {
+        return this.handleException(c, exception);
       }
-      const userId = BigInt(user.id);
-      const requests = await this.connectionService.getConnectionRequestsFrom(
-        userId
-      );
-
-      const jsonFriendlyRequests = requests.map((req) => ({
-        ...req,
-        from_id: Number(req.from_id),
-        to_id: Number(req.to_id),
-      }));
-
-      return c.json({
-        success: true,
-        message: "Connection requests from this user retrieved successfully",
-        body: jsonFriendlyRequests,
-      });
     });
+  }
+
+  // send connection request
+  private registerRequestConnectionRoute() {
+    const route = createRoute({
+      method: "post",
+      path: "/api/connections/request",
+      security: [{ BearerAuth: [] }],
+      request: {
+        body: {
+          content: {
+            "application/json": {
+              schema: RequestConnectionSchema,
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: "Connection request sent successfully",
+          content: {
+            "application/json": {
+              schema: z.object({
+                success: z.boolean(),
+                message: z.string(),
+              }),
+            },
+          },
+        },
+        400: {
+          description: "Bad Request",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+        500: {
+          description: "Internal Server Error",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+      },
+    });
+
+    this.hono.app.openapi(route, async (c) => {
+      try {
+        const { to_id } = await c.req.json();
+        const user = c.var.user;
+
+        if (!user || user.id === undefined) {
+          throw new BadRequestException("User not found or user ID is undefined");
+        }
+
+        const from_id = BigInt(user.id);
+        await this.connectionService.sendConnectionRequest(
+          from_id,
+          BigInt(to_id)
+        );
+
+        return c.json(
+          {
+            success: true,
+            message: "Connection request sent successfully",
+          },
+          200
+        );
+      } catch (exception) {
+        return this.handleException(c, exception);
+      }
+    });
+  }
+
+  // respond to connection request
+  private registerRespondToConnectionRequestRoute() {
+    const route = createRoute({
+      method: "patch",
+      path: "/api/connections/requests/{from_id}",
+      security: [{ BearerAuth: [] }],
+      request: {
+        body: {
+          content: {
+            "application/json": {
+              schema: RespondToConnectionRequestSchema,
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: "Connection request responded successfully",
+          content: {
+            "application/json": {
+              schema: z.object({
+                success: z.boolean(),
+                message: z.string(),
+              }),
+            },
+          },
+        },
+        400: {
+          description: "Bad Request",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+        500: {
+          description: "Internal Server Error",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+      },
+    });
+
+    this.hono.app.openapi(route, async (c) => {
+      try {
+        const { action } = await c.req.json();
+        const from_id = BigInt(c.req.param("from_id"));
+        const user = c.var.user;
+
+        if (!user || user.id === undefined) {
+          throw new BadRequestException("User not found or user ID is undefined");
+        }
+
+        const to_id = BigInt(user.id);
+
+        if (!["accept", "reject"].includes(action)) {
+          throw new BadRequestException(
+            "Invalid action. Use 'accept' or 'reject'."
+          );
+        }
+
+        await this.connectionService.respondToConnectionRequest(
+          from_id,
+          to_id,
+          action
+        );
+
+        return c.json(
+          {
+            success: true,
+            message: `Connection request ${action}ed successfully`,
+          },
+          200
+        );
+      } catch (exception) {
+        return this.handleException(c, exception);
+      }
+    });
+  }
+
+  // get all connection requests
+  private registerGetConnectionRequestsRoute() {
+    const route = createRoute({
+      method: "get",
+      path: "/api/connections/requests",
+      security: [{ BearerAuth: [] }],
+      responses: {
+        200: {
+          description: "Connection requests retrieved successfully",
+          content: {
+            "application/json": {
+              schema: GetConnectionRequestsResponseSchema,
+            },
+          },
+        },
+        400: {
+          description: "Bad Request",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+        500: {
+          description: "Internal Server Error",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+      },
+    });
+
+    this.hono.app.openapi(route, async (c) => {
+      try {
+        const user = c.var.user;
+
+        if (!user || user.id === undefined) {
+          throw new BadRequestException("User not found or user ID is undefined");
+        }
+
+        const userId = BigInt(user.id);
+        const requests = await this.connectionService.getConnectionRequests(
+          userId
+        );
+
+        const jsonFriendlyRequests = requests.map((req) => ({
+          ...req,
+          from_id: Number(req.from_id),
+          to_id: Number(req.to_id),
+        }));
+
+        return c.json(
+          {
+            success: true,
+            message: "Connection requests retrieved successfully",
+            body: jsonFriendlyRequests,
+          },
+          200
+        );
+      } catch (exception) {
+        return this.handleException(c, exception);
+      }
+    });
+  }
+
+  // unconnect
+  private registerUnconnectRoute() {
+    const route = createRoute({
+      method: "delete",
+      path: "/api/connections/{user_id}",
+      security: [{ BearerAuth: [] }],
+      responses: {
+        200: {
+          description: "Connection removed successfully",
+          content: {
+            "application/json": {
+              schema: UnconnectSchema,
+            },
+          },
+        },
+        400: {
+          description: "Bad Request",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+        500: {
+          description: "Internal Server Error",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+      },
+    });
+
+    this.hono.app.openapi(route, async (c) => {
+      try {
+        const to_id = BigInt(c.req.param("user_id"));
+        const user = c.var.user;
+
+        if (!user || user.id === undefined) {
+          throw new BadRequestException("User not found or user ID is undefined");
+        }
+
+        const from_id = BigInt(user.id);
+
+        await this.connectionService.unconnect(from_id, to_id);
+
+        return c.json(
+          {
+            success: true,
+            message: "Connection removed successfully",
+          },
+          200
+        );
+      } catch (exception) {
+        return this.handleException(c, exception);
+      }
+    });
+  }
+
+  // check connection
+  private registerCheckConnectionRoute() {
+    const route = createRoute({
+      method: "post",
+      path: "/api/connection/check",
+      security: [{ BearerAuth: [] }],
+      request: {
+        body: {
+          content: {
+            "application/json": {
+              schema: CheckConnectionRequestSchema,
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: "Connection checked successfully",
+          content: {
+            "application/json": {
+              schema: CheckConnectionResponseSchema,
+            },
+          },
+        },
+        400: {
+          description: "Bad Request",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+        500: {
+          description: "Internal Server Error",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+      },
+    });
+
+    this.hono.app.openapi(route, async (c) => {
+      try {
+        const { from_id, to_id } = await c.req.json();
+        const connection = await this.connectionService.checkConnection(
+          from_id,
+          to_id
+        );
+
+        return c.json(
+          {
+            success: true,
+            message: "Connection checked successfully",
+            body: {
+              connected: connection,
+            },
+          },
+          200
+        );
+      } catch (exception) {
+        return this.handleException(c, exception);
+      }
+    });
+  }
+
+  // get all connection requests from current user
+  private registerGetConnectionRequestsFromRoute() {
+    const route = createRoute({
+      method: "get",
+      path: "/api/connections/requests-from",
+      security: [{ BearerAuth: [] }],
+      responses: {
+        200: {
+          description: "Connection requests from the current user retrieved successfully",
+          content: {
+            "application/json": {
+              schema: GetConnectionRequestsFromResponseSchema,
+            },
+          },
+        },
+        400: {
+          description: "Bad Request",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+        500: {
+          description: "Internal Server Error",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+      },
+    });
+
+    this.hono.app.openapi(route, async (c) => {
+      try {
+        const user = c.var.user;
+
+        if (!user || user.id === undefined) {
+          throw new BadRequestException("User not found or user ID is undefined");
+        }
+
+        const userId = BigInt(user.id);
+        const requests = await this.connectionService.getConnectionRequestsFrom(
+          userId
+        );
+
+        const jsonFriendlyRequests = requests.map((req) => ({
+          ...req,
+          from_id: Number(req.from_id),
+          to_id: Number(req.to_id),
+        }));
+
+        return c.json(
+          {
+            success: true,
+            message: "Connection requests from this user retrieved successfully",
+            body: jsonFriendlyRequests,
+          },
+          200
+        );
+      } catch (exception) {
+        return this.handleException(c, exception);
+      }
+    });
+  }
+
+  private handleException(c: any, exception: any) {
+    if (exception instanceof HTTPException) {
+      return c.json(
+        {
+          success: false,
+          message: exception.message,
+          error: null,
+        },
+        exception.status
+      );
+    }
+
+    return c.json(
+      {
+        success: false,
+        message: "Internal Server Error",
+        error: null,
+      },
+      500
+    );
   }
 }
