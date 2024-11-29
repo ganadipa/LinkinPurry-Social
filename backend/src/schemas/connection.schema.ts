@@ -27,7 +27,7 @@ export const GetConnectionsResponseSchema = z.object({
 
 // schema for /api/connections/request
 export const RequestConnectionSchema = z.object({
-  to_id: z.bigint(),
+  to_id: z.number(),
 });
 
 // schema for /api/connections/requests/{from_id}
@@ -49,13 +49,13 @@ export const GetConnectionRequestsResponseSchema = z.object({
 
 // schema for /api/connections/{user_id}
 export const UnconnectSchema = z.object({
-  user_id: z.bigint(),
+  user_id: z.number(),
 });
 
 // schema for /api/connection/check
 export const CheckConnectionRequestSchema = z.object({
-  from_id: z.bigint(),
-  to_id: z.bigint(),
+  from_id: z.number(),
+  to_id: z.number(),
 });
 
 export const CheckConnectionResponseSchema = z.object({
