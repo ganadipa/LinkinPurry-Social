@@ -6,8 +6,20 @@ import { CONFIG } from "../ioc/config";
 import { OpenApiHonoProvider } from "../core/hono-provider";
 import { ZodValidationService } from "../services/zod-validation.service";
 import { BadRequestException } from "../exceptions/bad-request.exception";
-import { GetFeedEnv } from "../constants/context-env.types";
-import { GetFeedSuccessSchema } from "../schemas/feed.schema";
+import {
+  CreatePostEnv,
+  DeletePostEnv,
+  GetFeedEnv,
+  UpdatePostEnv,
+} from "../constants/context-env.types";
+import {
+  CreatePostRequestSchema,
+  CreatePostSuccessSchema,
+  DeletePostSuccessSchema,
+  EditPostRequestSchema,
+  EditPostSuccessSchema,
+  GetFeedSuccessSchema,
+} from "../schemas/feed.schema";
 import { ErrorResponseSchema } from "../constants/types";
 import { UnauthorizedException } from "../exceptions/unauthorized.exception";
 import { InternalErrorException } from "../exceptions/internal-error.exception";
@@ -25,9 +37,9 @@ export class FeedController implements Controller {
   public registerMiddlewaresAfterGlobal(): void {}
   public registerRoutes(): void {
     this.registerGetFeedRoute();
-    // this.registerCreatePostRoute();
-    // this.registerUpdatePostRoute();
-    // this.registerDeletePostRoute();
+    this.registerCreatePostRoute();
+    this.registerUpdatePostRoute();
+    this.registerDeletePostRoute();
   }
 
   private setGetFeedQueryMiddleware = createMiddleware<GetFeedEnv>(
@@ -63,6 +75,87 @@ export class FeedController implements Controller {
       } catch (exception) {
         console.log(exception);
         throw new BadRequestException("Invalid query parameters");
+      }
+    }
+  );
+
+  private createPostBodyMiddleware = createMiddleware<CreatePostEnv>(
+    async (c, next) => {
+      const json = await c.req.json();
+      const expected = CreatePostRequestSchema.safeParse(json);
+      if (!expected.success) {
+        throw new BadRequestException("Invalid request body");
+      }
+
+      c.set("content", expected.data.content);
+      await next();
+    }
+  );
+
+  private setUpdatePostParamsAndQueryMiddleware =
+    createMiddleware<UpdatePostEnv>(async (c, next) => {
+      try {
+        const postId = c.req.param("postId");
+        const payload = await c.req.json();
+        const expected = EditPostRequestSchema.safeParse(payload);
+
+        if (!expected.success) {
+          throw new BadRequestException(
+            "Invalid request body: content is required, even if it must be an empty string"
+          );
+        }
+
+        if (!postId) {
+          throw new BadRequestException(
+            "Invalid parameters: postId is required"
+          );
+        }
+
+        const postIdConstraint = z.string().transform((value) => {
+          const parsed = parseInt(value);
+          if (isNaN(parsed)) {
+            throw new Error("Invalid number");
+          }
+          return parsed;
+        });
+
+        const postIdValue = postIdConstraint.parse(postId);
+
+        c.set("postId", postIdValue);
+        c.set("content", payload.content);
+        await next();
+      } catch (exception) {
+        console.log(exception);
+        throw new BadRequestException("Invalid parameters");
+      }
+    });
+
+  private setDeletePostParamsMiddleware = createMiddleware<DeletePostEnv>(
+    async (c, next) => {
+      try {
+        const postId = c.req.param("postId");
+
+        if (!postId) {
+          throw new BadRequestException(
+            "Invalid parameters: postId is required"
+          );
+        }
+
+        const postIdConstraint = z.string().transform((value) => {
+          const parsed = parseInt(value);
+          if (isNaN(parsed)) {
+            throw new Error("Invalid number");
+          }
+          return parsed;
+        });
+
+        const postIdValue = postIdConstraint.parse(postId);
+
+        c.set("postId", postIdValue);
+        await next();
+      } catch (exception) {
+        console.log(exception);
+        throw new BadRequestException("Invalid parameters");
       }
     }
   );
@@ -162,6 +255,413 @@ export class FeedController implements Controller {
             {
               success: false as const,
               message: exception.message,
+              error: null,
+            },
+            status
+          );
+        }
+
+        c.status(500);
+        return c.json(
+          {
+            success: false as const,
+            message: "Internal server error",
+            error: null,
+          },
+          500
+        );
+      }
+    });
+  }
+
+  private registerCreatePostRoute() {
+    const route = createRoute({
+      method: "post",
+      path: "/api/feed",
+      middleware: [this.createPostBodyMiddleware] as const,
+      request: {
+        body: {
+          content: {
+            "application/json": {
+              schema: z.object({
+                content: z.string(),
+              }),
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: "Successfully create post",
+          content: {
+            "application/json": {
+              schema: CreatePostSuccessSchema,
+            },
+          },
+        },
+        400: {
+          description: "Bad request",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+        401: {
+          description: "Unauthorized",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+        500: {
+          description: "Internal server error",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+      },
+    });
+
+    this.hono.app.openapi(route, async (c) => {
+      try {
+        const user = c.var.user;
+        const content = c.var.content;
+
+        if (!user) {
+          throw new UnauthorizedException("Unauthorized");
+        }
+
+        if (!user.id) {
+          throw new InternalErrorException(
+            "User from the repo somehow does not have an ID"
+          );
+        }
+
+        const feed = await this.feedService.createPost(
+          Number(user.id),
+          content
+        );
+
+        if (
+          !feed.id ||
+          !feed.user_id ||
+          !feed.content ||
+          !feed.created_at ||
+          !feed.updated_at
+        ) {
+          throw new InternalErrorException("Failed to create post");
+        }
+
+        return c.json(
+          {
+            success: true as const,
+            message: "Successfully create post",
+            body: {
+              post: {
+                id: feed.id,
+                content: feed.content,
+                created_at: feed.created_at.getTime(),
+                updated_at: feed.updated_at.getTime(),
+              },
+              user: {
+                fullname: user.full_name,
+                username: user.username,
+                profile_photo_path: user.profile_photo_path,
+              },
+            },
+          },
+          200
+        );
+      } catch (err) {
+        if (err instanceof HTTPException) {
+          let status: 400 | 401 | 500;
+
+          switch (err.status) {
+            case 400:
+              status = 400;
+              break;
+            case 401:
+              status = 401;
+              break;
+            default:
+              status = 500;
+              break;
+          }
+
+          c.status(status);
+          return c.json(
+            {
+              success: false as const,
+              message: err.message,
+              error: null,
+            },
+            status
+          );
+        }
+
+        c.status(500);
+        return c.json(
+          {
+            success: false as const,
+            message: "Internal server error",
+            error: null,
+          },
+          500
+        );
+      }
+    });
+  }
+
+  private registerUpdatePostRoute() {
+    const route = createRoute({
+      method: "put",
+      path: "/api/feed/{postId}",
+      middleware: [this.setUpdatePostParamsAndQueryMiddleware] as const,
+      request: {
+        params: z.object({
+          postId: z.string(),
+        }),
+        body: {
+          content: {
+            "application/json": {
+              schema: z.object({
+                content: z.string(),
+              }),
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: "Successfully update post",
+          content: {
+            "application/json": {
+              schema: EditPostSuccessSchema,
+            },
+          },
+        },
+        400: {
+          description: "Bad request",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+        401: {
+          description: "Unauthorized",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+        500: {
+          description: "Internal server error",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+      },
+    });
+
+    this.hono.app.openapi(route, async (c) => {
+      try {
+        const user = c.var.user;
+        const postId = c.var.postId;
+        const content = c.var.content;
+
+        if (!user) {
+          throw new UnauthorizedException("Unauthorized");
+        }
+
+        if (!user.id) {
+          throw new InternalErrorException(
+            "User from the repo somehow does not have an ID"
+          );
+        }
+
+        console.log("updating");
+        const feed = await this.feedService.updatePost(
+          Number(user.id),
+          Number(postId),
+          content
+        );
+        console.log("updated");
+
+        if (
+          !feed.id ||
+          !feed.user_id ||
+          !feed.content ||
+          !feed.created_at ||
+          !feed.updated_at
+        ) {
+          throw new InternalErrorException("Failed to update post");
+        }
+        console.log("returning");
+
+        return c.json(
+          {
+            success: true as const,
+            message: "Successfully update post",
+            body: {
+              post: {
+                id: Number(feed.id),
+                content: feed.content,
+                created_at: feed.created_at.getTime(),
+                updated_at: feed.updated_at.getTime(),
+              },
+              user: {
+                fullname: user.full_name,
+                username: user.username,
+                profile_photo_path: user.profile_photo_path,
+              },
+            },
+          },
+          200
+        );
+      } catch (err) {
+        console.log(err);
+        if (err instanceof HTTPException) {
+          let status: 400 | 401 | 500;
+
+          switch (err.status) {
+            case 400:
+              status = 400;
+              break;
+            case 401:
+              status = 401;
+              break;
+            default:
+              status = 500;
+              break;
+          }
+
+          c.status(status);
+          return c.json(
+            {
+              success: false as const,
+              message: err.message,
+              error: null,
+            },
+            status
+          );
+        }
+
+        c.status(500);
+        return c.json(
+          {
+            success: false as const,
+            message: "Internal server error",
+            error: null,
+          },
+          500
+        );
+      }
+    });
+  }
+
+  private registerDeletePostRoute() {
+    const route = createRoute({
+      method: "delete",
+      path: "/api/feed/{postId}",
+      request: {
+        params: z.object({
+          postId: z.string(),
+        }),
+      },
+      middleware: [this.setDeletePostParamsMiddleware] as const,
+      responses: {
+        200: {
+          description: "Successfully delete post",
+          content: {
+            "application/json": {
+              schema: DeletePostSuccessSchema,
+            },
+          },
+        },
+        400: {
+          description: "Bad request",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+        401: {
+          description: "Unauthorized",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+        500: {
+          description: "Internal server error",
+          content: {
+            "application/json": {
+              schema: ErrorResponseSchema,
+            },
+          },
+        },
+      },
+    });
+
+    this.hono.app.openapi(route, async (c) => {
+      try {
+        const user = c.var.user;
+        const postId = c.var.postId;
+
+        if (!user) {
+          throw new UnauthorizedException("Unauthorized");
+        }
+
+        if (!user.id) {
+          throw new InternalErrorException(
+            "User from the repo somehow does not have an ID"
+          );
+        }
+
+        const feed = await this.feedService.deletePost(
+          Number(user.id),
+          Number(postId)
+        );
+
+        return c.json(
+          {
+            success: true as const,
+            message: "Successfully delete post",
+            body: null,
+          },
+          200
+        );
+      } catch (err) {
+        if (err instanceof HTTPException) {
+          let status: 400 | 401 | 500;
+
+          switch (err.status) {
+            case 400:
+              status = 400;
+              break;
+            case 401:
+              status = 401;
+              break;
+            default:
+              status = 500;
+              break;
+          }
+
+          c.status(status);
+          return c.json(
+            {
+              success: false as const,
+              message: err.message,
               error: null,
             },
             status

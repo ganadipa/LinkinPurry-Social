@@ -2,181 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
-import { Paperclip, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Contact, Message } from "./types";
+import { Contact, Message } from "../../types/chat";
 import { cn } from "@/lib/utils";
-
-const initialMessages: Message[] = [
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-  {
-    id: "5",
-    content:
-      "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
-  },
-];
+import { useAuth } from "@/hooks/auth";
+import { useChat } from "@/hooks/chat";
 
 interface ChatAreaProps {
   selectedContact: Contact | null;
@@ -187,9 +18,10 @@ export default function ChatArea({
   selectedContact,
   className,
 }: ChatAreaProps) {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const { messages, setMessages, isChatLoading } = useChat();
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const { user } = useAuth();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -201,6 +33,16 @@ export default function ChatArea({
     return <div className="self-center mx-auto">No contact selected</div>;
   }
 
+  if (isChatLoading) {
+    return <div className="self-center mx-auto">Loading...</div>;
+  }
+
+  if (messages === null) {
+    return (
+      <div className="self-center mx-auto">Something terrible happened</div>
+    );
+  }
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -208,17 +50,21 @@ export default function ChatArea({
   const handleSendMessage = () => {
     if (inputMessage.trim()) {
       const newMessage: Message = {
-        id: Date.now().toString(),
+        id: Date.now(),
         content: inputMessage,
-        sender: "user",
-        timestamp: new Date(),
+        sender: 1,
+        timestamp: new Date().getTime(),
       };
-      setMessages((prev) => [...prev, newMessage]);
+      setMessages((prev) => {
+        if (prev === null) return [newMessage];
+        return [...prev, newMessage];
+      });
       setInputMessage("");
     }
   };
 
-  const formatMessageTime = (date: Date) => {
+  const formatMessageTime = (dateNumber: number) => {
+    const date = new Date(dateNumber);
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -241,14 +87,16 @@ export default function ChatArea({
         <div className="flex items-center">
           <Avatar className="h-12 w-12 mr-3">
             <AvatarImage
-              src={selectedContact.avatar}
-              alt={selectedContact.name}
+              src={selectedContact.profile_photo_path}
+              alt={selectedContact.full_name}
             />
-            <AvatarFallback>{selectedContact.name.charAt(0)}</AvatarFallback>
+            <AvatarFallback>
+              {selectedContact.full_name.charAt(0)}
+            </AvatarFallback>
           </Avatar>
           <div>
             <h2 className="text-xl font-semibold text-[#000000]">
-              {selectedContact.name}
+              {selectedContact.full_name}
             </h2>
           </div>
         </div>
@@ -265,38 +113,39 @@ export default function ChatArea({
           return (
             <div
               key={message.id}
-              className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"} ${isLastInGroup ? "mb-4" : "mb-1"}`}
+              className={`flex ${message.sender === user?.id ? "justify-end" : "justify-start"} ${isLastInGroup ? "mb-4" : "mb-1"}`}
             >
-              {message.sender === "contact" && isFirstInGroup && (
+              {message.sender === user?.id && isFirstInGroup && (
                 <Avatar className="h-8 w-8 mr-2 mt-2">
                   <AvatarImage
-                    src={selectedContact.avatar}
-                    alt={selectedContact.name}
+                    src={selectedContact.profile_photo_path}
+                    alt={selectedContact.full_name}
                   />
                   <AvatarFallback>
-                    {selectedContact.name.charAt(0)}
+                    {selectedContact.full_name.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
               )}
               <div
-                className={`max-w-[70%] ${message.sender === "contact" && !isFirstInGroup ? "ml-10" : ""}`}
+                className={`max-w-[70%] ${message.sender === user?.id && !isFirstInGroup ? "ml-10" : ""}`}
               >
                 <div
                   className={`p-3 rounded-lg ${
-                    message.sender === "user"
+                    message.sender === user?.id
                       ? "bg-[#0a66c2] text-white"
                       : "bg-[#f2f2f2] text-[#000000]"
                   }`}
                 >
                   <p>{message.content}</p>
+                  <p
+                    className={cn("text-xs text-end text-white", {
+                      "text-[#00000099]": message.sender !== user?.id,
+                      "text-start": message.sender === user?.id,
+                    })}
+                  >
+                    {formatMessageTime(message.timestamp)}
+                  </p>
                 </div>
-                {isLastInGroup && (
-                  <div className="flex items-center gap-1 mt-1">
-                    <p className="text-xs text-[#00000099]">
-                      {formatMessageTime(message.timestamp)}
-                    </p>
-                  </div>
-                )}
               </div>
             </div>
           );
@@ -306,7 +155,7 @@ export default function ChatArea({
 
       {isTyping && (
         <div className="px-4 py-2 text-sm text-[#00000099] bg-white">
-          {selectedContact.name} is typing...
+          {selectedContact.full_name} is typing...
         </div>
       )}
 

@@ -18,8 +18,9 @@ export class AuthMiddleware {
   ) {}
 
   public intercept = createMiddleware(async (c, next) => {
+    console.log("[AuthMiddleware] intercept");
+
     const token = getCookie(c, "authorization");
-    console.log("token", token);
     if (!token) {
       c.set("user", null);
       await next();
@@ -28,8 +29,6 @@ export class AuthMiddleware {
 
     const user = await this.authStrategy.validate(token);
     c.set("user", user);
-    console.log("in the auth middleware");
     await next();
-    console.log("out the auth middleware");
   });
 }

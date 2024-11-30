@@ -2,179 +2,180 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
-import { Paperclip, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Contact, Message } from "./types";
+import { Contact, Message } from "../../types/chat";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/auth";
 
 const initialMessages: Message[] = [
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
   {
-    id: "5",
+    id: 1,
     content:
       "That's awesome! I'd love to hear more about what you're learning. Maybe we could discuss it over coffee sometime?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 10000),
+    sender: 1,
+    timestamp: new Date(Date.now() - 10000).getTime(),
   },
 ];
 
@@ -190,18 +191,17 @@ export default function ChatAreaMobile({
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const { user } = useAuth();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (selectedContact) scrollToBottom();
-  }, [messages]);
+  }, [messages, selectedContact]);
 
   if (selectedContact === null) {
     return (
-      <div className={cn("self-center mx-auto", className)}>
-        No chat is currently selected.
-      </div>
+      <div className="self-center mx-auto md:hidden">No contact selected</div>
     );
   }
 
@@ -209,37 +209,21 @@ export default function ChatAreaMobile({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const simulateMessageResponse = () => {
-    setTimeout(() => {
-      setIsTyping(true);
-      setTimeout(() => {
-        const newMessage: Message = {
-          id: Date.now().toString(),
-          content: `Thanks for your message! This is a simulated response from ${selectedContact.name}.`,
-          sender: "contact",
-          timestamp: new Date(),
-        };
-        setMessages((prev) => [...prev, newMessage]);
-        setIsTyping(false);
-      }, 2000);
-    }, 1000);
-  };
-
   const handleSendMessage = () => {
     if (inputMessage.trim()) {
       const newMessage: Message = {
-        id: Date.now().toString(),
+        id: Date.now(),
         content: inputMessage,
-        sender: "user",
-        timestamp: new Date(),
+        sender: 1,
+        timestamp: new Date().getTime(),
       };
       setMessages((prev) => [...prev, newMessage]);
       setInputMessage("");
-      simulateMessageResponse();
     }
   };
 
-  const formatMessageTime = (date: Date) => {
+  const formatMessageTime = (dateNumber: number) => {
+    const date = new Date(dateNumber);
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -262,14 +246,16 @@ export default function ChatAreaMobile({
         <div className="flex items-center">
           <Avatar className="h-12 w-12 mr-3">
             <AvatarImage
-              src={selectedContact.avatar}
-              alt={selectedContact.name}
+              src={selectedContact.profile_photo_path}
+              alt={selectedContact.full_name}
             />
-            <AvatarFallback>{selectedContact.name.charAt(0)}</AvatarFallback>
+            <AvatarFallback>
+              {selectedContact.full_name.charAt(0)}
+            </AvatarFallback>
           </Avatar>
           <div>
             <h2 className="text-xl font-semibold text-[#000000]">
-              {selectedContact.name}
+              {selectedContact.full_name}
             </h2>
           </div>
         </div>
@@ -286,38 +272,40 @@ export default function ChatAreaMobile({
           return (
             <div
               key={message.id}
-              className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"} ${isLastInGroup ? "mb-4" : "mb-1"}`}
+              className={`flex ${message.sender === user?.id ? "justify-end" : "justify-start"} ${isLastInGroup ? "mb-4" : "mb-1"}`}
             >
-              {message.sender === "contact" && isFirstInGroup && (
+              {message.sender === user?.id && isFirstInGroup && (
                 <Avatar className="h-8 w-8 mr-2 mt-2">
                   <AvatarImage
-                    src={selectedContact.avatar}
-                    alt={selectedContact.name}
+                    src={selectedContact.profile_photo_path}
+                    alt={selectedContact.full_name}
                   />
                   <AvatarFallback>
-                    {selectedContact.name.charAt(0)}
+                    {selectedContact.full_name.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
               )}
               <div
-                className={`max-w-[70%] ${message.sender === "contact" && !isFirstInGroup ? "ml-10" : ""}`}
+                className={`max-w-[70%] ${message.sender === user?.id && !isFirstInGroup ? "ml-10" : ""}`}
               >
                 <div
                   className={`p-3 rounded-lg ${
-                    message.sender === "user"
+                    message.sender === user?.id
                       ? "bg-[#0a66c2] text-white"
                       : "bg-[#f2f2f2] text-[#000000]"
                   }`}
                 >
                   <p>{message.content}</p>
-                </div>
-                {isLastInGroup && (
                   <div className="flex items-center gap-1 mt-1">
-                    <p className="text-xs text-[#00000099]">
+                    <p
+                      className={cn("text-xs text-end text-white", {
+                        "text-[#00000099]": message.sender !== user?.id,
+                      })}
+                    >
                       {formatMessageTime(message.timestamp)}
                     </p>
                   </div>
-                )}
+                </div>
               </div>
             </div>
           );
@@ -327,7 +315,7 @@ export default function ChatAreaMobile({
 
       {isTyping && (
         <div className="px-4 py-2 text-sm text-[#00000099] bg-white">
-          {selectedContact.name} is typing...
+          {selectedContact.full_name} is typing...
         </div>
       )}
 
@@ -337,6 +325,7 @@ export default function ChatAreaMobile({
           placeholder="Write a message..."
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
+          onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
           className="flex-1 bg-[#eef3f8] text-[#000000]"
         />
         <Button

@@ -1,5 +1,4 @@
 import { Application } from "./core/app";
-import dotenv from "dotenv";
 
 // dotenv.config({
 //   path: ".env.prod",
@@ -7,5 +6,14 @@ import dotenv from "dotenv";
 const app = new Application();
 const port = Number(process.env.PORT) || 8000;
 app.start(port);
+
+const io = app.getSocket();
+io.on("connection", (socket) => {
+  socket.emit("hello", "Hello from the server!");
+
+  socket.on("disconnect", () => {
+    console.log("A user disconnected");
+  });
+});
 
 export default app.getApp();

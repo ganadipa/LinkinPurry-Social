@@ -1,6 +1,7 @@
 export const CONFIG = {
   HonoProvider: Symbol.for("HonoProvider"),
   OpenApiHonoProvider: Symbol.for("OpenApiHonoProvider"),
+  SocketProvider: Symbol.for("SocketProvider"),
   Server: Symbol.for("Server"),
   Router: Symbol.for("Router"),
   Controllers: Symbol.for("Controllers"),
@@ -13,6 +14,7 @@ export const CONFIG = {
   ConnectionService: Symbol.for("ConnectionService"),
   ProfileService: Symbol.for("ProfileService"),
   FeedService: Symbol.for("FeedService"),
+  ChatService: Symbol.for("ChatService"),
 
   AuthStrategy: Symbol.for("Jwt"),
   JwtAuthStrategy: Symbol.for("Jwt"),
@@ -25,6 +27,9 @@ export const CONFIG = {
 
   FeedRepository: Symbol.for("DbFeedRepository"),
   DbFeedRepository: Symbol.for("DbFeedRepository"),
+
+  ChatRepository: Symbol.for("DbChatRepository"),
+  DbChatRepository: Symbol.for("DbChatRepository"),
 
   PrismaProvider: Symbol.for("PrismaProvider"),
 

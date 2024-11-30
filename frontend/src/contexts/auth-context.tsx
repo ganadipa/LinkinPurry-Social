@@ -1,4 +1,5 @@
 import { wait } from "@/lib/utils";
+import { ErrorSchema } from "@/schemas/error.schema";
 import { loginResponse } from "@/types/response";
 import { User } from "@/types/user";
 import React, { useEffect, useState } from "react";
@@ -58,9 +59,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await wait(1000);
 
     const json = await response.json();
-    const expected = loginResponse.safeParse(json);
-    if (expected.success) {
-      if (expected.data.success) {
+    const failureResponse = ErrorSchema.safeParse(json);
+    if (failureResponse.success) {
+      throw new Error(failureResponse.data.message);
+    }
+
+    const expectedSuccess = loginResponse.safeParse(json);
+    if (expectedSuccess.success) {
+      if (expectedSuccess.data.success) {
         setIsLoading(true);
         checkAuth();
 
@@ -69,8 +75,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           message: "Successfully logged in",
         };
       }
-
-      throw new Error(expected.data.message);
     }
 
     throw new Error("Something went wrong");

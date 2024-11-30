@@ -78,4 +78,7 @@ prod:
 
 prod-build:
 	@docker compose up prod --build
+
+seed:
+	@cd backend && node 
 	

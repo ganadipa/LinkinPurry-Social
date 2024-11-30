@@ -18,3 +18,22 @@ export type GetFeedEnv = {
     cursor?: number;
   };
 };
+
+export type CreatePostEnv = {
+  Variables: {
+    content: string;
+  };
+};
+
+export type UpdatePostEnv = {
+  Variables: {
+    postId: number;
+    content: string;
+  };
+};
+
+export type DeletePostEnv = {
+  Variables: {
+    postId: number;
+  };
+};

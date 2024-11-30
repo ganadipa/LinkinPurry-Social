@@ -9,41 +9,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { FeedRelated } from "@/types/feed";
+import { useFeed } from "@/hooks/feed";
+import Loading from "@/components/loading";
 
 const Feed = () => {
-  const [posts, setPosts] = useState([
-    {
-      post: {
-        content:
-          "Excited to announce that I've just launched a new project! #innovation #tech",
-        id: 1,
-        created_at: Date.now() - 3600000,
-        updated_at: Date.now() - 3600000,
-      },
-      user: {
-        username: "johndoe",
-        fullname: "John Doe",
-        profile_photo_path: "/api/placeholder/32/32",
-      },
-    },
-    {
-      post: {
-        content:
-          "Great meeting with the team today discussing future strategies! 🚀",
-        id: 2,
-        created_at: Date.now() - 7200000,
-        updated_at: Date.now() - 3600000,
-      },
-      user: {
-        username: "janedoe",
-        fullname: "Jane Doe",
-        profile_photo_path: "/api/placeholder/32/32",
-      },
-    },
-  ]);
+  const { feed, loading, createPost, updatePost, deletePost } = useFeed();
 
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editContent, setEditContent] = useState("");
+  if (loading || feed === null) {
+    return <Loading />;
+  }
 
   const formatTime = (timestamp: number) => {
     const diff = Date.now() - timestamp;
@@ -60,30 +36,17 @@ const Feed = () => {
   };
 
   const handleSaveEdit = (postId: number) => {
-    setPosts(
-      posts.map((p) =>
-        p.post.id === postId
-          ? {
-              ...p,
-              post: {
-                ...p.post,
-                content: editContent,
-                updated_at: Date.now(),
-              },
-            }
-          : p
-      )
-    );
+    updatePost(postId, editContent);
     setEditingId(null);
   };
 
   const handleDelete = (postId: number) => {
-    setPosts(posts.filter((p) => p.post.id !== postId));
+    deletePost(postId);
   };
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-4">
-      {posts.map((item) => (
+      {feed.map((item) => (
         <div
           key={item.post.id}
           className="bg-white rounded-lg shadow-sm border border-gray-200 p-4"

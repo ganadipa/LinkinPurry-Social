@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SuccessResponseSchema } from "./success.schema";
 
 export const FeedRelatedSchemas = z.object({
   post: z.object({
@@ -13,3 +14,17 @@ export const FeedRelatedSchemas = z.object({
     profile_photo_path: z.string(),
   }),
 });
+
+export const GetFeedSuccessSchema = SuccessResponseSchema.extend({
+  body: z.array(FeedRelatedSchemas),
+});
+
+export const CreatePostSuccessSchema = SuccessResponseSchema.extend({
+  body: FeedRelatedSchemas,
+});
+
+export const EditPostSuccessSchema = SuccessResponseSchema.extend({
+  body: FeedRelatedSchemas,
+});
+
+export const DeletePostSuccessSchema = SuccessResponseSchema;

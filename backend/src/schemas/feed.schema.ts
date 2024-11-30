@@ -20,3 +20,25 @@ export const GetFeedSuccessSchema = SuccessResponseSchema.extend({
 });
 
 export type FeedRelated = z.infer<typeof FeedRelatedSchemas>;
+
+export const CreatePostRequestSchema = z.object({
+  content: z.string(),
+});
+
+export const CreatePostSuccessSchema = SuccessResponseSchema.extend({
+  body: FeedRelatedSchemas,
+});
+
+export const DeletePostRequestSchema = z.object({
+  postId: z.number(),
+});
+
+export const DeletePostSuccessSchema = SuccessResponseSchema;
+
+export const EditPostRequestSchema = z.object({
+  content: z.string(),
+});
+
+export const EditPostSuccessSchema = SuccessResponseSchema.extend({
+  body: FeedRelatedSchemas,
+});

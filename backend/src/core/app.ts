@@ -33,6 +33,11 @@ import { IOCContainer } from "../ioc/container";
 import { SwaggerUIController } from "../controllers/swagger-ui.controller";
 import { FeedService } from "../services/feed.service";
 import { FeedController } from "../controllers/feed.controller";
+import { SocketProvider } from "./ws-provider";
+import { ChatRepository } from "../interfaces/chat-repository.interface";
+import { DbChatRepository } from "../repositories/db/chat.repository";
+import { ChatService } from "../services/chat.service";
+import { ChatController } from "../controllers/chat.controller";
 
 export class Application {
   private ioc: IOCContainer;
@@ -100,6 +105,10 @@ export class Application {
   public getApp() {
     return this.ioc.get<OpenApiHonoProvider>(CONFIG.OpenApiHonoProvider).app;
   }
+
+  public getSocket() {
+    return this.ioc.get<SocketProvider>(CONFIG.SocketProvider).io;
+  }
 }
 
 class MainBindingConfigurator {
@@ -129,6 +138,7 @@ class MainBindingConfigurator {
     this.ioc.bind<Controller>(CONFIG.Controllers, ConnectionController);
     this.ioc.bind<Controller>(CONFIG.Controllers, SwaggerUIController);
     this.ioc.bind<Controller>(CONFIG.Controllers, FeedController);
+    this.ioc.bind<Controller>(CONFIG.Controllers, ChatController);
   }
 
   private configureProviders(): void {
@@ -139,6 +149,7 @@ class MainBindingConfigurator {
       OpenApiHonoProvider
     );
     this.ioc.bind<PrismaProvider>(CONFIG.PrismaProvider, PrismaProvider);
+    this.ioc.bind<SocketProvider>(CONFIG.SocketProvider, SocketProvider);
   }
 
   private configureServer(): void {
@@ -173,6 +184,7 @@ class MainBindingConfigurator {
       CONFIG.DbConnectionRepository,
       DbConnectionRepository
     );
+    this.ioc.bind<ChatRepository>(CONFIG.DbChatRepository, DbChatRepository);
   }
 
   private configureServices(): void {
@@ -190,5 +202,6 @@ class MainBindingConfigurator {
       ConnectionService
     );
     this.ioc.bind<FeedService>(CONFIG.FeedService, FeedService);
+    this.ioc.bind<ChatService>(CONFIG.ChatService, ChatService);
   }
 }

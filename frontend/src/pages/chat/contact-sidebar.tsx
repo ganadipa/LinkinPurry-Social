@@ -1,10 +1,9 @@
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Search } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { Contact } from "./types";
+import { Contact, Message } from "../../types/chat";
 import { cn } from "@/lib/utils";
 
 type ContactSidebarProps = {
@@ -23,7 +22,7 @@ export function ContactSidebar({
   const [searchQuery, setSearchQuery] = useState("");
   useEffect(() => {
     const filtered = contacts.filter((contact) =>
-      contact.name.toLowerCase().includes(searchQuery.toLowerCase())
+      contact.full_name.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredContacts(filtered);
   }, [searchQuery]);
@@ -33,7 +32,7 @@ export function ContactSidebar({
   const handleContactSelect = (contact: Contact) => {
     setSelectedContact(contact);
     const updatedContacts = contacts.map((c) =>
-      c.id === contact.id ? { ...c, unreadCount: 0 } : c
+      c.user_id === contact.user_id ? { ...c, unreadCount: 0 } : c
     );
     setFilteredContacts(updatedContacts);
   };
@@ -65,45 +64,28 @@ export function ContactSidebar({
       <ScrollArea className="flex-1">
         {filteredContacts.map((contact) => (
           <button
-            key={contact.id}
+            key={contact.user_id}
             className={`w-full text-left p-4 hover:bg-[#eef3f8] transition-colors duration-200 ${
-              selectedContact?.id === contact.id ? "bg-[#eef3f8]" : ""
+              selectedContact?.user_id === contact.user_id ? "bg-[#eef3f8]" : ""
             }`}
             onClick={() => handleContactSelect(contact)}
           >
             <div className="flex items-center">
               <div className="relative">
                 <Avatar className="h-12 w-12 mr-3">
-                  <AvatarImage src={contact.avatar} alt={contact.name} />
-                  <AvatarFallback>{contact.name.charAt(0)}</AvatarFallback>
+                  <AvatarImage
+                    src={contact.profile_photo_path}
+                    alt={contact.full_name}
+                  />
+                  <AvatarFallback>{contact.full_name.charAt(0)}</AvatarFallback>
                 </Avatar>
-                <span
-                  className={`absolute bottom-0 right-2 w-3 h-3 rounded-full border-2 border-white
-                    ${
-                      contact.status === "online"
-                        ? "bg-green-500"
-                        : contact.status === "away"
-                          ? "bg-yellow-500"
-                          : "bg-gray-500"
-                    }`}
-                />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-center">
-                  <p className="font-semibold text-[#000000] truncate">
-                    {contact.name}
-                  </p>
-                  {contact.unreadCount ? (
-                    <Badge variant="default" className="bg-[#0a66c2]">
-                      {contact.unreadCount}
-                    </Badge>
-                  ) : null}
-                </div>
                 <p className="text-sm text-[#00000099] truncate">
-                  {contact.lastMessage}
+                  {contact.last_message}
                 </p>
                 <span className="text-xs text-[#00000099]">
-                  {contact.lastMessageTime}
+                  {contact.last_message_time}
                 </span>
               </div>
             </div>
