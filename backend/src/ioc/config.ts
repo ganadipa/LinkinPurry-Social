@@ -15,6 +15,7 @@ export const CONFIG = {
   ProfileService: Symbol.for("ProfileService"),
   FeedService: Symbol.for("FeedService"),
   ChatService: Symbol.for("ChatService"),
+  NotificationService: Symbol.for("NotificationService"),
 
   AuthStrategy: Symbol.for("Jwt"),
   JwtAuthStrategy: Symbol.for("Jwt"),
@@ -30,6 +31,9 @@ export const CONFIG = {
 
   ChatRepository: Symbol.for("DbChatRepository"),
   DbChatRepository: Symbol.for("DbChatRepository"),
+
+  PushSubscriptionRepository: Symbol.for("DbPushSubscriptionRepository"),
+  DbPushSubscriptionRepository: Symbol.for("DbPushSubscriptionRepository"),
 
   PrismaProvider: Symbol.for("PrismaProvider"),
 
