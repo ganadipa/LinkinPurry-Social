@@ -1,0 +1,57 @@
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { MdEditSquare } from "react-icons/md";
+import EditModals from "@/components/specific/edit-modals";
+import { useAuth } from "@/hooks/auth";
+// import { useProfile } from "@/hooks/profile";
+
+interface WorkHistoryProps {
+  work_history: string | null;
+  isOwnProfile: boolean;
+}
+
+const WorkHistory: React.FC<WorkHistoryProps> = ({
+    work_history,
+    isOwnProfile
+}) => {
+  const { user } = useAuth();
+  const [workHistoryValue, setWorkHistoryValue] = useState<string>(work_history || "");
+  const [workHistoryModalOpen, setWorkHistoryModalOpen] = useState<boolean>(false);
+
+  const handleWorkHistoryUpdate = (newWorkHistory: string) => {
+    setWorkHistoryValue(newWorkHistory);
+  };
+
+  return (
+    <>
+      <div className="bg-white rounded-lg shadow border p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Work History</h2>
+          {isOwnProfile && (
+            <Button
+              variant="ghost"
+              className="bg-white shadow-sm"
+              onClick={() => setWorkHistoryModalOpen(true)}
+            >
+              Edit
+              <MdEditSquare />
+            </Button>
+          )}
+        </div>
+        <div>{workHistoryValue}</div>
+      </div>
+
+      <EditModals
+        labelModal="Work History"
+        value={workHistoryValue}
+        isModalOpen={workHistoryModalOpen}
+        setIsModalOpen={setWorkHistoryModalOpen}
+        userId={user?.id ?? 0}
+        field="work_history"
+        onUpdateSuccess={handleWorkHistoryUpdate}
+      />
+    </>
+  );
+};
+
+export default WorkHistory;

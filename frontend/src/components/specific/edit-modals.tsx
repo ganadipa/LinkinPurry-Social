@@ -33,29 +33,26 @@ export default function EditModals({
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
-
+  
     try {
       const updatePayload: Partial<User> = {
         [field]: inputValue,
       };
-      console.log('Update Payload:', updatePayload);
       const response = await axios.put(`/api/profile/${userId}`, updatePayload);
-      console.log('Response:', response.data);
-
       const data = response.data as { success: boolean; message?: string };
+  
       if (data.success) {
-        console.log('Update Success:', data.message);
         onUpdateSuccess?.(inputValue);
         setIsModalOpen(false);
       } else {
-        console.log('Update Failed:', data.message);
-        const errorMessage = (response.data as { message?: string }).message || 'Failed to update profile';
-        setError(errorMessage);
+        setError(data.message || 'Failed to update profile');
       }
     } catch {
       setError('Error updating profile');
+    } finally {
+      setIsSubmitting(false);
     }
-  };
+  };  
 
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

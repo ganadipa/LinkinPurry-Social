@@ -49,7 +49,18 @@ const Header = () => {
           </Link>
           {user === null ? (
             <>
-              <Link
+              <a
+                href="/users"
+                className="flex flex-col items-center text-gray-500"
+              >
+                <img
+                  src="/public/images/people.png"
+                  alt="Users"
+                  className="w-6 h-6 mb-1 invert-[0.5]"
+                />
+                <span className="text-xs">People</span>
+              </a>
+              <a
                 href="/signin"
                 className="flex flex-col items-center text-gray-500"
               >
@@ -59,7 +70,7 @@ const Header = () => {
                   className="w-6 h-6 mb-1 invert-[0.5]"
                 />
                 <span className="text-xs">Login</span>
-              </Link>
+              </a>
               <Link
                 href="/signup"
                 className="flex flex-col items-center text-gray-500"
@@ -87,6 +98,18 @@ const Header = () => {
                 </Link>
               )}
               // */}
+              <a href={`/connections/${user.id}`} className="flex flex-col items-center text-gray-500">
+                <img src="/public/images/people.png" alt="Connections" className="w-6 h-6 mb-1 invert-[0.5]" />
+                <span className="text-xs">Connections</span>
+              </a>
+              <a href={`/requests`} className="flex flex-col items-center text-gray-500">
+                <img src="/public/images/bell.png" alt="Messages" className="w-6 h-6 mb-1 invert-[0.5]" />
+                <span className="text-xs">Request</span>
+              </a>
+              <a href={`/profile/${user.id}`} className="flex flex-col items-center text-gray-500">
+                <img src="/public/images/account.png" alt="Profile" className="w-6 h-6 mb-1 invert-[0.5]" />
+                <span className="text-xs">Profile</span>
+              </a>
               <button
                 className="flex flex-col items-center text-gray-500"
                 onClick={logout}
