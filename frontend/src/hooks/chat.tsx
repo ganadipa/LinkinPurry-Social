@@ -1,4 +1,5 @@
 import { redirect, wait } from "@/lib/utils";
+import { ErrorSchema } from "@/schemas/error.schema";
 import {
   ChatSpecificResponseSuccessSchema,
   Contact,
@@ -29,6 +30,12 @@ export function useChat() {
       return;
     }
 
+    const error = ErrorSchema.safeParse(data);
+    if (error.success) {
+      toast(error.data.message);
+      return;
+    }
+
     if (!response.ok) {
       await wait(1000);
       redirect({
@@ -54,7 +61,7 @@ export function useChat() {
       return;
     }
 
-    setContacts(data.contacts);
+    setContacts(result.data.body);
     setIsLoading(false);
   };
 
@@ -65,11 +72,17 @@ export function useChat() {
     if (!response.ok) {
       toast.error("Failed to fetch messages");
       setIsChatLoading(false);
-
       return;
     }
 
     const data = await response.json();
+    const error = ErrorSchema.safeParse(data);
+    if (error.success) {
+      toast.error(error.data.message);
+      setIsChatLoading(false);
+      return;
+    }
+
     const result = ChatSpecificResponseSuccessSchema.safeParse(data);
     if (!result.success) {
       toast.error(result.error.message);
@@ -77,13 +90,15 @@ export function useChat() {
       return;
     }
 
+    console.log(result.data);
     if (!result.data.success) {
       toast.error(result.data.message);
       setIsChatLoading(false);
       return;
     }
 
-    setMessages(data.messages);
+    setMessages(result.data.body);
+    setIsChatLoading(false);
   };
 
   useEffect(() => {
@@ -98,7 +113,6 @@ export function useChat() {
     isChatLoading,
     handleContactSelect,
     setContacts,
-    setSelectedContact,
     setMessages,
   };
 }

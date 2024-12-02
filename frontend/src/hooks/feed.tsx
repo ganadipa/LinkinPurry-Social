@@ -135,11 +135,9 @@ export function useFeed() {
   };
 
   const deletePost = async (id: number) => {
-    console.log(id);
     const response = await fetch(`/api/feed/${id}`, {
       method: "DELETE",
     });
-    console.log(response);
     const data = await response.json();
     const failureCheck = ErrorSchema.safeParse(data);
     if (failureCheck.success) {

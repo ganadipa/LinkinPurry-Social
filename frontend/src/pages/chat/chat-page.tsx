@@ -5,13 +5,20 @@ import { useChat } from "@/hooks/chat";
 import Loading from "@/components/loading";
 
 export default function ChatPage() {
-  const { contacts, selectedContact, setSelectedContact, isLoading } =
-    useChat();
+  const {
+    contacts,
+    selectedContact,
+    handleContactSelect,
+    isLoading,
+    messages,
+    setMessages,
+    isChatLoading,
+  } = useChat();
   if (isLoading) {
     return <Loading />;
   }
 
-  if (contacts === null) {
+  if (!contacts) {
     return <div>Something went wrong</div>;
   }
 
@@ -20,11 +27,16 @@ export default function ChatPage() {
       <ContactSidebar
         contacts={contacts}
         selectedContact={selectedContact}
-        setSelectedContact={setSelectedContact}
+        handleContactSelect={handleContactSelect}
         className="max-md:w-full"
       />
-
-      <ChatArea selectedContact={selectedContact} className="max-md:hidden" />
+      <ChatArea
+        selectedContact={selectedContact}
+        className="max-md:hidden"
+        messages={messages}
+        setMessages={setMessages}
+        isChatLoading={isChatLoading}
+      />
       {/* <ChatAreaMobile
         selectedContact={selectedContact}
         className="hidden max-md:flex"

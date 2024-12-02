@@ -12,19 +12,27 @@ import { useChat } from "@/hooks/chat";
 interface ChatAreaProps {
   selectedContact: Contact | null;
   className?: string;
+  messages: Message[] | null;
+  setMessages: React.Dispatch<React.SetStateAction<Message[] | null>>;
+  isChatLoading: boolean;
 }
 
 export default function ChatArea({
   selectedContact,
   className,
+  messages,
+  setMessages,
+  isChatLoading,
 }: ChatAreaProps) {
-  const { messages, setMessages, isChatLoading } = useChat();
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const { user } = useAuth();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
   useEffect(() => {
     if (selectedContact) scrollToBottom();
   }, [messages, selectedContact]);
@@ -38,14 +46,11 @@ export default function ChatArea({
   }
 
   if (messages === null) {
+    console.log("messages", messages);
     return (
       <div className="self-center mx-auto">Something terrible happened</div>
     );
   }
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
 
   const handleSendMessage = () => {
     if (inputMessage.trim()) {

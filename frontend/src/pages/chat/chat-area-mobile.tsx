@@ -195,6 +195,9 @@ export default function ChatAreaMobile({
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
   useEffect(() => {
     if (selectedContact) scrollToBottom();
   }, [messages, selectedContact]);
@@ -204,10 +207,6 @@ export default function ChatAreaMobile({
       <div className="self-center mx-auto md:hidden">No contact selected</div>
     );
   }
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
 
   const handleSendMessage = () => {
     if (inputMessage.trim()) {

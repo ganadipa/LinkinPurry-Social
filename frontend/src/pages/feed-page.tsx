@@ -11,14 +11,28 @@ import { Textarea } from "@/components/ui/textarea";
 import { FeedRelated } from "@/types/feed";
 import { useFeed } from "@/hooks/feed";
 import Loading from "@/components/loading";
+import { useAuth } from "@/hooks/auth";
+import { redirect } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 const Feed = () => {
-  const { feed, loading, createPost, updatePost, deletePost } = useFeed();
+  const { feed, loading, updatePost, deletePost } = useFeed();
+  const { isLoading, user } = useAuth();
 
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editContent, setEditContent] = useState("");
-  if (loading || feed === null) {
+  if (loading || feed === null || isLoading) {
     return <Loading />;
+  }
+
+  if (!user) {
+    redirect({
+      to: "/signin",
+      params: {
+        redirect: "/",
+      },
+    });
+    return null;
   }
 
   const formatTime = (timestamp: number) => {
@@ -36,12 +50,28 @@ const Feed = () => {
   };
 
   const handleSaveEdit = (postId: number) => {
-    updatePost(postId, editContent);
+    const promise = updatePost(postId, editContent);
+    toast.promise(promise, {
+      loading: "Updating post...",
+      success: "Post updated",
+      error: (err) => {
+        if (err.message) return err.message;
+        return "Failed to update post";
+      },
+    });
     setEditingId(null);
   };
 
   const handleDelete = (postId: number) => {
-    deletePost(postId);
+    const promise = deletePost(postId);
+    toast.promise(promise, {
+      loading: "Deleting post...",
+      success: "Post deleted",
+      error: (err) => {
+        if (err.message) return err.message;
+        return "Failed to delete post";
+      },
+    });
   };
 
   return (
@@ -76,28 +106,29 @@ const Feed = () => {
               </div>
             </div>
 
-            {editingId !== item.post.id && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleEdit(item)}>
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Edit post
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-red-600"
-                    onClick={() => handleDelete(item.post.id)}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete post
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+            {editingId !== item.post.id &&
+              item.user.username === user.username && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleEdit(item)}>
+                      <Pencil className="mr-2 h-4 w-4" />
+                      Edit post
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="text-red-600"
+                      onClick={() => handleDelete(item.post.id)}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete post
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
           </div>
 
           {editingId === item.post.id ? (

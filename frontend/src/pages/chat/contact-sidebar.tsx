@@ -9,14 +9,14 @@ import { cn } from "@/lib/utils";
 type ContactSidebarProps = {
   contacts: Contact[];
   selectedContact: Contact | null;
-  setSelectedContact: React.Dispatch<React.SetStateAction<Contact | null>>;
+  handleContactSelect: (contact: Contact) => void;
   className?: string;
 };
 
 export function ContactSidebar({
   contacts,
   selectedContact,
-  setSelectedContact,
+  handleContactSelect,
   className,
 }: ContactSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -28,14 +28,6 @@ export function ContactSidebar({
   }, [searchQuery]);
 
   const [filteredContacts, setFilteredContacts] = useState(contacts);
-
-  const handleContactSelect = (contact: Contact) => {
-    setSelectedContact(contact);
-    const updatedContacts = contacts.map((c) =>
-      c.user_id === contact.user_id ? { ...c, unreadCount: 0 } : c
-    );
-    setFilteredContacts(updatedContacts);
-  };
 
   return (
     <div
@@ -63,33 +55,44 @@ export function ContactSidebar({
 
       <ScrollArea className="flex-1">
         {filteredContacts.map((contact) => (
-          <button
-            key={contact.user_id}
-            className={`w-full text-left p-4 hover:bg-[#eef3f8] transition-colors duration-200 ${
-              selectedContact?.user_id === contact.user_id ? "bg-[#eef3f8]" : ""
-            }`}
-            onClick={() => handleContactSelect(contact)}
-          >
-            <div className="flex items-center">
-              <div className="relative">
+          <>
+            <button
+              key={contact.user_id}
+              className={`w-full text-left p-4 hover:bg-[#eef3f8] transition-colors duration-200 
+              ${
+                selectedContact?.user_id === contact.user_id
+                  ? "bg-[#eef3f8]"
+                  : ""
+              }`}
+              onClick={() => handleContactSelect(contact)}
+            >
+              <div className="flex items-center ">
                 <Avatar className="h-12 w-12 mr-3">
                   <AvatarImage
                     src={contact.profile_photo_path}
                     alt={contact.full_name}
+                    className="h-12 w-12 rounded-full "
                   />
                   <AvatarFallback>{contact.full_name.charAt(0)}</AvatarFallback>
                 </Avatar>
+                <div className="flex flex-1 min-w-0">
+                  <div className="flex flex-1 flex-col">
+                    <p className="text-sm text-black truncate">
+                      {contact.full_name ?? "Nyoman Ganadipa Narayana"}
+                    </p>
+                    <p className="text-sm text-[#00000099] truncate">
+                      {contact.last_message ?? "Message last"}
+                    </p>
+                  </div>
+                  <div className="">
+                    <p className="text-sm text-[#00000099] truncate">
+                      {contact.last_message ?? "1/1/2001"}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-[#00000099] truncate">
-                  {contact.last_message}
-                </p>
-                <span className="text-xs text-[#00000099]">
-                  {contact.last_message_time}
-                </span>
-              </div>
-            </div>
-          </button>
+            </button>
+          </>
         ))}
       </ScrollArea>
     </div>
