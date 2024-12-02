@@ -24,3 +24,13 @@ export const MessageSchema = z.object({
 });
 
 export type Message = z.infer<typeof MessageSchema>;
+
+export const GetChatToAContactParamSchema = z.object({
+  contactId: z.string(),
+});
+
+export const MessagesSuccessResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+  body: z.array(MessageSchema),
+});

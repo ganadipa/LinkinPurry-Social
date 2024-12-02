@@ -89,25 +89,33 @@ async function main() {
   //     continue;
   //   }
   // }
-  // console.log("Seeded connection requests.");
+  console.log("Seeded connection requests.");
   // Seed connections
   // for (let i = 0; i < 20; i++) {
   //   const fromUser = faker.helpers.arrayElement(users);
   //   const toUser = faker.helpers.arrayElement(
   //     users.filter((u) => u.id !== fromUser.id)
   //   );
-  //   try {
-  //     await prisma.connection.create({
-  //       data: {
-  //         from_id: fromUser.id,
-  //         to_id: toUser.id,
-  //         created_at: faker.date.recent(),
-  //       },
-  //     });
-  //   } catch (error) {
-  //     // Skip if duplicate connection
-  //     continue;
-  //   }
+  try {
+    await prisma.connection.create({
+      data: {
+        from_id: 86,
+        to_id: 87,
+        created_at: faker.date.recent(),
+      },
+    });
+
+    await prisma.connection.create({
+      data: {
+        from_id: 87,
+        to_id: 86,
+        created_at: faker.date.recent(),
+      },
+    });
+  } catch (error) {
+    // Skip if duplicate connection
+    // continue;
+  }
   // }
   // console.log("Seeded connections.");
   // // Seed push subscriptions

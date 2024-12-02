@@ -55,7 +55,7 @@ export class ProfileController implements Controller {
       path: "/api/profile/{user_id}",
       security: [{ BearerAuth: [] }],
       request: {
-        // params: GetProfileURLParamSchema,
+        params: GetProfileURLParamSchema,
       },
       responses: {
         200: {

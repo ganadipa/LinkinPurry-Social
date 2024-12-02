@@ -37,3 +37,9 @@ export type DeletePostEnv = {
     postId: number;
   };
 };
+
+export type ContactIdEnv = {
+  Variables: {
+    contactId: number;
+  };
+};
