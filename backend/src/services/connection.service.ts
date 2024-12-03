@@ -20,6 +20,16 @@ export class ConnectionService {
     return await this.connectionRepository.getConnectionsByUserId(userId);
   }
 
+  async getAllConnectedUserIds(userId: bigint): Promise<bigint[]> {
+    const connections = await this.connectionRepository.getConnectionsByUserId(userId);
+  
+    const connectedUserIds = connections.map((connection) =>
+      connection.from_id === userId ? connection.to_id : connection.from_id
+    );
+  
+    return connectedUserIds;
+  }
+  
   async sendConnectionRequest(fromId: bigint, toId: bigint) {
     return await this.connectionRepository.createConnectionRequest(
       fromId,

@@ -26,11 +26,16 @@ import { InternalErrorException } from "../exceptions/internal-error.exception";
 import { HTTPException } from "hono/http-exception";
 import { FeedService } from "../services/feed.service";
 
+import { NotificationService } from "../services/notification.service";
+import { ConnectionService } from "../services/connection.service";
+
 @injectable()
 export class FeedController implements Controller {
   constructor(
     @inject(CONFIG.OpenApiHonoProvider) private hono: OpenApiHonoProvider,
-    @inject(CONFIG.FeedService) private feedService: FeedService
+    @inject(CONFIG.FeedService) private feedService: FeedService,
+    @inject(CONFIG.NotificationService) private notificationService: NotificationService,
+    @inject(CONFIG.ConnectionService) private connectionService: ConnectionService
   ) {}
 
   public registerMiddlewaresbeforeGlobal(): void {}
@@ -356,6 +361,13 @@ export class FeedController implements Controller {
         ) {
           throw new InternalErrorException("Failed to create post");
         }
+
+        const connectedUserIds = await this.connectionService.getAllConnectedUserIds(BigInt(user.id));
+        await this.notificationService.sendPostNotification(
+            connectedUserIds,
+            Number(feed.id),
+            user.full_name
+          );
 
         return c.json(
           {

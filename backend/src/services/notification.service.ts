@@ -45,27 +45,27 @@ export class NotificationService {
     );
   }
 
-  async sendPostNotification(userId: number, postId: number, poster: string) {
-    const connections = await this.pushSubscriptionRepo.getAllActiveSubscriptions();
-
-    const payload = JSON.stringify({
-      title: `${poster} has a new post`,
-      body: "Check it out on your timeline!",
-      url: `/feed/${postId}`,
-    });
-
-    await Promise.all(
-      connections.map((sub) =>
-        webPush
-          .sendNotification(
+  async sendPostNotification(userIds: bigint[], postId: number, poster: string) {
+    for (const userId of userIds) {
+      const subscriptions = await this.pushSubscriptionRepo.findByUserId(Number(userId));
+  
+      const payload = JSON.stringify({
+        title: `${poster} has a new post`,
+        body: "Check it out on your timeline!",
+        url: `/post/${postId}`,
+      });
+  
+      await Promise.all(
+        subscriptions.map((sub) =>
+          webPush.sendNotification(
             {
               endpoint: sub.endpoint,
               keys: sub.keys as { p256dh: string; auth: string },
             },
             payload
-          )
-          .catch((error) => console.error("Error sending post notification:", error))
-      )
-    );
-  }
+          ).catch(console.error)
+        )
+      );
+    }
+  }  
 }
