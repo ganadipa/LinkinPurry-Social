@@ -9,7 +9,7 @@ export class PrismaProvider {
   constructor() {
     if (!PrismaProvider.instance) {
       PrismaProvider.instance = new PrismaClient({
-        log: ["query", "info", "warn", "error"],
+        log: ["warn", "error"],
       });
     }
     PrismaProvider.client = PrismaProvider.instance;

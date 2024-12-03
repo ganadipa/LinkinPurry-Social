@@ -3,6 +3,7 @@ import { ChatRepository } from "../interfaces/chat-repository.interface";
 import { CONFIG } from "../ioc/config";
 import { Contact, Message } from "../schemas/chat.schema";
 import { InternalErrorException } from "../exceptions/internal-error.exception";
+import { Chat } from "../models/chat.model";
 
 @injectable()
 export class ChatService {
@@ -36,5 +37,9 @@ export class ChatService {
         content: c.message,
       };
     });
+  }
+
+  public async addMessage(message: Chat): Promise<Chat> {
+    return this.chatRepository.addMessage(message);
   }
 }

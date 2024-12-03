@@ -142,4 +142,16 @@ export class DbChatRepository implements ChatRepository {
       };
     });
   }
+
+  public async addMessage(message: Chat): Promise<Chat> {
+    const newMessage = await this.prisma.prisma.chat.create({
+      data: {
+        from_id: message.from_id,
+        to_id: message.to_id,
+        message: message.message,
+        timestamp: new Date(),
+      },
+    });
+    return newMessage;
+  }
 }

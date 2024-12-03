@@ -59,8 +59,9 @@ export class Application {
 
   public start(port: number): void {
     const server = this.ioc.get<Server>(CONFIG.Server);
-    const router = this.ioc.get<Router>(CONFIG.Router);
     server.start(port);
+    this.configureSocket();
+    const router = this.ioc.get<Router>(CONFIG.Router);
 
     router.registerMiddlewaresBeforeGlobal();
     this.registerGlobalMiddlewares();
@@ -68,6 +69,11 @@ export class Application {
     router.registerRoutes();
 
     this.configureHono();
+  }
+
+  private configureSocket(): void {
+    this.ioc.bind<Controller>(CONFIG.Controllers, ChatController);
+    this.ioc.bind<SocketProvider>(CONFIG.SocketProvider, SocketProvider);
   }
 
   public configureHono(): void {
@@ -155,7 +161,6 @@ class MainBindingConfigurator {
       OpenApiHonoProvider
     );
     this.ioc.bind<PrismaProvider>(CONFIG.PrismaProvider, PrismaProvider);
-    this.ioc.bind<SocketProvider>(CONFIG.SocketProvider, SocketProvider);
   }
 
   private configureServer(): void {

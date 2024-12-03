@@ -13,6 +13,7 @@ export class SocketProvider {
     @inject(CONFIG.OpenApiHonoProvider) private hono: OpenApiHonoProvider,
     @inject(CONFIG.Server) private server: Server
   ) {
+    console.log("Socket provider initialized");
     this.io = new SocketIOServer(this.server.server as HTTPServer, {
       path: "/ws",
       serveClient: false,
@@ -20,6 +21,22 @@ export class SocketProvider {
         origin: "*",
         methods: ["GET", "POST"],
       },
+      transports: ["websocket"],
+    });
+    console.log("Socket provider initialized");
+
+    // Add this to debug connection attempts
+    this.io.engine.on("headers", (headers, req) => {
+      console.log("Socket headers:", headers);
+    });
+
+    this.io.engine.on("initial_headers", (headers, req) => {
+      console.log("Socket initial headers:", headers);
+    });
+
+    this.io.on("connection", (socket) => {
+      console.log("Client connected:", socket.id);
+      // ... rest of your socket code
     });
   }
 }

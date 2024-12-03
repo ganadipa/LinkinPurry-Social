@@ -7,25 +7,29 @@ import { useEffect, useRef, useState } from "react";
 import { Contact, Message } from "../../types/chat";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth";
-import { useChat } from "@/hooks/chat";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ChatAreaProps {
   selectedContact: Contact | null;
   className?: string;
   messages: Message[] | null;
-  setMessages: React.Dispatch<React.SetStateAction<Message[] | null>>;
+  sendMessage: (message: string) => void;
   isChatLoading: boolean;
+  sendTypingStatus: (isTyping: boolean) => void;
+  isOtherTyping: boolean;
 }
 
 export default function ChatArea({
   selectedContact,
   className,
   messages,
-  setMessages,
   isChatLoading,
+  sendMessage,
+  isOtherTyping,
+  sendTypingStatus,
 }: ChatAreaProps) {
   const [inputMessage, setInputMessage] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  const isTyping = inputMessage.length > 0;
   const { user } = useAuth();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -33,9 +37,14 @@ export default function ChatArea({
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
   useEffect(() => {
     if (selectedContact) scrollToBottom();
   }, [messages, selectedContact]);
+
+  useEffect(() => {
+    sendTypingStatus(isTyping);
+  }, [isTyping]);
 
   if (selectedContact === null) {
     return <div className="self-center mx-auto">No contact selected</div>;
@@ -46,7 +55,6 @@ export default function ChatArea({
   }
 
   if (messages === null) {
-    console.log("messages", messages);
     return (
       <div className="self-center mx-auto">Something terrible happened</div>
     );
@@ -54,35 +62,59 @@ export default function ChatArea({
 
   const handleSendMessage = () => {
     if (inputMessage.trim()) {
-      const newMessage: Message = {
-        id: Date.now(),
-        content: inputMessage,
-        sender: 1,
-        timestamp: new Date().getTime(),
-      };
-      setMessages((prev) => {
-        if (prev === null) return [newMessage];
-        return [...prev, newMessage];
-      });
+      sendMessage(inputMessage);
       setInputMessage("");
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
     }
   };
 
   const formatMessageTime = (dateNumber: number) => {
     const date = new Date(dateNumber);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
-    if (days === 0) {
-      return date.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    } else if (days === 1) {
-      return "Yesterday";
+  const shouldShowTimeDivider = (
+    currentMsg: Message,
+    prevMsg: Message | null
+  ) => {
+    if (!prevMsg) return true;
+
+    const currentTime = new Date(currentMsg.timestamp);
+    const prevTime = new Date(prevMsg.timestamp);
+    const diffMinutes =
+      (currentTime.getTime() - prevTime.getTime()) / (1000 * 60);
+
+    return diffMinutes > 30;
+  };
+
+  const formatTimeDivider = (timestamp: number) => {
+    const date = new Date(timestamp);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return `Today at ${formatMessageTime(timestamp)}`;
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return `Yesterday at ${formatMessageTime(timestamp)}`;
     } else {
-      return date.toLocaleDateString();
+      return (
+        date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year:
+            date.getFullYear() !== today.getFullYear() ? "numeric" : undefined,
+        }) + ` at ${formatMessageTime(timestamp)}`
+      );
     }
   };
 
@@ -108,70 +140,99 @@ export default function ChatArea({
       </div>
 
       <ScrollArea className="h-full p-4 bg-[#f8f9fa] overflow-y-auto">
-        {messages.map((message, index) => {
-          const isFirstInGroup =
-            index === 0 || messages[index - 1].sender !== message.sender;
-          const isLastInGroup =
-            index === messages.length - 1 ||
-            messages[index + 1].sender !== message.sender;
+        <div className="space-y-1">
+          {messages.map((message, index) => {
+            const isFirstInGroup =
+              index === 0 || messages[index - 1].sender !== message.sender;
+            const isLastInGroup =
+              index === messages.length - 1 ||
+              messages[index + 1].sender !== message.sender;
+            const isOwnMessage = message.sender === user?.id;
+            const prevMessage = index > 0 ? messages[index - 1] : null;
+            const showTimeDivider = shouldShowTimeDivider(message, prevMessage);
 
-          return (
-            <div
-              key={message.id}
-              className={`flex ${message.sender === user?.id ? "justify-end" : "justify-start"} ${isLastInGroup ? "mb-4" : "mb-1"}`}
-            >
-              {message.sender === user?.id && isFirstInGroup && (
-                <Avatar className="h-8 w-8 mr-2 mt-2">
-                  <AvatarImage
-                    src={selectedContact.profile_photo_path}
-                    alt={selectedContact.full_name}
-                  />
-                  <AvatarFallback>
-                    {selectedContact.full_name.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
-              )}
-              <div
-                className={`max-w-[70%] ${message.sender === user?.id && !isFirstInGroup ? "ml-10" : ""}`}
-              >
+            return (
+              <>
+                {showTimeDivider && (
+                  <div className="flex justify-center my-4">
+                    <span className="text-xs bg-gray-100 text-gray-500 px-3 py-1 rounded-full">
+                      {formatTimeDivider(message.timestamp)}
+                    </span>
+                  </div>
+                )}
                 <div
-                  className={`p-3 rounded-lg ${
-                    message.sender === user?.id
-                      ? "bg-[#0a66c2] text-white"
-                      : "bg-[#f2f2f2] text-[#000000]"
-                  }`}
+                  key={message.id}
+                  className={cn("flex items-start gap-2", {
+                    "justify-end": isOwnMessage,
+                    "justify-start": !isOwnMessage,
+                    "mb-4": isLastInGroup,
+                    "mb-1": !isLastInGroup,
+                  })}
                 >
-                  <p>{message.content}</p>
-                  <p
-                    className={cn("text-xs text-end text-white", {
-                      "text-[#00000099]": message.sender !== user?.id,
-                      "text-start": message.sender === user?.id,
+                  {!isOwnMessage && isFirstInGroup && (
+                    <Avatar className="h-8 w-8 mt-1 flex-shrink-0">
+                      <AvatarImage
+                        src={selectedContact.profile_photo_path}
+                        alt={selectedContact.full_name}
+                      />
+                      <AvatarFallback>
+                        {selectedContact.full_name.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                  {!isOwnMessage && !isFirstInGroup && (
+                    <div className="w-8 flex-shrink-0" />
+                  )}
+                  <div
+                    className={cn("flex flex-col", {
+                      "items-end": isOwnMessage,
+                      "items-start": !isOwnMessage,
                     })}
                   >
-                    {formatMessageTime(message.timestamp)}
-                  </p>
+                    <div
+                      className={cn(
+                        "p-3 rounded-lg break-words max-w-[300px]",
+                        {
+                          "bg-[#0a66c2] text-white": isOwnMessage,
+                          "bg-[#f2f2f2] text-[#000000]": !isOwnMessage,
+                        }
+                      )}
+                    >
+                      <p style={{ whiteSpace: "pre-wrap" }}>
+                        {message.content}
+                      </p>
+                      <p
+                        className={cn("text-xs mt-1", {
+                          "text-white/80": isOwnMessage,
+                          "text-black/60": !isOwnMessage,
+                        })}
+                      >
+                        {formatMessageTime(message.timestamp)}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          );
-        })}
+              </>
+            );
+          })}
+        </div>
         <div ref={messagesEndRef} />
       </ScrollArea>
 
-      {isTyping && (
+      {isOtherTyping && (
         <div className="px-4 py-2 text-sm text-[#00000099] bg-white">
           {selectedContact.full_name} is typing...
         </div>
       )}
 
-      <div className="p-4 bg-white border-t border-[#e0e0e0] flex items-center gap-2">
-        <Input
-          type="text"
-          placeholder="Write a message..."
+      <div className="p-4 bg-white border-t border-[#e0e0e0] flex items-end gap-2">
+        <Textarea
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-          className="flex-1 bg-[#eef3f8] text-[#000000]"
+          onKeyDown={handleKeyPress}
+          placeholder="Write a message..."
+          className="flex-1 bg-[#eef3f8] text-[#000000] resize-none"
+          rows={3}
         />
         <Button
           onClick={handleSendMessage}

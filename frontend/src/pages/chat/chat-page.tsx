@@ -3,17 +3,21 @@ import ChatArea from "./chat-area";
 import ChatAreaMobile from "./chat-area-mobile";
 import { useChat } from "@/hooks/chat";
 import Loading from "@/components/loading";
+import { useAuth } from "@/hooks/auth";
 
 export default function ChatPage() {
+  const { user } = useAuth();
   const {
     contacts,
     selectedContact,
     handleContactSelect,
     isLoading,
     messages,
-    setMessages,
     isChatLoading,
-  } = useChat();
+    sendMessage,
+    sendTypingStatus,
+    isTyping: isOtherTyping,
+  } = useChat({ user_id: user?.id });
   if (isLoading) {
     return <Loading />;
   }
@@ -34,8 +38,10 @@ export default function ChatPage() {
         selectedContact={selectedContact}
         className="max-md:hidden"
         messages={messages}
-        setMessages={setMessages}
         isChatLoading={isChatLoading}
+        sendMessage={sendMessage}
+        isOtherTyping={isOtherTyping}
+        sendTypingStatus={sendTypingStatus}
       />
       {/* <ChatAreaMobile
         selectedContact={selectedContact}

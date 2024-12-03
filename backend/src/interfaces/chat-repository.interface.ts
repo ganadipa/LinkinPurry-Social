@@ -8,4 +8,5 @@ export interface ChatRepository {
   getChat(user_id: number, contact_id: number): Promise<Chat[]>;
   getChats(userId: number): Promise<Chat[]>;
   getContactsByUserId(userId: number): Promise<Contact[]>;
+  addMessage(message: Chat): Promise<Chat>;
 }

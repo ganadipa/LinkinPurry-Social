@@ -1,8 +1,7 @@
 import path from "path";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
-import { loadEnv } from "vite";
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
@@ -40,32 +39,13 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path,
         },
       },
+      outDir: "dist",
+      assetsDir: "assets",
     },
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
       },
-    },
-    build: {
-      rollupOptions: {
-        input: {
-          main: path.resolve(__dirname, 'index.html'),
-          'service-worker': path.resolve(__dirname, 'public/service-worker.ts'),
-        },
-        output: {
-          entryFileNames: (chunkInfo) => {
-            return chunkInfo.name === 'service-worker' 
-              ? '[name].js'
-              : 'assets/js/[name]-[hash].js';
-          },
-        },
-      },
-      outDir: 'dist',
-      assetsDir: 'assets',
-    },
-    worker: {
-      format: 'es',
-      plugins: [],
     },
   };
 });

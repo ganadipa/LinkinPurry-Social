@@ -2,8 +2,8 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Search } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { Contact, Message } from "../../types/chat";
+import { useEffect, useState } from "react";
+import { Contact } from "../../types/chat";
 import { cn } from "@/lib/utils";
 
 type ContactSidebarProps = {
@@ -11,6 +11,31 @@ type ContactSidebarProps = {
   selectedContact: Contact | null;
   handleContactSelect: (contact: Contact) => void;
   className?: string;
+};
+
+const formatLastMessageTime = (time: number) => {
+  let ret = "";
+  if (new Date().getTime() - time < 86400000) {
+    ret = new Date(time).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } else if (new Date().getTime() - time < 604800000) {
+    ret = new Date(time).toLocaleDateString([], {
+      weekday: "short",
+    });
+  } else {
+    ret = new Date(time).toLocaleDateString([], {
+      month: "short",
+      day: "numeric",
+    });
+  }
+  return ret;
+};
+
+const truncateText = (text: string, maxLength: number) => {
+  if (!text) return "";
+  return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 };
 
 export function ContactSidebar({
@@ -55,44 +80,46 @@ export function ContactSidebar({
 
       <ScrollArea className="flex-1">
         {filteredContacts.map((contact) => (
-          <>
-            <button
-              key={contact.user_id}
-              className={`w-full text-left p-4 hover:bg-[#eef3f8] transition-colors duration-200 
+          <button
+            key={contact.user_id}
+            className={`w-full text-left p-4 hover:bg-[#eef3f8] transition-colors duration-200 
               ${
                 selectedContact?.user_id === contact.user_id
                   ? "bg-[#eef3f8]"
                   : ""
               }`}
-              onClick={() => handleContactSelect(contact)}
-            >
-              <div className="flex items-center ">
-                <Avatar className="h-12 w-12 mr-3">
-                  <AvatarImage
-                    src={contact.profile_photo_path}
-                    alt={contact.full_name}
-                    className="h-12 w-12 rounded-full "
-                  />
-                  <AvatarFallback>{contact.full_name.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-1 min-w-0">
-                  <div className="flex flex-1 flex-col">
-                    <p className="text-sm text-black truncate">
-                      {contact.full_name ?? "Nyoman Ganadipa Narayana"}
-                    </p>
-                    <p className="text-sm text-[#00000099] truncate">
-                      {contact.last_message ?? "Message last"}
-                    </p>
-                  </div>
-                  <div className="">
-                    <p className="text-sm text-[#00000099] truncate">
-                      {contact.last_message ?? "1/1/2001"}
-                    </p>
-                  </div>
+            onClick={() => handleContactSelect(contact)}
+          >
+            <div className="flex items-center">
+              <Avatar className="h-12 w-12 mr-3">
+                <AvatarImage
+                  src={contact.profile_photo_path}
+                  alt={contact.full_name}
+                  className="h-12 w-12 rounded-full"
+                />
+                <AvatarFallback>{contact.full_name.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div className="flex flex-1 min-w-0">
+                <div className="flex flex-1 flex-col">
+                  <p className="text-sm text-black truncate">
+                    {truncateText(contact.full_name, 20)}
+                  </p>
+                  <p className="text-sm text-[#00000099] truncate">
+                    {contact.last_message
+                      ? truncateText(contact.last_message, 10)
+                      : ""}
+                  </p>
+                </div>
+                <div className="">
+                  <p className="text-sm text-[#00000099] truncate">
+                    {contact.last_message_time
+                      ? formatLastMessageTime(contact.last_message_time)
+                      : ""}
+                  </p>
                 </div>
               </div>
-            </button>
-          </>
+            </div>
+          </button>
         ))}
       </ScrollArea>
     </div>

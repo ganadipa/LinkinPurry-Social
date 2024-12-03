@@ -1,4 +1,5 @@
 import { Application } from "./core/app";
+import { Message, MessageSocketSchema } from "./schemas/chat.schema";
 
 // dotenv.config({
 //   path: ".env.prod",
@@ -6,14 +7,5 @@ import { Application } from "./core/app";
 const app = new Application();
 const port = Number(process.env.PORT) || 8000;
 app.start(port);
-
-const io = app.getSocket();
-io.on("connection", (socket) => {
-  socket.emit("hello", "Hello from the server!");
-
-  socket.on("disconnect", () => {
-    console.log("A user disconnected");
-  });
-});
 
 export default app.getApp();

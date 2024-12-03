@@ -6,6 +6,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 import {
   ContactsResponseSuccessSchema,
   GetChatToAContactParamSchema,
+  MessageSocketSchema,
   MessagesSuccessResponseSchema,
 } from "../schemas/chat.schema";
 import { ErrorResponseSchema } from "../constants/types";
@@ -16,12 +17,15 @@ import { InternalErrorException } from "../exceptions/internal-error.exception";
 import { createMiddleware } from "hono/factory";
 import { BadRequestException } from "../exceptions/bad-request.exception";
 import { ContactIdEnv } from "../constants/context-env.types";
+import { SocketProvider } from "../core/ws-provider";
+import { Chat } from "../models/chat.model";
 
 @injectable()
 export class ChatController implements Controller {
   constructor(
     @inject(CONFIG.OpenApiHonoProvider) private hono: OpenApiHonoProvider,
-    @inject(CONFIG.ChatService) private chatService: ChatService
+    @inject(CONFIG.ChatService) private chatService: ChatService,
+    @inject(CONFIG.SocketProvider) private socketProvider: SocketProvider
   ) {}
 
   public registerMiddlewaresAfterGlobal(): void {}
@@ -31,6 +35,7 @@ export class ChatController implements Controller {
   public registerRoutes(): void {
     this.registerContacts();
     this.registerMessagesInAContact();
+    this.registerSocket();
   }
 
   private validateContactIdMiddleware = createMiddleware<ContactIdEnv>(
@@ -275,6 +280,74 @@ export class ChatController implements Controller {
           500
         );
       }
+    });
+  }
+  public registerSocket(): void {
+    this.socketProvider.io.on("connection", (socket) => {
+      console.log("New client connected", socket.id);
+
+      socket.on("join_room", ({ roomName }) => {
+        socket.join(roomName);
+        console.log(`Socket ${socket.id} joined room: ${roomName}`);
+      });
+
+      socket.on("leave_room", ({ roomName }) => {
+        socket.leave(roomName);
+        console.log(`Socket ${socket.id} left room: ${roomName}`);
+      });
+
+      // Handle new messages
+      socket.on("send_message", async (messageData: unknown) => {
+        const expect = MessageSocketSchema.safeParse(messageData);
+        if (!expect.success) {
+          console.error("Failed to parse message:", expect.error);
+          return;
+        }
+
+        const from_id = expect.data.sender;
+        const to_id = expect.data.roomName
+          .split("-")
+          .find((id) => Number(id) !== from_id);
+        if (!to_id) {
+          console.error("Failed to parse message:", expect.error);
+          return;
+        }
+
+        const chat = new Chat(from_id, Number(to_id), expect.data.content);
+        const message = await this.chatService.addMessage(chat);
+
+        if (!message.id) {
+          console.error("Failed to save message to database");
+          return;
+        }
+
+        if (!message.timestamp) {
+          console.error("Failed to save message to database");
+          return;
+        }
+
+        this.socketProvider.io.to(expect.data.roomName).emit("new_message", {
+          id: Number(message.id),
+          timestamp: message.timestamp?.getTime(),
+          sender: Number(message.from_id),
+          content: message.message,
+        });
+      });
+
+      socket.on("typing", ({ roomName, isTyping, userId }) => {
+        console.log("Typing status:", {
+          roomName,
+          isTyping,
+          userId,
+          socketId: socket.id,
+        });
+
+        socket.to(roomName).emit("typing_status", { isTyping, userId });
+      });
+
+      socket.on("disconnect", () => {
+        console.log("Client disconnected", socket.id);
+      });
     });
   }
 }

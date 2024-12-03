@@ -34,3 +34,9 @@ export const MessagesSuccessResponseSchema = z.object({
   message: z.string(),
   body: z.array(MessageSchema),
 });
+
+export const MessageSocketSchema = z.object({
+  content: z.string(),
+  sender: z.number(),
+  roomName: z.string(),
+});
