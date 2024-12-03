@@ -1,6 +1,15 @@
 import { Application } from "./core/app";
 import { Message, MessageSocketSchema } from "./schemas/chat.schema";
 
+declare global {
+  interface BigInt {
+    toJSON(): string;
+  }
+}
+
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
 // dotenv.config({
 //   path: ".env.prod",
 // });

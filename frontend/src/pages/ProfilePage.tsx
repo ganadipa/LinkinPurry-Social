@@ -34,10 +34,7 @@ export default function ProfilePage({ id }: { id: number }) {
         isOwnProfile={isOwnProfile}
       />
 
-      <Skills
-        skills={profile.skills}
-        isOwnProfile={isOwnProfile}
-      />
+      <Skills skills={profile.skills} isOwnProfile={isOwnProfile} />
     </div>
   );
 }

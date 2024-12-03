@@ -23,6 +23,7 @@ export function useProfile(id: number) {
     }
 
     const json = await response.json();
+    console.log(json);
     const expected = profileResponse.safeParse(json);
 
     if (!expected.success) {
@@ -43,8 +44,25 @@ export function useProfile(id: number) {
         connection_count: data.connection_count,
       };
 
+      const rel_posts = data.relevant_posts.map((post) => {
+        if (!post.created_at) {
+          throw new Error("Post created_at somehow missing");
+        }
+
+        if (!post.updated_at) {
+          throw new Error("Post updated_at somehow missing");
+        }
+
+        return {
+          id: post.id,
+          content: post.content,
+          created_at: new Date(post.created_at).toLocaleDateString(),
+          updated_at: new Date(post.updated_at).toLocaleDateString(),
+        };
+      });
+
       setProfile(profile);
-      setPosts(data.relevant_posts);
+      setPosts(rel_posts);
       setSuccess(true);
       setLoading(false);
       return;
