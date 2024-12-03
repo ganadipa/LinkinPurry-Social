@@ -3,6 +3,7 @@ import { UserCard } from "@/components/ui/user-card";
 import { useAuth } from "@/hooks/auth";
 import { getUsersResponse } from "@/types/response";
 import { determineStatus } from "@/lib/connectionUtils";
+import Loading from "@/components/loading";
 
 export default function UserListPage() {
     const { user: currentUser } = useAuth();
@@ -123,14 +124,16 @@ export default function UserListPage() {
                 className="border border-gray-300 rounded-lg p-2 mb-6 w-full"
             />
             {loading ? (
-                <p>Loading...</p>
+                <Loading />
             ) : (
-                <div className="space-y-4">
+                <div className="bg-white rounded-lg border border-gray-300">
+                    <h1 className="text-2xl font-semibold p-4">People</h1>
                     {users
                         .filter((user) => user.id !== currentUser?.id)
                         .map((user) => (
                             <UserCard
                                 key={user.id}
+                                id={user.id}
                                 name={user.full_name}
                                 profilePhoto={user.profile_photo_path}
                                 status={statuses[user.id]}

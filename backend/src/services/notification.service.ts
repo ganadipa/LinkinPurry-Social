@@ -12,8 +12,8 @@ export class NotificationService {
   ) {
     webPush.setVapidDetails(
       "mailto:example@example.com",
-      process.env.VAPID_PUBLIC_KEY || "",
-      process.env.VAPID_PRIVATE_KEY || ""
+      process.env.REACT_VAPID_PUBLIC_KEY || "",
+      process.env.REACT_VAPID_PRIVATE_KEY || ""
     );
   }
 

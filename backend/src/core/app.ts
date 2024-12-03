@@ -38,6 +38,11 @@ import { ChatRepository } from "../interfaces/chat-repository.interface";
 import { DbChatRepository } from "../repositories/db/chat.repository";
 import { ChatService } from "../services/chat.service";
 import { ChatController } from "../controllers/chat.controller";
+import { NotificationController } from "../controllers/notification.controller";
+import { NotificationService } from "../services/notification.service";
+import { PushSubscription } from "web-push";
+import { PushSubscriptionRepository } from "../interfaces/push-subscription-repository.interface";
+import { DbPushSubscriptionRepository } from "../repositories/db/push-subscription.repository";
 
 export class Application {
   private ioc: IOCContainer;
@@ -139,6 +144,7 @@ class MainBindingConfigurator {
     this.ioc.bind<Controller>(CONFIG.Controllers, SwaggerUIController);
     this.ioc.bind<Controller>(CONFIG.Controllers, FeedController);
     this.ioc.bind<Controller>(CONFIG.Controllers, ChatController);
+    this.ioc.bind<Controller>(CONFIG.Controllers, NotificationController);
   }
 
   private configureProviders(): void {
@@ -185,6 +191,10 @@ class MainBindingConfigurator {
       DbConnectionRepository
     );
     this.ioc.bind<ChatRepository>(CONFIG.DbChatRepository, DbChatRepository);
+    this.ioc.bind<PushSubscriptionRepository>(
+      CONFIG.DbPushSubscriptionRepository,
+      DbPushSubscriptionRepository
+    );
   }
 
   private configureServices(): void {
@@ -203,5 +213,9 @@ class MainBindingConfigurator {
     );
     this.ioc.bind<FeedService>(CONFIG.FeedService, FeedService);
     this.ioc.bind<ChatService>(CONFIG.ChatService, ChatService);
+    this.ioc.bind<NotificationService>(
+      CONFIG.NotificationService,
+      NotificationService
+    );
   }
 }

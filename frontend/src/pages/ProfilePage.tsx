@@ -5,7 +5,7 @@ import ProfileHeader from "@/components/specific/profile/ProfileHeader";
 import WorkHistory from "@/components/specific/profile/WorkHistory";
 import Skills from "@/components/specific/profile/Skills";
 
-export default function ProfilePage2({ id }: { id: number }) {
+export default function ProfilePage({ id }: { id: number }) {
   const { user, isLoading: isAuthLoading } = useAuth();
   const { profile, loading: isProfileLoading } = useProfile(id);
 
