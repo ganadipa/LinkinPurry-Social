@@ -68,7 +68,8 @@ export class NotificationController implements Controller {
     this.hono.app.openapi(route, async (c) => {
       try {
         const body = await c.req.json();
-        const subscription = new PushSubscription(body.endpoint, body.keys);
+        const subscription = new PushSubscription(body.endpoint, body.keys, body.user_id);
+        console.log("Subscription:", subscription);
         await this.notificationService.saveSubscription(subscription);
 
         return c.json({

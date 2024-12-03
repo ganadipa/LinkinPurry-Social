@@ -19,13 +19,17 @@ import { BadRequestException } from "../exceptions/bad-request.exception";
 import { ContactIdEnv } from "../constants/context-env.types";
 import { SocketProvider } from "../core/ws-provider";
 import { Chat } from "../models/chat.model";
+import { NotificationService } from "../services/notification.service";
+import { UserService } from "../services/user.service";
 
 @injectable()
 export class ChatController implements Controller {
   constructor(
     @inject(CONFIG.OpenApiHonoProvider) private hono: OpenApiHonoProvider,
     @inject(CONFIG.ChatService) private chatService: ChatService,
-    @inject(CONFIG.SocketProvider) private socketProvider: SocketProvider
+    @inject(CONFIG.SocketProvider) private socketProvider: SocketProvider,
+    @inject(CONFIG.NotificationService) private notificationService: NotificationService,
+    @inject(CONFIG.UserService) private userService: UserService
   ) {}
 
   public registerMiddlewaresAfterGlobal(): void {}
@@ -315,6 +319,22 @@ export class ChatController implements Controller {
 
         const chat = new Chat(from_id, Number(to_id), expect.data.content);
         const message = await this.chatService.addMessage(chat);
+        const user = await this.userService.getUserById(from_id);
+
+        if (!user) {
+          throw new InternalErrorException("User not found");
+        }
+
+        if (!user.full_name) {
+          throw new InternalErrorException("User full name not found");
+        }
+
+        console.log("Sending chat notification to:", to_id);
+        this.notificationService.sendChatNotification(
+          Number(to_id),
+          expect.data.content,
+          user.full_name
+        );
 
         if (!message.id) {
           console.error("Failed to save message to database");
