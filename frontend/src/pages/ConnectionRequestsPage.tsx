@@ -95,7 +95,8 @@ export default function ConnectionRequestsPage() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto mt-10 p-6 space-y-4">
+        <div className="max-w-4xl bg-white mx-auto mt-10 rounded-lg border border-gray-300">
+            <h1 className="text-2xl font-semibold p-4">Connection Requests</h1>
             {loading ? (
                 <p>Loading...</p>
             ) : requests.length === 0 ? (
@@ -104,6 +105,7 @@ export default function ConnectionRequestsPage() {
                 requests.map((req) => (
                     <UserCard
                         key={req.from_id}
+                        id={req.from_id}
                         name={req.full_name}
                         profilePhoto={req.profile_photo_path}
                         status="pending"

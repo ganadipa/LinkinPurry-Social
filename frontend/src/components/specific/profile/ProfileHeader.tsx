@@ -5,6 +5,7 @@ import { Link } from "@tanstack/react-router";
 import EditPhotoModals from "@/components/specific/edit-photo";
 import EditModals from "@/components/specific/edit-modals";
 import { useConnectionStatus } from "@/hooks/connection-status";
+// import EditProfileModals from "@/components/specific/edit-modals-profile";
 
 interface ProfileHeaderProps {
   profile: {
@@ -12,6 +13,8 @@ interface ProfileHeaderProps {
     username: string;
     profile_photo: string;
     connection_count: number;
+    // work_history?: string;
+    // skills?: string;
   };
   user?: { id: number };
   profileId: number;
@@ -30,6 +33,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     const [username, setUsername] = useState<string>(profile.username);
     const [connectionCount, setConnectionCount] = useState<number>(profile.connection_count);
     const [profilePhoto, setProfilePhoto] = useState<string>(profile.profile_photo);
+    // const [workHistory, setWorkHistory] = useState<string>(profile.work_history);
+    // const [skills, setSkills] = useState<string>(profile.skills);
   
     const [photoModalOpen, setPhotoModalOpen] = useState<boolean>(false);
     const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
@@ -39,6 +44,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       await toggleConnection();
     };
   
+    // const handleUpdate = (newName: string, newUsername: string, newWorkHistory: string, newSkills: string) => {
+    //   setName(newName);
+    //   setUsername(newUsername);
+    //   setWorkHistory(newWorkHistory);
+    //   setSkills(newSkills);
+    // };
+
     const handleNameUpdate = (newName: string) => {
       setName(newName);
     };
@@ -112,6 +124,28 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           onDeletePhoto={() => {}}
         />
   
+        {/* <EditProfileModals
+          isModalOpen={editModalOpen}
+          setIsModalOpen={setEditModalOpen}
+          userId={user?.id ?? 0}
+          initialData={{
+            name: name || '',
+            username: username || '',
+            work_history: workHistory || '',
+            skills: skills || '',
+          }}
+          onUpdateSuccess={(updatedData) => {
+            console.log('Profile updated successfully:', updatedData);
+            // Handle UI state or refetch updated data
+            handleUpdate(
+              updatedData.name || '',
+              updatedData.username || '',
+              updatedData.work_history || '',
+              updatedData.skills || ''
+            );
+          }}
+        /> */}
+
         <EditModals
           labelModal="Name"
           value={name || ""}

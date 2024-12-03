@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 
 interface UserCardProps {
+  id: number;
   name: string;
   profilePhoto: string;
   status: "connected" | "pending" | "not_connected";
@@ -11,6 +12,7 @@ interface UserCardProps {
 }
 
 export function UserCard({
+  id,
   name,
   profilePhoto,
   status,
@@ -20,15 +22,19 @@ export function UserCard({
   hideStatus = false,
 }: UserCardProps) {
   return (
-    <div className="flex items-center bg-white rounded-lg shadow p-4">
-      <img
-        src={profilePhoto}
-        alt={`${name}'s profile`}
-        className="w-16 h-16 rounded-full mr-4"
-      />
-      <div className="flex-1">
-        <h3 className="text-lg font-semibold">{name}</h3>
-      </div>
+    <>
+    <hr />
+    <div className="flex items-center justify-between bg-white px-4 py-3 rounded-lg">
+      <a href={`/profile/${id}`} className="flex flex-row justify-center items-center">
+        <img
+          src={profilePhoto}
+          alt={`${name}'s profile`}
+          className="w-16 h-16 rounded-full mr-4"
+          />
+        <div className="flex-1">
+          <h3 className="text-lg font-semibold hover:underline">{name}</h3>
+        </div>
+      </a>
       {!hideStatus && (
         <div>
           {status === "connected" && (
@@ -40,23 +46,24 @@ export function UserCard({
                 <span className="text-yellow-500 font-semibold">Pending</span>
               ) : (
                 <div className="flex space-x-2">
-                  <Button onClick={onAccept} className="bg-green-500 text-white">
-                    Accept
+                  <Button onClick={onDecline} className="bg-transparent px-4 py-1 text-md font-semibold text-gray-700 shadow-none hover:bg-slate-100">
+                    Ignore
                   </Button>
-                  <Button onClick={onDecline} className="bg-red-500 text-white">
-                    Decline
+                  <Button onClick={onAccept} className="bg-transparent px-4 py-1 text-md font-semibold text-blue-600 border border-blue-600 rounded-full hover:bg-blue-50">
+                    Accept
                   </Button>
                 </div>
               )}
             </>
           )}
           {status === "not_connected" && (
-            <Button onClick={onConnect} className="bg-blue-500 text-white">
+            <Button onClick={onConnect} className="bg-transparent px-4 py-1 text-md font-semibold text-blue-600 border border-blue-600 rounded-full hover:bg-blue-50">
               Connect
             </Button>
           )}
         </div>
       )}
     </div>
+    </>
   );
 }

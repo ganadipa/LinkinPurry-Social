@@ -234,7 +234,7 @@ const short = createAnimation(
 
 function BarLoader({
   loading = true,
-  color = "#000000",
+  color = "#0a66c2",
   speedMultiplier = 1,
   cssOverride = {},
   height = 4,
@@ -285,8 +285,10 @@ function BarLoader({
 
 export default function Loading() {
   return (
-    <div className="flex flex-col items-center justify-center gap-2">
-      LinkinPurry
+    <div className="flex flex-col items-center justify-center gap-4 h-screen">
+      <h1 className="flex items-center justify-center text-4xl font-extrabold text-[#0a66c2]">
+        Link<img src="/public/images/linkedin.png" alt="logo" width={40} height={40} />Purry
+      </h1>
       <BarLoader />
     </div>
   );
