@@ -7,6 +7,7 @@ export const SaveSubscriptionRequestSchema = z.object({
     p256dh: z.string(),
     auth: z.string(),
   }),
+  user_id: z.number(),
 });
 
 export const SaveSubscriptionResponseSchema = z.object({
