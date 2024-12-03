@@ -1,11 +1,11 @@
 // frontend/public/service-worker.ts
-
 declare const self: ServiceWorkerGlobalScope;
 
 self.addEventListener('push', (event: PushEvent) => {
   if (!event.data) return;
 
-  const payload: NotificationPayload = event.data.json();
+  const payload = event.data.json();
+  console.log('Received push notification:', payload);
 
   event.waitUntil(
     self.registration.showNotification(payload.title, {
@@ -21,23 +21,10 @@ self.addEventListener('push', (event: PushEvent) => {
 self.addEventListener('notificationclick', (event: NotificationEvent) => {
   event.notification.close();
 
-  const url = event.notification.data?.url || '/';
+  const baseUrl = self.location.origin;
+  const chatUrl = `${baseUrl}/chat`;
 
   event.waitUntil(
-    (async () => {
-      const windowClients = await self.clients.matchAll({
-        type: 'window',
-        includeUncontrolled: true
-      });
-
-      const existingWindow = windowClients.find(client => 
-        new URL(client.url).pathname === new URL(url, self.location.origin).pathname
-      );
-
-      if (existingWindow) {
-        return existingWindow.focus();
-      }
-      return self.clients.openWindow(url);
-    })()
+    clients.openWindow(chatUrl)
   );
 });
