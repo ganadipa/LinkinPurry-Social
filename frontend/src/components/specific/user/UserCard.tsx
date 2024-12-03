@@ -1,3 +1,5 @@
+import { Link } from "@tanstack/react-router";
+
 type ConnectionStatusType = "connected" | "pending" | "not_connected";
 
 interface UserCardProps {
@@ -51,26 +53,29 @@ export const UserCard = ({
 
   return (
     <>
-    <hr />
-    <div className="p-4">
-      <div className="flex items-center space-x-4">
-        <div className="flex-shrink-0">
-          <a href={`/profile/${id}`}>
-            <img
-              src={profilePhoto || "/api/placeholder/64/64"}
-              alt={`${name}'s profile`}
-              className="w-16 h-16 rounded-full border border-gray-200"
-            />
-          </a>
+      <hr />
+      <div className="p-4">
+        <div className="flex items-center space-x-4">
+          <div className="flex-shrink-0">
+            <Link href={`/profile/${id}`}>
+              <img
+                src={profilePhoto || "/api/placeholder/64/64"}
+                alt={`${name}'s profile`}
+                className="w-16 h-16 rounded-full border border-gray-200"
+              />
+            </Link>
+          </div>
+          <div className="flex-1 min-w-0">
+            <Link
+              href={`/profile/${id}`}
+              className="text-lg font-semibold text-gray-800 hover:underline"
+            >
+              {name}
+            </Link>
+          </div>
+          <div className="flex-shrink-0">{getStatusButton()}</div>
         </div>
-        <div className="flex-1 min-w-0">
-          <a href={`/profile/${id}`} className="text-lg font-semibold text-gray-800 hover:underline">
-            {name}
-          </a>
-        </div>
-        <div className="flex-shrink-0">{getStatusButton()}</div>
       </div>
-    </div>
     </>
   );
 };

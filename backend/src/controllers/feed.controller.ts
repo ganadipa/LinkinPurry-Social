@@ -345,6 +345,7 @@ export class FeedController implements Controller {
           Number(user.id),
           content
         );
+        console.log(feed);
 
         if (
           !feed.id ||
@@ -362,7 +363,7 @@ export class FeedController implements Controller {
             message: "Successfully create post",
             body: {
               post: {
-                id: feed.id,
+                id: Number(feed.id),
                 content: feed.content,
                 created_at: feed.created_at.getTime(),
                 updated_at: feed.updated_at.getTime(),

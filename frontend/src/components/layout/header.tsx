@@ -37,7 +37,7 @@ const Header = () => {
           </Link>
           {user === null ? (
             <>
-              <a
+              <Link
                 href="/users"
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
               >
@@ -47,8 +47,8 @@ const Header = () => {
                   className="w-6 h-6 mb-1"
                 />
                 <span className="text-xs">People</span>
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/signin"
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
               >
@@ -58,7 +58,7 @@ const Header = () => {
                   className="w-6 h-6 mb-1"
                 />
                 <span className="text-xs">Login</span>
-              </a>
+              </Link>
               <Link
                 href="/signup"
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
@@ -87,7 +87,7 @@ const Header = () => {
               )}
               // */}
               <NotificationMain />
-              <a
+              <Link
                 href={`/connections/${user.id}`}
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
               >
@@ -97,8 +97,8 @@ const Header = () => {
                   className="w-6 h-6 mb-1"
                 />
                 <span className="text-xs">Connections</span>
-              </a>
-              <a
+              </Link>
+              <Link
                 href={`/chat`}
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
               >
@@ -108,8 +108,8 @@ const Header = () => {
                   className="w-6 h-6 mb-1"
                 />
                 <span className="text-xs">Messaging</span>
-              </a>
-              <a
+              </Link>
+              <Link
                 href={`/requests`}
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
               >
@@ -119,8 +119,8 @@ const Header = () => {
                   className="w-6 h-6 mb-1"
                 />
                 <span className="text-xs">Request</span>
-              </a>
-              <a
+              </Link>
+              <Link
                 href={`/profile/${user.id}`}
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
               >
@@ -130,7 +130,7 @@ const Header = () => {
                   className="w-6 h-6 mb-1"
                 />
                 <span className="text-xs">Profile</span>
-              </a>
+              </Link>
               <button
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
                 onClick={logout}
@@ -183,7 +183,7 @@ const Header = () => {
             ) : (
               <>
                 {/* {user.role.value === "jobseeker" && (
-                  <a
+                  <Link
                     href="/jobseeker/history"
                     className="block text-gray-700 mb-4"
                   >
