@@ -10,6 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import io from "socket.io-client";
+import { z } from "zod";
 
 const socket = io("http://localhost:8000", {
   path: "/ws",
@@ -81,10 +82,33 @@ export function useChat({ user_id }: { user_id: number | undefined }) {
     socket.emit("join_room", { roomName });
 
     const onNewMessage = (newMessage: unknown) => {
-      const expect = MessageSchema.safeParse(newMessage);
-      console.log(newMessage);
+      const schema = MessageSchema.extend({
+        receiver: z.number(),
+      });
+      const expect = schema.safeParse(newMessage);
       if (expect.success) {
         setMessages((prev) => (prev ? [...prev, expect.data] : [expect.data]));
+        setContacts((contacts) => {
+          if (!contacts) return null;
+          const contact = contacts.find(
+            (contact) =>
+              (contact.user_id === expect.data.receiver &&
+                contact.user_id !== user_id) ||
+              (contact.user_id === expect.data.sender &&
+                contact.user_id !== user_id)
+          );
+
+          if (!contact) return contacts;
+          console.log("Updating contact:", expect.data);
+          return [
+            {
+              ...contact,
+              last_message: expect.data.content,
+              last_message_time: expect.data.timestamp,
+            },
+            ...contacts.filter((c) => c.user_id !== contact.user_id),
+          ];
+        });
       } else {
         throw new Error("Failed to parse message");
       }
@@ -224,5 +248,6 @@ export function useChat({ user_id }: { user_id: number | undefined }) {
     setMessages,
     sendMessage,
     sendTypingStatus,
+    setSelectedContact,
   };
 }

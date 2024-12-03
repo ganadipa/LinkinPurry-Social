@@ -50,7 +50,7 @@ export function ContactSidebar({
       contact.full_name.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredContacts(filtered);
-  }, [searchQuery]);
+  }, [searchQuery, contacts]);
 
   const [filteredContacts, setFilteredContacts] = useState(contacts);
 

@@ -48,16 +48,22 @@ export default function ChatArea({
   }, [isTyping]);
 
   if (selectedContact === null) {
-    return <div className="self-center mx-auto">No contact selected</div>;
+    return (
+      <div className={`self-center mx-auto ${className}`}>
+        No contact selected
+      </div>
+    );
   }
 
   if (isChatLoading) {
-    return <div className="self-center mx-auto">Loading...</div>;
+    return <div className={`self-center mx-auto ${className}`}>Loading...</div>;
   }
 
   if (messages === null) {
     return (
-      <div className="self-center mx-auto">Something terrible happened</div>
+      <div className={`self-center mx-auto ${className}`}>
+        Something terrible happened
+      </div>
     );
   }
 
@@ -123,7 +129,6 @@ export default function ChatArea({
 
   return (
     <div className={cn(`flex flex-col w-[70%]`, className)}>
-      {/* Header remains the same */}
       <div className="bg-white border-b border-[#e0e0e0] p-4 flex items-center justify-between">
         <div className="flex items-center">
           <Avatar className="h-12 w-12 mr-3">
@@ -142,10 +147,7 @@ export default function ChatArea({
           </div>
         </div>
       </div>
-
-      {/* Messages area remains the same */}
       <ScrollArea className="h-full p-4 bg-[#f8f9fa] overflow-y-auto">
-        {/* ... Your existing messages mapping code ... */}
         <div className="space-y-1">
           {messages.map((message, index) => {
             const isFirstInGroup =
@@ -224,14 +226,11 @@ export default function ChatArea({
         </div>
         <div ref={messagesEndRef} />
       </ScrollArea>
-
       {isOtherTyping && (
         <div className="px-4 py-2 text-sm text-[#00000099] bg-white">
           {selectedContact.full_name} is typing...
         </div>
       )}
-
-      {/* Updated input area with form */}
       <form
         ref={formRef}
         onSubmit={handleSubmit}

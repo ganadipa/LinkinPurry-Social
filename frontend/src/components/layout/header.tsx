@@ -25,27 +25,14 @@ const Header = () => {
               className="w-8 h-8"
             />
           </Link>
-          <form className="flex items-center bg-gray-100 rounded-lg px-2 py-1">
-            <img
-              src="/public/images/search.png"
-              alt="Search Icon"
-              className="w-4 h-4 mr-2"
-            />
-            <input
-              type="text"
-              placeholder="Search"
-              className="bg-transparent focus:outline-none text-sm w-64"
-            />
-          </form>
         </div>
 
         <div className="hidden md:flex items-center space-x-6">
-          <Link href="/" className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0">
-            <img
-              src={homeImage}
-              alt="Home"
-              className="w-6 h-6 mb-1"
-            />
+          <Link
+            href="/"
+            className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
+          >
+            <img src={homeImage} alt="Home" className="w-6 h-6 mb-1" />
             <span className="text-xs">Home</span>
           </Link>
           {user === null ? (
@@ -100,20 +87,48 @@ const Header = () => {
               )}
               // */}
               <NotificationMain />
-              <a href={`/connections/${user.id}`} className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0">
-                <img src="/public/images/people.png" alt="Connections" className="w-6 h-6 mb-1" />
+              <a
+                href={`/connections/${user.id}`}
+                className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
+              >
+                <img
+                  src="/public/images/people.png"
+                  alt="Connections"
+                  className="w-6 h-6 mb-1"
+                />
                 <span className="text-xs">Connections</span>
               </a>
-              <a href={`/chat`} className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0">
-                <img src="/public/images/messaging.png" alt="Messages" className="w-6 h-6 mb-1" />
+              <a
+                href={`/chat`}
+                className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
+              >
+                <img
+                  src="/public/images/messaging.png"
+                  alt="Messages"
+                  className="w-6 h-6 mb-1"
+                />
                 <span className="text-xs">Messaging</span>
               </a>
-              <a href={`/requests`} className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0">
-                <img src="/public/images/bell.png" alt="Messages" className="w-6 h-6 mb-1" />
+              <a
+                href={`/requests`}
+                className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
+              >
+                <img
+                  src="/public/images/bell.png"
+                  alt="Messages"
+                  className="w-6 h-6 mb-1"
+                />
                 <span className="text-xs">Request</span>
               </a>
-              <a href={`/profile/${user.id}`} className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0">
-                <img src="/public/images/account.png" alt="Profile" className="w-6 h-6 mb-1" />
+              <a
+                href={`/profile/${user.id}`}
+                className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
+              >
+                <img
+                  src="/public/images/account.png"
+                  alt="Profile"
+                  className="w-6 h-6 mb-1"
+                />
                 <span className="text-xs">Profile</span>
               </a>
               <button

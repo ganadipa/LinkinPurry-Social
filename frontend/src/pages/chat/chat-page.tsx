@@ -4,6 +4,7 @@ import ChatAreaMobile from "./chat-area-mobile";
 import { useChat } from "@/hooks/chat";
 import Loading from "@/components/loading";
 import { useAuth } from "@/hooks/auth";
+import { cn } from "@/lib/utils";
 
 export default function ChatPage() {
   const { user } = useAuth();
@@ -11,6 +12,7 @@ export default function ChatPage() {
     contacts,
     selectedContact,
     handleContactSelect,
+    setSelectedContact,
     isLoading,
     messages,
     isChatLoading,
@@ -26,13 +28,16 @@ export default function ChatPage() {
     return <div>Something went wrong</div>;
   }
 
+  console.log("contacts in chat page", contacts);
   return (
     <div className="flex h-[80vh] bg-[#f3f2ef] md:mt-8 border border-1 border-[#e0e0e0] rounded-lg overflow-hidden">
       <ContactSidebar
         contacts={contacts}
         selectedContact={selectedContact}
         handleContactSelect={handleContactSelect}
-        className="max-md:w-full"
+        className={cn("max-md:w-full", {
+          "max-md:hidden": selectedContact !== null,
+        })}
       />
       <ChatArea
         selectedContact={selectedContact}
@@ -43,10 +48,18 @@ export default function ChatPage() {
         isOtherTyping={isOtherTyping}
         sendTypingStatus={sendTypingStatus}
       />
-      {/* <ChatAreaMobile
+      <ChatAreaMobile
         selectedContact={selectedContact}
-        className="hidden max-md:flex"
-      /> */}
+        className={cn("hidden max-md:flex", {
+          "max-md:hidden": selectedContact === null,
+        })}
+        messages={messages}
+        isChatLoading={isChatLoading}
+        sendMessage={sendMessage}
+        isOtherTyping={isOtherTyping}
+        sendTypingStatus={sendTypingStatus}
+        setSelectedContact={setSelectedContact}
+      />
     </div>
   );
 }

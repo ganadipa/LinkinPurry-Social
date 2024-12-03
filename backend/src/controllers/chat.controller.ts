@@ -331,6 +331,7 @@ export class ChatController implements Controller {
           timestamp: message.timestamp?.getTime(),
           sender: Number(message.from_id),
           content: message.message,
+          receiver: Number(message.to_id),
         });
       });
 
