@@ -2,12 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { NotificationService } from '@/lib/notification';
+import { useAuth } from '@/hooks/auth';
 
 export function useNotifications() {
+  const user = useAuth();
   const [isSupported, setIsSupported] = useState(false);
   const [isGranted, setIsGranted] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  
+  console.log('User IDs:', user.user?.id);
 
   useEffect(() => {
     checkNotificationStatus();
@@ -19,8 +23,9 @@ export function useNotifications() {
 
     if (supported) {
       setIsGranted(Notification.permission === 'granted');
-      
-      const service = NotificationService.getInstance();
+      const userId = user.user?.id || 0;
+      console.log('User ID:', userId);
+      const service = NotificationService.getInstance(userId);
       try {
         await service.init();
         setIsSubscribed(true);
@@ -37,7 +42,9 @@ export function useNotifications() {
 
     try {
       setIsLoading(true);
-      const service = NotificationService.getInstance();
+      const userId = user.user?.id || 0;
+      console.log('User IDee:', userId);
+      const service = NotificationService.getInstance(userId);
       
       const permissionGranted = await service.requestPermission();
       setIsGranted(permissionGranted);
@@ -46,6 +53,7 @@ export function useNotifications() {
         const subscription = await service.subscribeToPush();
         if (subscription) {
           // Send subscription to your backend
+          console.log(JSON.stringify(subscription));
           await fetch('/api/notifications/subscribe', {
             method: 'POST',
             headers: {
@@ -55,7 +63,7 @@ export function useNotifications() {
           });
           
           setIsSubscribed(true);    
-          console.log('Subscribed successfully');
+          console.log('Subscribed successfully', subscription);
           return true;
         }
       }

@@ -1,14 +1,19 @@
 // frontend/src/services/notification.service.ts
 
 export class NotificationService {
+    private user_id: number;
+
     private static instance: NotificationService;
     private registration: ServiceWorkerRegistration | null = null;
   
-    private constructor() {}
+    private constructor(user_id: number) {
+        this.user_id = user_id;
+    }
   
-    static getInstance(): NotificationService {
+    static getInstance(user_id: number): NotificationService {
       if (!NotificationService.instance) {
-        NotificationService.instance = new NotificationService();
+        console.log('User IDtrr:', user_id);
+        NotificationService.instance = new NotificationService(user_id);
       }
       return NotificationService.instance;
     }
@@ -41,14 +46,16 @@ export class NotificationService {
           userVisibleOnly: true,
           applicationServerKey: process.env.REACT_VAPID_PUBLIC_KEY
         });
-  
+        console.log('User IDDD:', this.user_id);
+
         const subscriptionJson = subscription.toJSON();
         return {
           endpoint: subscriptionJson.endpoint || '',
           keys: {
             p256dh: this.arrayBufferToBase64(subscription.getKey('p256dh')!),
             auth: this.arrayBufferToBase64(subscription.getKey('auth')!)
-          }
+          },
+          user_id: this.user_id
         };
       } catch (error) {
         console.error('Failed to subscribe to push:', error);
