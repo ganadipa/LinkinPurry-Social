@@ -91,6 +91,7 @@ export default function ConnectionsPage({ id }: ConnectionsPageProps) {
                 connectionsList.map((connection) => (
                     <UserCard
                         key={connection.id}
+                        id={connection.id}
                         name={connection.full_name}
                         profilePhoto={connection.profile_photo_path}
                         status="connected"
