@@ -149,7 +149,6 @@ class MainBindingConfigurator {
     this.ioc.bind<Controller>(CONFIG.Controllers, ConnectionController);
     this.ioc.bind<Controller>(CONFIG.Controllers, SwaggerUIController);
     this.ioc.bind<Controller>(CONFIG.Controllers, FeedController);
-    this.ioc.bind<Controller>(CONFIG.Controllers, ChatController);
     this.ioc.bind<Controller>(CONFIG.Controllers, NotificationController);
   }
 

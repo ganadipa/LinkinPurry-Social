@@ -33,6 +33,7 @@ export default function ChatArea({
   const { user } = useAuth();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -60,20 +61,22 @@ export default function ChatArea({
     );
   }
 
-  const handleSendMessage = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     if (inputMessage.trim()) {
       sendMessage(inputMessage);
       setInputMessage("");
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      formRef.current?.requestSubmit();
     }
   };
 
+  // Rest of your formatting functions remain the same
   const formatMessageTime = (dateNumber: number) => {
     const date = new Date(dateNumber);
     return date.toLocaleTimeString([], {
@@ -120,6 +123,7 @@ export default function ChatArea({
 
   return (
     <div className={cn(`flex flex-col w-[70%]`, className)}>
+      {/* Header remains the same */}
       <div className="bg-white border-b border-[#e0e0e0] p-4 flex items-center justify-between">
         <div className="flex items-center">
           <Avatar className="h-12 w-12 mr-3">
@@ -139,7 +143,9 @@ export default function ChatArea({
         </div>
       </div>
 
+      {/* Messages area remains the same */}
       <ScrollArea className="h-full p-4 bg-[#f8f9fa] overflow-y-auto">
+        {/* ... Your existing messages mapping code ... */}
         <div className="space-y-1">
           {messages.map((message, index) => {
             const isFirstInGroup =
@@ -225,24 +231,29 @@ export default function ChatArea({
         </div>
       )}
 
-      <div className="p-4 bg-white border-t border-[#e0e0e0] flex items-end gap-2">
+      {/* Updated input area with form */}
+      <form
+        ref={formRef}
+        onSubmit={handleSubmit}
+        className="p-4 bg-white border-t border-[#e0e0e0] flex items-end gap-2"
+      >
         <Textarea
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
-          onKeyDown={handleKeyPress}
+          onKeyDown={handleKeyDown}
           placeholder="Write a message..."
           className="flex-1 bg-[#eef3f8] text-[#000000] resize-none"
           rows={3}
         />
         <Button
-          onClick={handleSendMessage}
+          type="submit"
           className="bg-[#0a66c2] hover:bg-[#004182] text-white"
           disabled={!inputMessage.trim()}
         >
           <Send className="h-4 w-4 mr-2" />
           Send
         </Button>
-      </div>
+      </form>
     </div>
   );
 }
