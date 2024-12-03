@@ -200,6 +200,8 @@ export class ProfileController implements Controller {
         const payload = c.var.updateProfilePayload;
         const updateUser = c.var.user;
 
+        console.log(updateUser);
+
         if (!updateUser) {
           throw new UnauthorizedException("Unauthorized access");
         }

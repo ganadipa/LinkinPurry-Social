@@ -42,10 +42,10 @@ export const profileResponse = z.object({
     profile_photo: z.string(),
     relevant_posts: z.array(
       z.object({
-        created_at: z.string().nullable(),
+        created_at: z.number().nullable(),
         id: z.number().nullable(),
         content: z.string(),
-        updated_at: z.string().nullable(),
+        updated_at: z.number().nullable(),
       })
     ),
   }),

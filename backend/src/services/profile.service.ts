@@ -23,7 +23,12 @@ export class ProfileService {
     private readonly feedRepository: FeedRepository
   ) {}
 
-  public async getProfile(userId: number, currentUser: User | null) {
+  public async getProfile(
+    userId: number,
+    currentUser: User | null
+  ): Promise<
+    TGetProfileBodyResponseByPublic | TGetProfileBodyResponseByAuthenticated
+  > {
     if (!currentUser) {
       return this.getProfileDataFromGuest(userId);
     }
@@ -34,7 +39,8 @@ export class ProfileService {
       );
     }
 
-    return this.getProfileDataFromAuthenticated(userId);
+    const ret = await this.getProfileDataFromAuthenticated(userId);
+    return ret;
   }
 
   public async updateProfile(
@@ -91,6 +97,27 @@ export class ProfileService {
 
     const posts = await this.feedRepository.findByUserId(BigInt(userId));
 
+    const posts_number_timestamp = posts.map((post) => {
+      if (!post.created_at) {
+        throw new InternalErrorException("Post created_at somehow missing");
+      }
+
+      if (!post.updated_at) {
+        throw new InternalErrorException("Post updated_at somehow missing");
+      }
+
+      if (!post.id) {
+        throw new InternalErrorException("Post ID somehow missing");
+      }
+
+      return {
+        content: post.content,
+        created_at: post.created_at.getTime(),
+        updated_at: post.updated_at.getTime(),
+        id: Number(post.id),
+      };
+    });
+
     return {
       username: user.username,
       name: user.full_name,
@@ -98,7 +125,7 @@ export class ProfileService {
       skills: user.skills,
       connection_count: countConnections,
       profile_photo: user.profile_photo_path,
-      relevant_posts: posts,
+      relevant_posts: posts_number_timestamp,
     };
   }
 }
