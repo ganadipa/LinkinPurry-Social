@@ -25,6 +25,7 @@ export function useProfile(id: number) {
     const json = await response.json();
     console.log(json);
     const expected = profileResponse.safeParse(json);
+    console.log("expected", expected);
 
     if (!expected.success) {
       setLoading(false);
@@ -34,7 +35,6 @@ export function useProfile(id: number) {
 
     if (expected.data.success) {
       const data = expected.data.body;
-      console.log(data);
       const profile = {
         username: data.username,
         name: data.name,
@@ -44,22 +44,25 @@ export function useProfile(id: number) {
         connection_count: data.connection_count,
       };
 
-      const rel_posts = data.relevant_posts.map((post) => {
-        if (!post.created_at) {
-          throw new Error("Post created_at somehow missing");
-        }
+      let rel_posts: Post[] = [];
+      if (data.relevant_posts) {
+        rel_posts = data.relevant_posts.map((post) => {
+          if (!post.created_at) {
+            throw new Error("Post created_at somehow missing");
+          }
 
-        if (!post.updated_at) {
-          throw new Error("Post updated_at somehow missing");
-        }
+          if (!post.updated_at) {
+            throw new Error("Post updated_at somehow missing");
+          }
 
-        return {
-          id: post.id,
-          content: post.content,
-          created_at: new Date(post.created_at).toLocaleDateString(),
-          updated_at: new Date(post.updated_at).toLocaleDateString(),
-        };
-      });
+          return {
+            id: post.id,
+            content: post.content,
+            created_at: new Date(post.created_at).toLocaleDateString(),
+            updated_at: new Date(post.updated_at).toLocaleDateString(),
+          };
+        });
+      }
 
       setProfile(profile);
       setPosts(rel_posts);

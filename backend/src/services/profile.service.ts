@@ -11,6 +11,7 @@ import { ConnectionRepository } from "../interfaces/connection-repository.interf
 import { InternalErrorException } from "../exceptions/internal-error.exception";
 import { FeedRepository } from "../interfaces/feed-repository.interface";
 import { ForbiddenException } from "../exceptions/forbidden.exception";
+import { URL_PUBLIC_UPLOADS } from "../constants/constants";
 
 @injectable()
 export class ProfileService {
@@ -79,7 +80,7 @@ export class ProfileService {
       work_history: user.work_history,
       skills: user.skills,
       connection_count: countConnections,
-      profile_photo: user.profile_photo_path,
+      profile_photo: URL_PUBLIC_UPLOADS + user.profile_photo_path,
     };
   }
 
@@ -124,7 +125,7 @@ export class ProfileService {
       work_history: user.work_history,
       skills: user.skills,
       connection_count: countConnections,
-      profile_photo: user.profile_photo_path,
+      profile_photo: URL_PUBLIC_UPLOADS + user.profile_photo_path,
       relevant_posts: posts_number_timestamp,
     };
   }

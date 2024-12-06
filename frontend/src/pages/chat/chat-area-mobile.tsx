@@ -16,7 +16,7 @@ interface ChatAreaProps {
   isChatLoading: boolean;
   sendTypingStatus: (isTyping: boolean) => void;
   isOtherTyping: boolean;
-  setSelectedContact: (contact: Contact | null) => void;
+  setSelectedContact: (contact: number | null) => void;
 }
 
 export default function ChatAreaMobile({

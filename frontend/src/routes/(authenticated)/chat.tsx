@@ -1,6 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import ChatPage from "@/pages/chat/chat-page";
+import { Outlet, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(authenticated)/chat")({
-  component: ChatPage,
+  component: Outlet,
 });

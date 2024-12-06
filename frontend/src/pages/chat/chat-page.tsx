@@ -20,6 +20,7 @@ export default function ChatPage() {
     sendTypingStatus,
     isTyping: isOtherTyping,
   } = useChat({ user_id: user?.id });
+
   if (isLoading) {
     return <Loading />;
   }
@@ -28,7 +29,10 @@ export default function ChatPage() {
     return <div>Something went wrong</div>;
   }
 
-  console.log("contacts in chat page", contacts);
+  const theContact = contacts.find(
+    (contact) => contact.user_id === selectedContact
+  );
+
   return (
     <div className="flex h-[80vh] bg-[#f3f2ef] md:mt-8 border border-1 border-[#e0e0e0] rounded-lg overflow-hidden">
       <ContactSidebar
@@ -40,7 +44,7 @@ export default function ChatPage() {
         })}
       />
       <ChatArea
-        selectedContact={selectedContact}
+        selectedContact={theContact ?? null}
         className="max-md:hidden"
         messages={messages}
         isChatLoading={isChatLoading}
@@ -49,7 +53,7 @@ export default function ChatPage() {
         sendTypingStatus={sendTypingStatus}
       />
       <ChatAreaMobile
-        selectedContact={selectedContact}
+        selectedContact={theContact ?? null}
         className={cn("hidden max-md:flex", {
           "max-md:hidden": selectedContact === null,
         })}

@@ -4,6 +4,7 @@ import { CONFIG } from "../ioc/config";
 import { Contact, Message } from "../schemas/chat.schema";
 import { InternalErrorException } from "../exceptions/internal-error.exception";
 import { Chat } from "../models/chat.model";
+import { URL_PUBLIC_UPLOADS } from "../constants/constants";
 
 @injectable()
 export class ChatService {
@@ -12,7 +13,14 @@ export class ChatService {
   ) {}
 
   public async getContactsByUserId(userId: number): Promise<Contact[]> {
-    return this.chatRepository.getContactsByUserId(userId);
+    const ret = await this.chatRepository.getContactsByUserId(userId);
+    const adjusted_profile_photo = ret.map((contact) => {
+      return {
+        ...contact,
+        profile_photo_path: URL_PUBLIC_UPLOADS + contact.profile_photo_path,
+      };
+    });
+    return adjusted_profile_photo;
   }
 
   public async getChatToAContact(

@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils";
 
 type ContactSidebarProps = {
   contacts: Contact[];
-  selectedContact: Contact | null;
-  handleContactSelect: (contact: Contact) => void;
+  selectedContact: number | null;
+  handleContactSelect: (contact_id: number) => void;
   className?: string;
 };
 
@@ -83,12 +83,8 @@ export function ContactSidebar({
           <button
             key={contact.user_id}
             className={`w-full text-left p-4 hover:bg-[#eef3f8] transition-colors duration-200 
-              ${
-                selectedContact?.user_id === contact.user_id
-                  ? "bg-[#eef3f8]"
-                  : ""
-              }`}
-            onClick={() => handleContactSelect(contact)}
+              ${selectedContact === contact.user_id ? "bg-[#eef3f8]" : ""}`}
+            onClick={() => handleContactSelect(contact.user_id)}
           >
             <div className="flex items-center">
               <Avatar className="h-12 w-12 mr-3">

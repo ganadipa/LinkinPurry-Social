@@ -22,7 +22,7 @@ const socket = io("http://localhost:8000", {
 
 export function useChat({ user_id }: { user_id: number | undefined }) {
   const [contacts, setContacts] = useState<Contact[] | null>(null);
-  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [selectedContact, setSelectedContact] = useState<number | null>(null);
   const [messages, setMessages] = useState<Message[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isChatLoading, setIsChatLoading] = useState(false);
@@ -76,7 +76,7 @@ export function useChat({ user_id }: { user_id: number | undefined }) {
   useEffect(() => {
     if (!selectedContact || !user_id || !socketConnected) return;
 
-    const roomName = [selectedContact.user_id, user_id].sort().join("-");
+    const roomName = [selectedContact, user_id].sort().join("-");
 
     console.log("Joining room:", roomName);
     socket.emit("join_room", { roomName });
@@ -121,7 +121,7 @@ export function useChat({ user_id }: { user_id: number | undefined }) {
       isTyping: boolean;
       userId: number;
     }) => {
-      if (userId === selectedContact.user_id) {
+      if (userId === selectedContact) {
         setIsTyping(typing);
       }
     };
@@ -140,7 +140,7 @@ export function useChat({ user_id }: { user_id: number | undefined }) {
   const sendMessage = async (content: string) => {
     if (!selectedContact || !socketConnected || !user_id) return;
 
-    const roomName = [selectedContact.user_id, user_id].sort().join("-");
+    const roomName = [selectedContact, user_id].sort().join("-");
     const messageData: Omit<Message, "id"> & {
       roomName: string;
     } = {
@@ -156,7 +156,7 @@ export function useChat({ user_id }: { user_id: number | undefined }) {
   const sendTypingStatus = (isTyping: boolean) => {
     if (!selectedContact || !socketConnected || !user_id) return;
 
-    const roomName = [selectedContact.user_id, user_id].sort().join("-");
+    const roomName = [selectedContact, user_id].sort().join("-");
     socket.emit("typing", {
       roomName,
       isTyping,
@@ -201,12 +201,12 @@ export function useChat({ user_id }: { user_id: number | undefined }) {
     setIsLoading(false);
   };
 
-  const handleContactSelect = async (contact: Contact) => {
-    setSelectedContact(contact);
+  const handleContactSelect = async (other_id: number) => {
+    setSelectedContact(other_id);
     setIsChatLoading(true);
 
     try {
-      const response = await fetch(`/api/chat/${contact.user_id}`);
+      const response = await fetch(`/api/chat/${other_id}`);
       const data = await response.json();
 
       if (!response.ok) {

@@ -40,13 +40,15 @@ export const profileResponse = z.object({
     skills: z.string().nullable(),
     connection_count: z.number(),
     profile_photo: z.string(),
-    relevant_posts: z.array(
-      z.object({
-        created_at: z.number().nullable(),
-        id: z.number().nullable(),
-        content: z.string(),
-        updated_at: z.number().nullable(),
-      })
-    ),
+    relevant_posts: z
+      .array(
+        z.object({
+          created_at: z.number().nullable(),
+          id: z.number().nullable(),
+          content: z.string(),
+          updated_at: z.number().nullable(),
+        })
+      )
+      .optional(),
   }),
 });

@@ -19,6 +19,7 @@ import { Route as publicUsersImport } from './routes/(public)/users'
 import { Route as authorizationAuthImport } from './routes/(authorization)/_auth'
 import { Route as authenticatedRequestsImport } from './routes/(authenticated)/requests'
 import { Route as authenticatedChatImport } from './routes/(authenticated)/chat'
+import { Route as authenticatedChatIndexImport } from './routes/(authenticated)/chat/index'
 import { Route as publicProfileIdImport } from './routes/(public)/profile.$id'
 import { Route as publicConnectionsIdImport } from './routes/(public)/connections.$id'
 import { Route as authorizationAuthSignupImport } from './routes/(authorization)/_auth/signup'
@@ -67,6 +68,12 @@ const authenticatedChatRoute = authenticatedChatImport.update({
   id: '/(authenticated)/chat',
   path: '/chat',
   getParentRoute: () => rootRoute,
+} as any)
+
+const authenticatedChatIndexRoute = authenticatedChatIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => authenticatedChatRoute,
 } as any)
 
 const publicProfileIdRoute = publicProfileIdImport.update({
@@ -174,10 +181,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof publicProfileIdImport
       parentRoute: typeof rootRoute
     }
+    '/(authenticated)/chat/': {
+      id: '/(authenticated)/chat/'
+      path: '/'
+      fullPath: '/chat/'
+      preLoaderRoute: typeof authenticatedChatIndexImport
+      parentRoute: typeof authenticatedChatImport
+    }
   }
 }
 
 // Create and export the route tree
+
+interface authenticatedChatRouteChildren {
+  authenticatedChatIndexRoute: typeof authenticatedChatIndexRoute
+}
+
+const authenticatedChatRouteChildren: authenticatedChatRouteChildren = {
+  authenticatedChatIndexRoute: authenticatedChatIndexRoute,
+}
+
+const authenticatedChatRouteWithChildren =
+  authenticatedChatRoute._addFileChildren(authenticatedChatRouteChildren)
 
 interface authorizationAuthRouteChildren {
   authorizationAuthSigninRoute: typeof authorizationAuthSigninRoute
@@ -206,7 +231,7 @@ const authorizationRouteWithChildren = authorizationRoute._addFileChildren(
 
 export interface FileRoutesByFullPath {
   '': typeof AuthenticatedRoute
-  '/chat': typeof authenticatedChatRoute
+  '/chat': typeof authenticatedChatRouteWithChildren
   '/requests': typeof authenticatedRequestsRoute
   '/': typeof authenticatedIndexRoute
   '/users': typeof publicUsersRoute
@@ -214,11 +239,11 @@ export interface FileRoutesByFullPath {
   '/signup': typeof authorizationAuthSignupRoute
   '/connections/$id': typeof publicConnectionsIdRoute
   '/profile/$id': typeof publicProfileIdRoute
+  '/chat/': typeof authenticatedChatIndexRoute
 }
 
 export interface FileRoutesByTo {
   '': typeof AuthenticatedRoute
-  '/chat': typeof authenticatedChatRoute
   '/requests': typeof authenticatedRequestsRoute
   '/': typeof authenticatedIndexRoute
   '/users': typeof publicUsersRoute
@@ -226,12 +251,13 @@ export interface FileRoutesByTo {
   '/signup': typeof authorizationAuthSignupRoute
   '/connections/$id': typeof publicConnectionsIdRoute
   '/profile/$id': typeof publicProfileIdRoute
+  '/chat': typeof authenticatedChatIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_authenticated': typeof AuthenticatedRoute
-  '/(authenticated)/chat': typeof authenticatedChatRoute
+  '/(authenticated)/chat': typeof authenticatedChatRouteWithChildren
   '/(authenticated)/requests': typeof authenticatedRequestsRoute
   '/(authorization)': typeof authorizationRouteWithChildren
   '/(authorization)/_auth': typeof authorizationAuthRouteWithChildren
@@ -241,6 +267,7 @@ export interface FileRoutesById {
   '/(authorization)/_auth/signup': typeof authorizationAuthSignupRoute
   '/(public)/connections/$id': typeof publicConnectionsIdRoute
   '/(public)/profile/$id': typeof publicProfileIdRoute
+  '/(authenticated)/chat/': typeof authenticatedChatIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -255,10 +282,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/connections/$id'
     | '/profile/$id'
+    | '/chat/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | ''
-    | '/chat'
     | '/requests'
     | '/'
     | '/users'
@@ -266,6 +293,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/connections/$id'
     | '/profile/$id'
+    | '/chat'
   id:
     | '__root__'
     | '/_authenticated'
@@ -279,12 +307,13 @@ export interface FileRouteTypes {
     | '/(authorization)/_auth/signup'
     | '/(public)/connections/$id'
     | '/(public)/profile/$id'
+    | '/(authenticated)/chat/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRoute
-  authenticatedChatRoute: typeof authenticatedChatRoute
+  authenticatedChatRoute: typeof authenticatedChatRouteWithChildren
   authenticatedRequestsRoute: typeof authenticatedRequestsRoute
   authorizationRoute: typeof authorizationRouteWithChildren
   publicUsersRoute: typeof publicUsersRoute
@@ -295,7 +324,7 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRoute,
-  authenticatedChatRoute: authenticatedChatRoute,
+  authenticatedChatRoute: authenticatedChatRouteWithChildren,
   authenticatedRequestsRoute: authenticatedRequestsRoute,
   authorizationRoute: authorizationRouteWithChildren,
   publicUsersRoute: publicUsersRoute,
@@ -328,7 +357,10 @@ export const routeTree = rootRoute
       "filePath": "_authenticated.tsx"
     },
     "/(authenticated)/chat": {
-      "filePath": "(authenticated)/chat.tsx"
+      "filePath": "(authenticated)/chat.tsx",
+      "children": [
+        "/(authenticated)/chat/"
+      ]
     },
     "/(authenticated)/requests": {
       "filePath": "(authenticated)/requests.tsx"
@@ -366,6 +398,10 @@ export const routeTree = rootRoute
     },
     "/(public)/profile/$id": {
       "filePath": "(public)/profile.$id.tsx"
+    },
+    "/(authenticated)/chat/": {
+      "filePath": "(authenticated)/chat/index.tsx",
+      "parent": "/(authenticated)/chat"
     }
   }
 }
