@@ -5,7 +5,10 @@ export const registrationFormSchema = z
     username: z
       .string()
       .min(3, "Username must be at least 3 characters")
-      .max(50, "Username cannot exceed 50 characters"),
+      .max(50, "Username cannot exceed 50 characters")
+      .refine((value) => !value.includes(" "), {
+        message: "Username should not contain spaces",
+      }),
     email: z.string().email("Invalid email format").min(1, "Email is required"),
     name: z
       .string()

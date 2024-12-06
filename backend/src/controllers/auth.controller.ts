@@ -109,17 +109,22 @@ export class AuthController implements Controller {
 
     this.hono.app.openapi(route, async (c) => {
       try {
-        console.log("login route");
         const payload = c.var.loginPayload;
         const user = c.var.user;
         let token;
 
-        console.log("login route1");
+        // If each of the payload contains space, throw BadRequestException
+        if (
+          payload.identifier.includes(" ") ||
+          payload.password.includes(" ")
+        ) {
+          throw new BadRequestException(
+            "Identifier or password contains space."
+          );
+        }
+
         if (!user) {
-          console.log("here");
-          console.log(payload);
           token = await this.authService.login(payload);
-          console.log("her2");
         } else {
           if (!user.id) {
             throw new InternalErrorException(
@@ -129,7 +134,6 @@ export class AuthController implements Controller {
 
           token = await this.authService.login(payload);
         }
-        console.log("login route2");
 
         const tokenPayload = this.authStrategy.getPayload(token);
         if (!tokenPayload) {
@@ -374,6 +378,17 @@ export class AuthController implements Controller {
       try {
         const payload = c.var.registerPayload;
         const token = await this.authService.register(payload);
+
+        // If email, password, or username contains space, throw BadRequestException
+        if (
+          payload.email.includes(" ") ||
+          payload.password.includes(" ") ||
+          payload.username.includes(" ")
+        ) {
+          throw new BadRequestException(
+            "Email, password, or username contains space. Which is not allowed."
+          );
+        }
 
         return c.json(
           {
