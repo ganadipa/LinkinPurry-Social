@@ -43,3 +43,15 @@ export type ContactIdEnv = {
     contactId: number;
   };
 };
+
+export type UpdateProfileEnv = {
+  Variables: {
+    updateProfilePayload: {
+      username?: string;
+      profile_photo?: File;
+      name?: string;
+      work_history?: string;
+      skills?: string;
+    };
+  };
+};

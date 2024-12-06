@@ -20,6 +20,8 @@ import {
   GetProfileURLParamSchema,
   UpdateProfileURLParamSchema,
 } from "../schemas/profile.schema";
+import { UpdateProfileEnv } from "../constants/context-env.types";
+import { BadRequestException } from "../exceptions/bad-request.exception";
 
 @injectable()
 export class ProfileController implements Controller {
@@ -40,14 +42,13 @@ export class ProfileController implements Controller {
     this.registerUpdateProfileRoute();
   }
 
-  private setUpdateProfilePayloadMiddleware = createMiddleware(
-    async (c, next) => {
+  private setUpdateProfilePayloadMiddleware =
+    createMiddleware<UpdateProfileEnv>(async (c, next) => {
       const payload = await c.req.json();
       this.zodValidationService.validate(payload, UpdateProfilePayloadSchema);
       c.set("updateProfilePayload", payload);
       return next();
-    }
-  );
+    });
 
   private registerGetProfileRoute() {
     const route = createRoute({
@@ -200,8 +201,6 @@ export class ProfileController implements Controller {
         const payload = c.var.updateProfilePayload;
         const updateUser = c.var.user;
 
-        console.log(updateUser);
-
         if (!updateUser) {
           throw new UnauthorizedException("Unauthorized access");
         }
@@ -222,6 +221,10 @@ export class ProfileController implements Controller {
           Number(userId),
           updateUser
         );
+
+        if (updateUser.username.includes(" ")) {
+          throw new BadRequestException("Username cannot contain spaces");
+        }
 
         return c.json(
           {
