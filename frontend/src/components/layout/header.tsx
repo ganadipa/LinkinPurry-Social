@@ -1,6 +1,5 @@
 import { useAuth } from "@/hooks/auth";
 import { useState } from "react";
-import homeImage from "../../assets/home.png";
 import { Link } from "@tanstack/react-router";
 import NotificationMain from "../specific/notification/notification-main";
 
@@ -20,7 +19,7 @@ const Header = () => {
         <div className="flex items-center space-x-4">
           <Link href="/" aria-label="LinkedIn Home">
             <img
-              src="/public/images/linkedin.png"
+              src="/images/linkedin.png"
               alt="LinkedIn"
               className="w-8 h-8"
             />
@@ -32,7 +31,7 @@ const Header = () => {
             href="/"
             className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
           >
-            <img src={homeImage} alt="Home" className="w-6 h-6 mb-1" />
+            <img src={"/images/home.png"} alt="Home" className="w-6 h-6 mb-1" />
             <span className="text-xs">Home</span>
           </Link>
           {user === null ? (
@@ -42,7 +41,7 @@ const Header = () => {
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
               >
                 <img
-                  src="/public/images/people.png"
+                  src="/images/people.png"
                   alt="Users"
                   className="w-6 h-6 mb-1"
                 />
@@ -53,7 +52,7 @@ const Header = () => {
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
               >
                 <img
-                  src="/public/images/log-in.png"
+                  src="/images/log-in.png"
                   alt="Login"
                   className="w-6 h-6 mb-1"
                 />
@@ -64,7 +63,7 @@ const Header = () => {
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
               >
                 <img
-                  src="/public/images/add.png"
+                  src="/images/add.png"
                   alt="Register"
                   className="w-6 h-6 mb-1"
                 />
@@ -75,13 +74,13 @@ const Header = () => {
             <>
               {/* {user.role.value === "jobseeker" && (
                 <Link href="/jobseeker/history" className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0">
-                  <img src="/public/images/history.png" alt="History" className="w-6 h-6 mb-1" />
+                  <img src="/images/history.png" alt="History" className="w-6 h-6 mb-1" />
                   <span className="text-xs">History</span>
                 </Link>
               )}
               {user.role.value === "company" && (
                 <Link href="/profile" className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0">
-                  <img src="/public/images/account.png" alt="Profile" className="w-6 h-6 mb-1" />
+                  <img src="/images/account.png" alt="Profile" className="w-6 h-6 mb-1" />
                   <span className="text-xs">Profile</span>
                 </Link>
               )}
@@ -92,7 +91,7 @@ const Header = () => {
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
               >
                 <img
-                  src="/public/images/people.png"
+                  src="/images/people.png"
                   alt="Connections"
                   className="w-6 h-6 mb-1"
                 />
@@ -103,7 +102,7 @@ const Header = () => {
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
               >
                 <img
-                  src="/public/images/messaging.png"
+                  src="/images/messaging.png"
                   alt="Messages"
                   className="w-6 h-6 mb-1"
                 />
@@ -114,7 +113,7 @@ const Header = () => {
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
               >
                 <img
-                  src="/public/images/bell.png"
+                  src="/images/bell.png"
                   alt="Messages"
                   className="w-6 h-6 mb-1"
                 />
@@ -125,7 +124,7 @@ const Header = () => {
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
               >
                 <img
-                  src="/public/images/account.png"
+                  src="/images/account.png"
                   alt="Profile"
                   className="w-6 h-6 mb-1"
                 />
@@ -136,7 +135,7 @@ const Header = () => {
                 onClick={logout}
               >
                 <img
-                  src="/public/images/logout.png"
+                  src="/images/logout.png"
                   alt="Logout"
                   className="w-6 h-6 mb-1"
                 />

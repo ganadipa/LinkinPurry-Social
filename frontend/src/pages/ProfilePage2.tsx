@@ -19,17 +19,18 @@ import { User } from "@/types/user";
 export default function ProfilePage({ id }: { id: number }) {
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
   const [photoModalOpen, setPhotoModalOpen] = useState<boolean>(false);
-  const [workHistoryModalOpen, setWorkHistoryModalOpen] = useState<boolean>(false);
+  const [workHistoryModalOpen, setWorkHistoryModalOpen] =
+    useState<boolean>(false);
   const [skillModalOpen, setSkillModalOpen] = useState<boolean>(false);
   const [newSkill, setNewSkill] = useState<string>("");
   const authenticated = useAuth();
   const [connected, setConnected] = useState<boolean>(true);
-  
+
   const [user] = useState<User | null>(authenticated.user);
 
   const [profile, setProfile] = useState<Profile>({
     username: "ahmadmudabbir",
-    profile_photo: "/public/images/img-placeholder.svg",
+    profile_photo: "/images/img-placeholder.svg",
     name: "Ahmad Mudabbir Arif",
     work_history:
       "Software Engineer at Tech Corp (2020 - Present)\nJunior Developer at Startup Inc (2018 - 2020)",
@@ -37,13 +38,15 @@ export default function ProfilePage({ id }: { id: number }) {
     connection_count: 100,
   });
 
-  const skillsArray = (profile.skills ?? "").split(",").map((skill) => skill.trim());
+  const skillsArray = (profile.skills ?? "")
+    .split(",")
+    .map((skill) => skill.trim());
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
   };
-  
+
   const handleEditPhoto = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -60,7 +63,10 @@ export default function ProfilePage({ id }: { id: number }) {
   };
 
   const handleDeletePhoto = () => {
-    setProfile({ ...profile, profile_photo: "/public/images/img-placeholder.svg" });
+    setProfile({
+      ...profile,
+      profile_photo: "/images/img-placeholder.svg",
+    });
     setPhotoModalOpen(false);
   };
 
@@ -94,7 +100,7 @@ export default function ProfilePage({ id }: { id: number }) {
         <div className="bg-white rounded-lg shadow border">
           <div className="relative h-52">
             <img
-              src="/public/images/banner-placeholder.svg"
+              src="/images/banner-placeholder.svg"
               alt="Background"
               className="w-full h-full object-cover rounded-t-lg"
             />
@@ -124,7 +130,10 @@ export default function ProfilePage({ id }: { id: number }) {
               <h1 className="text-2xl font-semibold">{user?.name}</h1>
               <p className="text-gray-600">{user?.email}</p>
               {/* <p className="text-gray-600">{profile.location}</p> */}
-              <Link to={`/connections/${id}`} className="text-blue-500 hover:underline">
+              <Link
+                to={`/connections/${id}`}
+                className="text-blue-500 hover:underline"
+              >
                 <p className="text-blue-500">
                   <b>{profile.connection_count}</b> connections
                 </p>
@@ -215,17 +224,26 @@ export default function ProfilePage({ id }: { id: number }) {
               />
               {authenticated.user?.id === id && (
                 <div className="flex gap-4">
-                  <Button onClick={() => document.getElementById('fileInput')?.click()} className="bg-[#0a66c2] text-white hover:bg-[#004182]">
+                  <Button
+                    onClick={() =>
+                      document.getElementById("fileInput")?.click()
+                    }
+                    className="bg-[#0a66c2] text-white hover:bg-[#004182]"
+                  >
                     Upload Image
                     <MdFileUpload />
                   </Button>
                   <input
                     type="file"
                     id="fileInput"
-                    style={{ display: 'none' }}
+                    style={{ display: "none" }}
                     onChange={handleEditPhoto}
                   />
-                  <Button variant="destructive" onClick={handleDeletePhoto} className="bg-red-500 text-white hover:bg-red-600">
+                  <Button
+                    variant="destructive"
+                    onClick={handleDeletePhoto}
+                    className="bg-red-500 text-white hover:bg-red-600"
+                  >
                     <MdDelete />
                   </Button>
                 </div>
@@ -284,7 +302,10 @@ export default function ProfilePage({ id }: { id: number }) {
         </Dialog>
 
         {/* Work History Modal */}
-        <Dialog open={workHistoryModalOpen} onOpenChange={setWorkHistoryModalOpen}>
+        <Dialog
+          open={workHistoryModalOpen}
+          onOpenChange={setWorkHistoryModalOpen}
+        >
           <DialogContent className="bg-white">
             <DialogHeader>
               <DialogTitle>Edit Company Profile</DialogTitle>

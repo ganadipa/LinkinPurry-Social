@@ -7,7 +7,6 @@ import { Contact, Message } from "../../types/chat";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth";
 import { Textarea } from "@/components/ui/textarea";
-import { set } from "zod";
 
 interface ChatAreaProps {
   selectedContact: Contact | null;

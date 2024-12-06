@@ -124,7 +124,7 @@ const Feed = () => {
       <Card className="p-4">
         <div className="flex items-start space-x-3">
           <img
-            src={"/hello.png"}
+            src={user.profile_photo_path}
             alt={user.name}
             className="w-12 h-12 rounded-full"
           />

@@ -11,6 +11,7 @@ import {
   GetUserByIdParamsSchema,
   GetUserByIdResponseSchema,
 } from "../schemas/user.schema";
+import { URL_PUBLIC_UPLOADS } from "../constants/constants";
 
 @injectable()
 export class UserController implements Controller {
@@ -81,10 +82,7 @@ export class UserController implements Controller {
 
         const user = await this.userService.getUserById(Number(id));
         if (!user) {
-          return c.json(
-            { success: false, message: "User not found" },
-            404
-          );
+          return c.json({ success: false, message: "User not found" }, 404);
         }
 
         return c.json(
@@ -94,7 +92,7 @@ export class UserController implements Controller {
             body: {
               id: Number(user.id),
               full_name: user.full_name,
-              profile_photo_path: user.profile_photo_path,
+              profile_photo_path: URL_PUBLIC_UPLOADS + user.profile_photo_path,
             },
           },
           200

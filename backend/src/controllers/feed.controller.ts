@@ -4,7 +4,6 @@ import { createRoute, z } from "@hono/zod-openapi";
 import { createMiddleware } from "hono/factory";
 import { CONFIG } from "../ioc/config";
 import { OpenApiHonoProvider } from "../core/hono-provider";
-import { ZodValidationService } from "../services/zod-validation.service";
 import { BadRequestException } from "../exceptions/bad-request.exception";
 import {
   CreatePostEnv,
@@ -28,14 +27,17 @@ import { FeedService } from "../services/feed.service";
 
 import { NotificationService } from "../services/notification.service";
 import { ConnectionService } from "../services/connection.service";
+import { URL_PUBLIC_UPLOADS } from "../constants/constants";
 
 @injectable()
 export class FeedController implements Controller {
   constructor(
     @inject(CONFIG.OpenApiHonoProvider) private hono: OpenApiHonoProvider,
     @inject(CONFIG.FeedService) private feedService: FeedService,
-    @inject(CONFIG.NotificationService) private notificationService: NotificationService,
-    @inject(CONFIG.ConnectionService) private connectionService: ConnectionService
+    @inject(CONFIG.NotificationService)
+    private notificationService: NotificationService,
+    @inject(CONFIG.ConnectionService)
+    private connectionService: ConnectionService
   ) {}
 
   public registerMiddlewaresbeforeGlobal(): void {}
@@ -234,11 +236,22 @@ export class FeedController implements Controller {
           limit,
           cursor
         );
+        const feed_adjusted_profile_photo = feed.map((post) => {
+          return {
+            ...post,
+            user: {
+              ...post.user,
+              profile_photo_path:
+                URL_PUBLIC_UPLOADS + post.user.profile_photo_path,
+            },
+          };
+        });
+
         return c.json(
           {
             success: true as const,
             message: "Successfully get feed",
-            body: feed,
+            body: feed_adjusted_profile_photo,
           },
           200
         );
@@ -362,12 +375,13 @@ export class FeedController implements Controller {
           throw new InternalErrorException("Failed to create post");
         }
 
-        const connectedUserIds = await this.connectionService.getAllConnectedUserIds(BigInt(user.id));
+        const connectedUserIds =
+          await this.connectionService.getAllConnectedUserIds(BigInt(user.id));
         await this.notificationService.sendPostNotification(
-            connectedUserIds,
-            Number(feed.id),
-            user.full_name
-          );
+          connectedUserIds,
+          Number(feed.id),
+          user.full_name
+        );
 
         return c.json(
           {
@@ -383,7 +397,8 @@ export class FeedController implements Controller {
               user: {
                 fullname: user.full_name,
                 username: user.username,
-                profile_photo_path: user.profile_photo_path,
+                profile_photo_path:
+                  URL_PUBLIC_UPLOADS + user.profile_photo_path,
               },
             },
           },
@@ -533,7 +548,8 @@ export class FeedController implements Controller {
               user: {
                 fullname: user.full_name,
                 username: user.username,
-                profile_photo_path: user.profile_photo_path,
+                profile_photo_path:
+                  URL_PUBLIC_UPLOADS + user.profile_photo_path,
               },
             },
           },

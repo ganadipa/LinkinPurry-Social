@@ -14,9 +14,8 @@ function RouteComponent() {
     return <Loading />;
   }
 
-  console.log("user", user);
   if (user) {
-    // redirect({ to: "/" });
+    redirect({ to: "/" });
     return;
   }
 

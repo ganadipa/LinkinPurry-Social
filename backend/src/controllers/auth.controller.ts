@@ -24,6 +24,7 @@ import {
   LogoutSuccessSchema,
   MeSuccessSchema,
 } from "../constants/response-body";
+import { URL_PUBLIC_UPLOADS } from "../constants/constants";
 
 @injectable()
 export class AuthController implements Controller {
@@ -297,6 +298,7 @@ export class AuthController implements Controller {
               email: user.email,
               name: user.full_name,
               username: user.username,
+              profile_photo_path: URL_PUBLIC_UPLOADS + user.profile_photo_path,
             },
           },
           200

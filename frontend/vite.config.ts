@@ -24,7 +24,7 @@ export default defineConfig(({ mode }) => {
       proxy: {
         "/api": {
           target:
-            process.env.ENVIRONMENT === "dev"
+            process.env.REACT_ENVIRONMENT === "dev"
               ? "http://be-dev:8000"
               : "http://localhost:8000",
           changeOrigin: true,
@@ -37,6 +37,13 @@ export default defineConfig(({ mode }) => {
           ws: true,
           changeOrigin: true,
           rewrite: (path) => path,
+        },
+        "/uploads": {
+          target:
+            process.env.REACT_ENVIRONMENT === "dev"
+              ? "http://be-dev:8000"
+              : "http://localhost:8000",
+          changeOrigin: true,
         },
       },
       outDir: "dist",

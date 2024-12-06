@@ -285,9 +285,11 @@ function BarLoader({
 
 export default function Loading() {
   return (
-    <div className="flex flex-col items-center justify-center gap-4 h-screen">
+    <div className="flex flex-col items-center justify-center gap-4 h-[400px]">
       <h1 className="flex items-center justify-center text-4xl font-extrabold text-[#0a66c2]">
-        Link<img src="/public/images/linkedin.png" alt="logo" width={40} height={40} />Purry
+        Link
+        <img src="/images/linkedin.png" alt="logo" width={40} height={40} />
+        Purry
       </h1>
       <BarLoader />
     </div>

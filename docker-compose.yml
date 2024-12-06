@@ -15,6 +15,7 @@ services:
       - internal-network
     volumes:
       - ./backend:/app/backend
+      - ./uploads:/var/www/uploads
       - /app/backend/node_modules
 
   fe-dev:
@@ -24,7 +25,7 @@ services:
     env_file:
       - .env.docker
     environment:
-      - ENVIRONMENT=dev
+      - REACT_ENVIRONMENT=dev
     volumes:
       - ./frontend:/app/frontend
       - /app/frontend/node_modules
@@ -58,6 +59,8 @@ services:
       - .env.docker
     environment:
       - ENVIRONMENT=prod
+    volumes:
+      - ./uploads:/var/www/uploads
 
 networks:
   internal-network:
