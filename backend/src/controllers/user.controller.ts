@@ -6,7 +6,7 @@ import { UserService } from "../services/user.service";
 import { BadRequestException } from "../exceptions/bad-request.exception";
 import { createRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
-import { ErrorResponseSchema } from "../constants/types";
+import { NullErrorResponseSchema } from "../constants/types";
 import {
   GetUserByIdParamsSchema,
   GetUserByIdResponseSchema,
@@ -34,6 +34,7 @@ export class UserController implements Controller {
     const route = createRoute({
       method: "get",
       path: "/api/users/{id}",
+      tags: ["Users"],
       responses: {
         200: {
           description: "User retrieved successfully",
@@ -47,7 +48,7 @@ export class UserController implements Controller {
           description: "Bad Request",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -55,7 +56,7 @@ export class UserController implements Controller {
           description: "User not found",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -63,7 +64,7 @@ export class UserController implements Controller {
           description: "Internal Server Error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },

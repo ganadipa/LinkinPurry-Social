@@ -19,7 +19,7 @@ import {
   EditPostSuccessSchema,
   GetFeedSuccessSchema,
 } from "../schemas/feed.schema";
-import { ErrorResponseSchema } from "../constants/types";
+import { NullErrorResponseSchema } from "../constants/types";
 import { UnauthorizedException } from "../exceptions/unauthorized.exception";
 import { InternalErrorException } from "../exceptions/internal-error.exception";
 import { HTTPException } from "hono/http-exception";
@@ -172,6 +172,7 @@ export class FeedController implements Controller {
       middleware: [this.setGetFeedQueryMiddleware] as const,
       method: "get",
       path: "/api/feed",
+      tags: ["Feed"],
       security: [],
       request: {
         query: z.object({
@@ -192,7 +193,7 @@ export class FeedController implements Controller {
           description: "Bad request",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -200,7 +201,7 @@ export class FeedController implements Controller {
           description: "Unauthorized",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -208,7 +209,7 @@ export class FeedController implements Controller {
           description: "Internal server error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -297,6 +298,8 @@ export class FeedController implements Controller {
       method: "post",
       path: "/api/feed",
       middleware: [this.createPostBodyMiddleware] as const,
+      tags: ["Feed"],
+
       request: {
         body: {
           content: {
@@ -321,7 +324,7 @@ export class FeedController implements Controller {
           description: "Bad request",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -329,7 +332,7 @@ export class FeedController implements Controller {
           description: "Unauthorized",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -337,7 +340,7 @@ export class FeedController implements Controller {
           description: "Internal server error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -449,6 +452,8 @@ export class FeedController implements Controller {
       method: "put",
       path: "/api/feed/{postId}",
       middleware: [this.setUpdatePostParamsAndQueryMiddleware] as const,
+      tags: ["Feed"],
+
       request: {
         params: z.object({
           postId: z.string(),
@@ -476,7 +481,7 @@ export class FeedController implements Controller {
           description: "Bad request",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -484,7 +489,7 @@ export class FeedController implements Controller {
           description: "Unauthorized",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -492,7 +497,7 @@ export class FeedController implements Controller {
           description: "Internal server error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -606,6 +611,8 @@ export class FeedController implements Controller {
         }),
       },
       middleware: [this.setDeletePostParamsMiddleware] as const,
+      tags: ["Feed"],
+
       responses: {
         200: {
           description: "Successfully delete post",
@@ -619,7 +626,7 @@ export class FeedController implements Controller {
           description: "Bad request",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -627,7 +634,7 @@ export class FeedController implements Controller {
           description: "Unauthorized",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -635,7 +642,7 @@ export class FeedController implements Controller {
           description: "Internal server error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },

@@ -28,7 +28,8 @@ export class ChatController implements Controller {
     @inject(CONFIG.OpenApiHonoProvider) private hono: OpenApiHonoProvider,
     @inject(CONFIG.ChatService) private chatService: ChatService,
     @inject(CONFIG.SocketProvider) private socketProvider: SocketProvider,
-    @inject(CONFIG.NotificationService) private notificationService: NotificationService,
+    @inject(CONFIG.NotificationService)
+    private notificationService: NotificationService,
     @inject(CONFIG.UserService) private userService: UserService
   ) {}
 
@@ -75,6 +76,7 @@ export class ChatController implements Controller {
     const route = createRoute({
       method: "get",
       path: "/api/chat/contacts",
+      tags: ["Chat"],
       security: [{ BearerAuth: [] }],
       responses: {
         200: {
@@ -89,7 +91,7 @@ export class ChatController implements Controller {
           description: "Bad request",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: ErrorResponseSchema(z.null()),
             },
           },
         },
@@ -97,7 +99,7 @@ export class ChatController implements Controller {
           description: "Unauthorized",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: ErrorResponseSchema(z.null()),
             },
           },
         },
@@ -105,7 +107,7 @@ export class ChatController implements Controller {
           description: "Internal server error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: ErrorResponseSchema(z.null()),
             },
           },
         },
@@ -185,6 +187,8 @@ export class ChatController implements Controller {
       request: {
         params: GetChatToAContactParamSchema,
       },
+      tags: ["Chat"],
+
       responses: {
         200: {
           description: "Successful login",
@@ -198,7 +202,7 @@ export class ChatController implements Controller {
           description: "Bad request",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: ErrorResponseSchema(z.null()),
             },
           },
         },
@@ -206,7 +210,7 @@ export class ChatController implements Controller {
           description: "Unauthorized",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: ErrorResponseSchema(z.null()),
             },
           },
         },
@@ -214,7 +218,7 @@ export class ChatController implements Controller {
           description: "Internal server error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: ErrorResponseSchema(z.null()),
             },
           },
         },

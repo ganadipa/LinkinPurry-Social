@@ -10,7 +10,7 @@ import { UpdateProfilePayloadSchema } from "../constants/request-payload";
 import { createMiddleware } from "hono/factory";
 import { createRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
-import { ErrorResponseSchema } from "../constants/types";
+import { NullErrorResponseSchema } from "../constants/types";
 import { z } from "zod";
 import {
   GetAuthenticatedProfileSuccessSchema,
@@ -53,6 +53,7 @@ export class ProfileController implements Controller {
   private registerGetProfileRoute() {
     const route = createRoute({
       method: "get",
+      tags: ["Profile"],
       path: "/api/profile/{user_id}",
       security: [{ BearerAuth: [] }],
       request: {
@@ -74,7 +75,7 @@ export class ProfileController implements Controller {
           description: "Unauthorized",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -82,7 +83,7 @@ export class ProfileController implements Controller {
           description: "Internal server error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -144,6 +145,8 @@ export class ProfileController implements Controller {
     const route = createRoute({
       middleware: [this.setUpdateProfilePayloadMiddleware] as const,
       method: "put",
+      tags: ["Profile"],
+
       path: "/api/profile/:user_id",
       security: [{ BearerAuth: [] }],
       request: {
@@ -172,7 +175,7 @@ export class ProfileController implements Controller {
           description: "Bad request",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -180,7 +183,7 @@ export class ProfileController implements Controller {
           description: "Unauthorized",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -188,7 +191,7 @@ export class ProfileController implements Controller {
           description: "Internal server error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },

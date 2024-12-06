@@ -7,7 +7,7 @@ import { BadRequestException } from "../exceptions/bad-request.exception";
 import { createRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
-import { ErrorResponseSchema } from "../constants/types";
+import { NullErrorResponseSchema } from "../constants/types";
 import {
   GetUsersResponseSchema,
   GetConnectionsResponseSchema,
@@ -56,6 +56,7 @@ export class ConnectionController implements Controller {
     const route = createRoute({
       method: "get",
       path: "/api/users",
+      tags: ["Connection"],
       responses: {
         200: {
           description: "Users retrieved successfully",
@@ -69,7 +70,7 @@ export class ConnectionController implements Controller {
           description: "Bad Request",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -77,7 +78,7 @@ export class ConnectionController implements Controller {
           description: "Internal Server Error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -117,6 +118,7 @@ export class ConnectionController implements Controller {
       method: "get",
       path: "/api/connections",
       security: [{ BearerAuth: [] }],
+      tags: ["Connection"],
       responses: {
         200: {
           description: "Connections retrieved successfully",
@@ -130,7 +132,7 @@ export class ConnectionController implements Controller {
           description: "Bad Request",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -138,7 +140,7 @@ export class ConnectionController implements Controller {
           description: "Internal Server Error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -188,6 +190,8 @@ export class ConnectionController implements Controller {
   private registerRequestConnectionRoute() {
     const route = createRoute({
       method: "post",
+      tags: ["Connection"],
+
       path: "/api/connections/request",
       security: [{ BearerAuth: [] }],
       request: {
@@ -215,7 +219,7 @@ export class ConnectionController implements Controller {
           description: "Bad Request",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -223,7 +227,7 @@ export class ConnectionController implements Controller {
           description: "Internal Server Error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -236,7 +240,9 @@ export class ConnectionController implements Controller {
         const user = c.var.user;
 
         if (!user || user.id === undefined) {
-          throw new BadRequestException("User not found or user ID is undefined");
+          throw new BadRequestException(
+            "User not found or user ID is undefined"
+          );
         }
 
         const from_id = BigInt(user.id);
@@ -273,6 +279,8 @@ export class ConnectionController implements Controller {
           },
         },
       },
+      tags: ["Connection"],
+
       responses: {
         200: {
           description: "Connection request responded successfully",
@@ -289,7 +297,7 @@ export class ConnectionController implements Controller {
           description: "Bad Request",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -297,7 +305,7 @@ export class ConnectionController implements Controller {
           description: "Internal Server Error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -311,7 +319,9 @@ export class ConnectionController implements Controller {
         const user = c.var.user;
 
         if (!user || user.id === undefined) {
-          throw new BadRequestException("User not found or user ID is undefined");
+          throw new BadRequestException(
+            "User not found or user ID is undefined"
+          );
         }
 
         const to_id = BigInt(user.id);
@@ -347,6 +357,8 @@ export class ConnectionController implements Controller {
       method: "get",
       path: "/api/connections/requests",
       security: [{ BearerAuth: [] }],
+      tags: ["Connection"],
+
       responses: {
         200: {
           description: "Connection requests retrieved successfully",
@@ -360,7 +372,7 @@ export class ConnectionController implements Controller {
           description: "Bad Request",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -368,7 +380,7 @@ export class ConnectionController implements Controller {
           description: "Internal Server Error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -380,7 +392,9 @@ export class ConnectionController implements Controller {
         const user = c.var.user;
 
         if (!user || user.id === undefined) {
-          throw new BadRequestException("User not found or user ID is undefined");
+          throw new BadRequestException(
+            "User not found or user ID is undefined"
+          );
         }
 
         const userId = BigInt(user.id);
@@ -414,6 +428,8 @@ export class ConnectionController implements Controller {
       method: "delete",
       path: "/api/connections/{user_id}",
       security: [{ BearerAuth: [] }],
+      tags: ["Connection"],
+
       responses: {
         200: {
           description: "Connection removed successfully",
@@ -427,7 +443,7 @@ export class ConnectionController implements Controller {
           description: "Bad Request",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -435,7 +451,7 @@ export class ConnectionController implements Controller {
           description: "Internal Server Error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -448,7 +464,9 @@ export class ConnectionController implements Controller {
         const user = c.var.user;
 
         if (!user || user.id === undefined) {
-          throw new BadRequestException("User not found or user ID is undefined");
+          throw new BadRequestException(
+            "User not found or user ID is undefined"
+          );
         }
 
         const from_id = BigInt(user.id);
@@ -474,6 +492,8 @@ export class ConnectionController implements Controller {
       method: "post",
       path: "/api/connection/check",
       security: [{ BearerAuth: [] }],
+      tags: ["Connection"],
+
       request: {
         body: {
           content: {
@@ -496,7 +516,7 @@ export class ConnectionController implements Controller {
           description: "Bad Request",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -504,7 +524,7 @@ export class ConnectionController implements Controller {
           description: "Internal Server Error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -541,9 +561,12 @@ export class ConnectionController implements Controller {
       method: "get",
       path: "/api/connections/requests-from",
       security: [{ BearerAuth: [] }],
+      tags: ["Connection"],
+
       responses: {
         200: {
-          description: "Connection requests from the current user retrieved successfully",
+          description:
+            "Connection requests from the current user retrieved successfully",
           content: {
             "application/json": {
               schema: GetConnectionRequestsFromResponseSchema,
@@ -554,7 +577,7 @@ export class ConnectionController implements Controller {
           description: "Bad Request",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -562,7 +585,7 @@ export class ConnectionController implements Controller {
           description: "Internal Server Error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -574,7 +597,9 @@ export class ConnectionController implements Controller {
         const user = c.var.user;
 
         if (!user || user.id === undefined) {
-          throw new BadRequestException("User not found or user ID is undefined");
+          throw new BadRequestException(
+            "User not found or user ID is undefined"
+          );
         }
 
         const userId = BigInt(user.id);
@@ -591,7 +616,8 @@ export class ConnectionController implements Controller {
         return c.json(
           {
             success: true,
-            message: "Connection requests from this user retrieved successfully",
+            message:
+              "Connection requests from this user retrieved successfully",
             body: jsonFriendlyRequests,
           },
           200

@@ -15,7 +15,7 @@ import { BadRequestException } from "../exceptions/bad-request.exception";
 import { InternalErrorException } from "../exceptions/internal-error.exception";
 import { HTTPException } from "hono/http-exception";
 import { createMiddleware } from "hono/factory";
-import { createRoute } from "@hono/zod-openapi";
+import { createRoute, z } from "@hono/zod-openapi";
 import { ErrorResponseSchema } from "../constants/types";
 import { LoginEnv } from "../constants/context-env.types";
 import { RegisterEnv } from "../constants/context-env.types";
@@ -51,6 +51,7 @@ export class AuthController implements Controller {
     async (c, next) => {
       const payload = await c.req.json();
       this.zodValidationService.validate(payload, LoginPayloadSchema);
+      console.log(payload);
       c.set("loginPayload", payload);
       return next();
     }
@@ -70,7 +71,9 @@ export class AuthController implements Controller {
       middleware: [this.setLoginPayloadMiddleware] as const,
       method: "post",
       path: "/api/login",
+      tags: ["Authentication"],
       security: [{ BearerAuth: [] }],
+
       request: {
         body: {
           content: {
@@ -93,7 +96,7 @@ export class AuthController implements Controller {
           description: "Bad request",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: ErrorResponseSchema(z.null()),
             },
           },
         },
@@ -101,7 +104,7 @@ export class AuthController implements Controller {
           description: "Internal server error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: ErrorResponseSchema(z.null()),
             },
           },
         },
@@ -202,6 +205,7 @@ export class AuthController implements Controller {
     const route = createRoute({
       method: "post",
       path: "/api/logout",
+      tags: ["Authentication"],
       responses: {
         200: {
           description: "Successfully logged out",
@@ -215,7 +219,7 @@ export class AuthController implements Controller {
           description: "Internal server error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: ErrorResponseSchema(z.null()),
             },
           },
         },
@@ -250,6 +254,7 @@ export class AuthController implements Controller {
       method: "get",
       path: "/api/me",
       security: [{ BearerAuth: [] }],
+      tags: ["Authentication"],
       responses: {
         200: {
           description: "User info retrieved",
@@ -263,7 +268,7 @@ export class AuthController implements Controller {
           description: "Internal server error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: ErrorResponseSchema(z.null()),
             },
           },
         },
@@ -339,6 +344,7 @@ export class AuthController implements Controller {
       middleware: [this.setRegisterPayloadMiddleware] as const,
       method: "post",
       path: "/api/register",
+      tags: ["Authentication"],
       request: {
         body: {
           content: {
@@ -361,7 +367,7 @@ export class AuthController implements Controller {
           description: "Bad request",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: ErrorResponseSchema(z.null()),
             },
           },
         },
@@ -369,7 +375,7 @@ export class AuthController implements Controller {
           description: "Internal server error",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: ErrorResponseSchema(z.null()),
             },
           },
         },

@@ -7,11 +7,15 @@ export const BaseResponseSchema = z.object({
   message: z.string(),
 });
 
-export const ErrorResponseSchema = z.object({
-  success: z.literal(false),
-  message: z.string(),
-  error: z.record(z.any()).nullable(),
-});
+export const ErrorResponseSchema = <T extends z.ZodType>(schema: T) => {
+  return z.object({
+    success: z.literal(false),
+    message: z.string(),
+    error: schema,
+  });
+};
+
+export const NullErrorResponseSchema = ErrorResponseSchema(z.null());
 
 export const SuccessResponseSchema = z.object({
   success: z.literal(true),

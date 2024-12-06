@@ -13,13 +13,14 @@ import {
   SendPostNotificationResponseSchema,
 } from "../schemas/notification.schema";
 import { PushSubscription } from "../models/push-subscription.model";
-import { ErrorResponseSchema } from "../constants/types";
+import { NullErrorResponseSchema } from "../constants/types";
 
 @injectable()
 export class NotificationController implements Controller {
   constructor(
     @inject(CONFIG.OpenApiHonoProvider) private hono: OpenApiHonoProvider,
-    @inject(CONFIG.NotificationService) private notificationService: NotificationService
+    @inject(CONFIG.NotificationService)
+    private notificationService: NotificationService
   ) {}
 
   public registerMiddlewaresbeforeGlobal(): void {}
@@ -36,6 +37,7 @@ export class NotificationController implements Controller {
     const route = createRoute({
       method: "post",
       path: "/api/notifications/subscribe",
+      tags: ["Notifications"],
       request: {
         body: {
           content: {
@@ -58,7 +60,7 @@ export class NotificationController implements Controller {
           description: "Failed to save subscription",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -68,21 +70,31 @@ export class NotificationController implements Controller {
     this.hono.app.openapi(route, async (c) => {
       try {
         const body = await c.req.json();
-        const subscription = new PushSubscription(body.endpoint, body.keys, body.user_id);
+        const subscription = new PushSubscription(
+          body.endpoint,
+          body.keys,
+          body.user_id
+        );
         console.log("Subscription:", subscription);
         await this.notificationService.saveSubscription(subscription);
 
-        return c.json({
-          success: true as const,
-          message: "Push subscription saved successfully",
-        }, 200);
+        return c.json(
+          {
+            success: true as const,
+            message: "Push subscription saved successfully",
+          },
+          200
+        );
       } catch (error) {
         console.error("Error saving subscription:", error);
-        return c.json({
-          success: false as const,
-          message: `Failed to save subscription: ${(error as Error).message}`,
-          error: error,
-        }, 500);
+        return c.json(
+          {
+            success: false as const,
+            message: `Failed to save subscription: ${(error as Error).message}`,
+            error: error,
+          },
+          500
+        );
       }
     });
   }
@@ -91,6 +103,8 @@ export class NotificationController implements Controller {
     const route = createRoute({
       method: "post",
       path: "/api/notifications/chat",
+      tags: ["Notifications"],
+
       request: {
         body: {
           content: {
@@ -113,7 +127,7 @@ export class NotificationController implements Controller {
           description: "Failed to send chat notification",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -123,19 +137,31 @@ export class NotificationController implements Controller {
     this.hono.app.openapi(route, async (c) => {
       try {
         const { toUserId, message, sender } = await c.req.json();
-        await this.notificationService.sendChatNotification(toUserId, message, sender);
+        await this.notificationService.sendChatNotification(
+          toUserId,
+          message,
+          sender
+        );
 
-        return c.json({
-          success: true as const,
-          message: "Chat notification sent successfully",
-        }, 200);
+        return c.json(
+          {
+            success: true as const,
+            message: "Chat notification sent successfully",
+          },
+          200
+        );
       } catch (error) {
         console.error("Error sending chat notification:", error);
-        return c.json({
-          success: false as const,
-          message: `Failed to send chat notification: ${(error as Error).message}`,
-          error: error,
-        }, 500);
+        return c.json(
+          {
+            success: false as const,
+            message: `Failed to send chat notification: ${
+              (error as Error).message
+            }`,
+            error: error,
+          },
+          500
+        );
       }
     });
   }
@@ -144,6 +170,8 @@ export class NotificationController implements Controller {
     const route = createRoute({
       method: "post",
       path: "/api/notifications/post",
+      tags: ["Notifications"],
+
       request: {
         body: {
           content: {
@@ -166,7 +194,7 @@ export class NotificationController implements Controller {
           description: "Failed to send post notification",
           content: {
             "application/json": {
-              schema: ErrorResponseSchema,
+              schema: NullErrorResponseSchema,
             },
           },
         },
@@ -176,19 +204,31 @@ export class NotificationController implements Controller {
     this.hono.app.openapi(route, async (c) => {
       try {
         const { userId, postId, poster } = await c.req.json();
-        await this.notificationService.sendPostNotification(userId, postId, poster);
+        await this.notificationService.sendPostNotification(
+          userId,
+          postId,
+          poster
+        );
 
-        return c.json({
-          success: true as const,
-          message: "Post notification sent successfully",
-        }, 200);
+        return c.json(
+          {
+            success: true as const,
+            message: "Post notification sent successfully",
+          },
+          200
+        );
       } catch (error) {
         console.error("Error sending post notification:", error);
-        return c.json({
-          success: false as const,
-          message: `Failed to send post notification: ${(error as Error).message}`,
-          error: error,
-        }, 500);
+        return c.json(
+          {
+            success: false as const,
+            message: `Failed to send post notification: ${
+              (error as Error).message
+            }`,
+            error: error,
+          },
+          500
+        );
       }
     });
   }
