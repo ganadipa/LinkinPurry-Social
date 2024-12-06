@@ -151,6 +151,7 @@ const Feed = () => {
 
       {feed.map((item) => (
         <div
+          id={item.post.id.toString()}
           key={item.post.id}
           className="bg-white rounded-lg shadow-sm border border-gray-200 p-4"
         >

@@ -17,15 +17,13 @@ export class AuthService {
   ) {}
 
   public async login({ identifier, password }: LoginPayload) {
-    console.log("heree");
     let user = null;
     if (identifier.includes("@")) {
-      user = await this.userRepository.findByEmail(identifier);
+      user = await this.userRepository.findByEmail(identifier.toLowerCase());
     } else {
       user = await this.userRepository.findByUsername(identifier);
     }
 
-    console.log("hereee");
     if (!user) {
       throw new BadRequestException("Identifier or password is incorrect");
     }
@@ -36,7 +34,6 @@ export class AuthService {
       );
     }
 
-    console.log("herrr");
     const match = bcrypt.compareSync(password, user.password_hash);
     if (!match) {
       throw new BadRequestException("Identifier or password is incorrect");
@@ -48,12 +45,12 @@ export class AuthService {
       user.email
     );
 
-    console.log("final");
-
     return token;
   }
 
   public async register({ email, name, password, username }: RegisterPayload) {
+    email = email.toLowerCase();
+
     const existingUser = await this.userRepository.findByEmail(email);
     if (existingUser) {
       throw new BadRequestException("Email is already in use");
@@ -61,9 +58,7 @@ export class AuthService {
 
     const existingUsername = await this.userRepository.findByUsername(username);
     if (existingUsername) {
-      console.log(existingUsername);
       throw new BadRequestException("Username is already in use");
-      console.log("why am i even here");
     }
 
     const password_hash = bcrypt.hashSync(password, 10);
