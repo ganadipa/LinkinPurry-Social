@@ -88,7 +88,6 @@ export class ConnectionController implements Controller {
     this.hono.app.openapi(route, async (c) => {
       try {
         const searchQuery = c.req.query("search") || "";
-        console.log("searchQuery: ", searchQuery); // debug
         const users = await this.connectionService.searchUsers(searchQuery);
 
         const jsonFriendlyUsers = users.map((user) => ({
@@ -96,7 +95,6 @@ export class ConnectionController implements Controller {
           id: Number(user.id),
         }));
 
-        console.log("jsonFriendlyUsers: ", jsonFriendlyUsers); // debug
 
         return c.json(
           {
@@ -243,6 +241,12 @@ export class ConnectionController implements Controller {
           throw new BadRequestException(
             "User not found or user ID is undefined"
           );
+        }
+
+        if (BigInt(user.id) === BigInt(to_id)) {
+            throw new BadRequestException(
+                "You cannot send a connection request to yourself"
+            );
         }
 
         const from_id = BigInt(user.id);
