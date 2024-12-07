@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { MdEditSquare } from "react-icons/md";
 import EditModals from "@/components/specific/edit-modals";
 import { useAuth } from "@/hooks/auth";
+import toast from "react-hot-toast";
 // import { useProfile } from "@/hooks/profile";
 
 interface WorkHistoryProps {
@@ -11,15 +12,19 @@ interface WorkHistoryProps {
 }
 
 const WorkHistory: React.FC<WorkHistoryProps> = ({
-    work_history,
-    isOwnProfile
+  work_history,
+  isOwnProfile,
 }) => {
   const { user } = useAuth();
-  const [workHistoryValue, setWorkHistoryValue] = useState<string>(work_history || "");
-  const [workHistoryModalOpen, setWorkHistoryModalOpen] = useState<boolean>(false);
+  const [workHistoryValue, setWorkHistoryValue] = useState<string>(
+    work_history || ""
+  );
+  const [workHistoryModalOpen, setWorkHistoryModalOpen] =
+    useState<boolean>(false);
 
   const handleWorkHistoryUpdate = (newWorkHistory: string) => {
     setWorkHistoryValue(newWorkHistory);
+    toast.success("Work history updated successfully");
   };
 
   return (

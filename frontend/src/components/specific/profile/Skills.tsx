@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { MdEditSquare } from "react-icons/md";
 import EditModals from "@/components/specific/edit-modals";
 import { useAuth } from "@/hooks/auth";
+import toast from "react-hot-toast";
 // import { useProfile } from "@/hooks/profile";
 
 interface SkillsProps {
@@ -10,17 +11,15 @@ interface SkillsProps {
   isOwnProfile: boolean;
 }
 
-const Skills: React.FC<SkillsProps> = ({
-    skills,
-    isOwnProfile
-}) => {
+const Skills: React.FC<SkillsProps> = ({ skills, isOwnProfile }) => {
   const { user } = useAuth();
 
-  const [skillsValue, setSkillsValue] = useState<string>(skills || "" );
+  const [skillsValue, setSkillsValue] = useState<string>(skills || "");
   const [skillModalOpen, setSkillModalOpen] = useState<boolean>(false);
 
   const handleSkillsUpdate = (newSkills: string) => {
-    setSkillsValue(newSkills); // Update the state immediately
+    setSkillsValue(newSkills);
+    toast.success("Skills updated successfully");
   };
 
   return (

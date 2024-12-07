@@ -5,6 +5,7 @@ import { Link } from "@tanstack/react-router";
 import EditPhotoModals from "@/components/specific/edit-photo";
 import EditModals from "@/components/specific/edit-modals";
 import { useConnectionStatus } from "@/hooks/connection-status";
+import toast from "react-hot-toast";
 // import EditProfileModals from "@/components/specific/edit-modals-profile";
 
 interface ProfileHeaderProps {
@@ -33,8 +34,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   );
 
   const [name, setName] = useState<string>(profile.name);
-  // const [workHistory, setWorkHistory] = useState<string>(profile.work_history);
-  // const [skills, setSkills] = useState<string>(profile.skills);
+  const [photoUrl, setPhotoUrl] = useState<string>(profile.profile_photo);
 
   const [photoModalOpen, setPhotoModalOpen] = useState<boolean>(false);
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
@@ -53,6 +53,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
   const handleNameUpdate = (newName: string) => {
     setName(newName);
+    toast.success("Name updated successfully");
   };
 
   return (
@@ -65,7 +66,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             className="w-full h-full object-cover rounded-t-lg"
           />
           {isOwnProfile && (
-            <Button 
+            <Button
               variant="ghost"
               className="absolute right-2 top-2 bg-white rounded-md p-1.5 sm:p-2 shadow-sm hover:bg-gray-100"
               onClick={() => setEditModalOpen(true)}
@@ -79,7 +80,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           <div className="flex flex-col items-start">
             <div className="relative">
               <img
-                src={profile.profile_photo}
+                src={photoUrl}
                 alt="Profile Picture"
                 className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-lg object-cover cursor-pointer"
                 onClick={
@@ -90,7 +91,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           </div>
           <div className="text-start mt-4">
             <h1 className="text-xl sm:text-2xl font-semibold">{name}</h1>
-            <p className="text-gray-600 text-sm sm:text-base">{profile.username}</p>
+            <p className="text-gray-600 text-sm sm:text-base">
+              {profile.username}
+            </p>
             <div className="text-blue-500">
               <Link
                 to={`/connections/${profileId}`}
@@ -122,7 +125,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       <EditPhotoModals
         photoModalOpen={photoModalOpen}
         setPhotoModalOpen={setPhotoModalOpen}
-        profilePhoto={profile.profile_photo}
+        profilePhoto={photoUrl}
+        setProfilePhoto={setPhotoUrl}
         userId={user?.id || ""}
         profileId={profileId || ""}
         onEditPhoto={() => {}}

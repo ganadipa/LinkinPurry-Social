@@ -25,15 +25,15 @@ export default defineConfig(({ mode }) => {
         "/api": {
           target:
             process.env.REACT_ENVIRONMENT === "dev"
-              ? "http://be-dev:8000"
-              : "http://localhost:8000",
+              ? "http://be-dev:3000"
+              : "http://localhost:3000",
           changeOrigin: true,
         },
         "/ws": {
           target:
             env.ENVIRONMENT === "dev"
-              ? "http://be-dev:8000"
-              : "http://localhost:8000",
+              ? "http://be-dev:3000"
+              : "http://localhost:3000",
           ws: true,
           changeOrigin: true,
           rewrite: (path) => path,
@@ -41,8 +41,8 @@ export default defineConfig(({ mode }) => {
         "/uploads": {
           target:
             process.env.REACT_ENVIRONMENT === "dev"
-              ? "http://be-dev:8000"
-              : "http://localhost:8000",
+              ? "http://be-dev:3000"
+              : "http://localhost:3000",
           changeOrigin: true,
         },
       },

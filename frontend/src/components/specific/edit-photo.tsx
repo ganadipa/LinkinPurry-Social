@@ -1,6 +1,14 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'; 
-import { Button } from '@/components/ui/button'; 
-import { MdFileUpload, MdDelete } from 'react-icons/md';
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { MdFileUpload } from "react-icons/md";
+import { set } from "zod";
 
 interface EditPhotoModalsProps {
   photoModalOpen: boolean;
@@ -10,18 +18,64 @@ interface EditPhotoModalsProps {
   profileId: string | number;
   onEditPhoto: () => void;
   onDeletePhoto: () => void;
+  setProfilePhoto: (photoUrl: string) => void;
 }
 
 export default function EditPhotoModals({
   photoModalOpen,
   setPhotoModalOpen,
   profilePhoto,
+  setProfilePhoto,
   userId,
   profileId,
-  onEditPhoto,
-  onDeletePhoto,
 }: EditPhotoModalsProps) {
   const isCurrentUser = userId === profileId;
+  const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>(profilePhoto);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedPhoto(file);
+      const objectUrl = URL.createObjectURL(file);
+      setPreviewUrl(objectUrl);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!selectedPhoto) return;
+
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("profile_photo", selectedPhoto);
+
+      const response = await fetch(`/api/profile/${userId}`, {
+        method: "PUT",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update profile photo");
+      }
+
+      setPhotoModalOpen(false);
+      const data = await response.json();
+      setProfilePhoto(data.body.profile_photo);
+      setSelectedPhoto(null);
+    } catch (error) {
+      console.error("Error updating profile photo:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setSelectedPhoto(null);
+    setPreviewUrl(profilePhoto);
+    setPhotoModalOpen(false);
+  };
 
   return (
     <Dialog open={photoModalOpen} onOpenChange={setPhotoModalOpen}>
@@ -32,29 +86,50 @@ export default function EditPhotoModals({
         <DialogDescription />
         <div className="flex flex-col items-center gap-4">
           <img
-            src={profilePhoto}
+            src={previewUrl}
             alt="Profile"
-            className="w-48 h-48 object-cover"
+            className="w-48 h-48 object-cover rounded-full"
           />
           {isCurrentUser && (
-            <div className="flex gap-4">
-            <Button onClick={() => document.getElementById('fileInput')?.click()} className="bg-[#0a66c2] text-white hover:bg-[#004182]">
-              Upload Image
-              <MdFileUpload />
-            </Button>
-            <input
-              type="file"
-              id="fileInput"
-              style={{ display: 'none' }}
-              onChange={onEditPhoto}
-            />
-            <Button variant="destructive" onClick={onDeletePhoto} className="bg-red-500 text-white hover:bg-red-600">
-              <MdDelete />
-            </Button>
-          </div>
+            <div className="flex flex-col gap-4 w-full">
+              <div className="flex gap-4 justify-center">
+                <Button
+                  onClick={() => document.getElementById("fileInput")?.click()}
+                  className="bg-[#0a66c2] text-white hover:bg-[#004182]"
+                >
+                  Change Image
+                  <MdFileUpload className="ml-2" />
+                </Button>
+                <input
+                  type="file"
+                  id="fileInput"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={handleFileSelect}
+                />
+              </div>
+              {selectedPhoto && (
+                <div className="flex gap-4 justify-center">
+                  <Button
+                    onClick={handleSave}
+                    className="bg-green-600 text-white hover:bg-green-700"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Saving..." : "Save Changes"}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={handleCancel}
+                    disabled={isLoading}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </DialogContent>
     </Dialog>
   );
-};
+}
