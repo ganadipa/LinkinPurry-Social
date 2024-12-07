@@ -3,6 +3,7 @@ import { ErrorSchema } from "@/schemas/error.schema";
 import { loginResponse } from "@/types/response";
 import { User } from "@/types/user";
 import React, { useEffect, useState } from "react";
+import { NotificationService } from "@/lib/notification";
 
 export interface AuthContext {
   user: User | null;
@@ -13,6 +14,8 @@ export interface AuthContext {
   ) => Promise<{
     ok: boolean;
     message: string;
+    user: User | null
+
   }>;
   logout: () => Promise<{
     ok: boolean;
@@ -41,6 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
 
         setUser(userData.body);
+        return userData.body
       }
     } finally {
       setIsLoading(false);
@@ -68,11 +72,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (expectedSuccess.success) {
       if (expectedSuccess.data.success) {
         setIsLoading(true);
-        checkAuth();
+        const usr = await checkAuth() ?? null;
 
         return {
           ok: true,
           message: "Successfully logged in",
+          user: usr
         };
       }
     }
@@ -81,6 +86,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
+    const userId = user?.id;
+    if (userId !== undefined) {
+      const notificationService = NotificationService.getInstance(userId);
+      await notificationService.unsubscribeFromPush();
+    }
+
     const resp = await fetch("/api/logout", {
       method: "POST",
     });

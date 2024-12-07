@@ -14,6 +14,7 @@ import {
 } from "../schemas/notification.schema";
 import { PushSubscription } from "../models/push-subscription.model";
 import { NullErrorResponseSchema } from "../constants/types";
+import { z } from "zod";
 
 @injectable()
 export class NotificationController implements Controller {
@@ -31,6 +32,7 @@ export class NotificationController implements Controller {
     this.registerSaveSubscriptionRoute();
     this.registerSendChatNotificationRoute();
     this.registerSendPostNotificationRoute();
+    this.registerUnsubscribeRoute();
   }
 
   private registerSaveSubscriptionRoute() {
@@ -232,4 +234,62 @@ export class NotificationController implements Controller {
       }
     });
   }
+
+  private registerUnsubscribeRoute() {
+    const route = createRoute({
+      method: "delete",
+      path: "/api/notifications/unsubscribe",
+      request: {
+        body: {
+          content: {
+            "application/json": {
+              schema: z.object({
+                user_id: z.number(),
+              }),
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: "Push subscription deleted successfully",
+          content: {
+            "application/json": {
+              schema: z.object({
+                success: z.boolean(),
+                message: z.string(),
+              }),
+            },
+          },
+        },
+        500: {
+          description: "Failed to delete push subscription",
+          content: {
+            "application/json": {
+              schema: NullErrorResponseSchema,
+            },
+          },
+        },
+      },
+    });
+  
+    this.hono.app.openapi(route, async (c) => {
+      try {
+        const { user_id } = await c.req.json();
+        await this.notificationService.deleteSubscriptionByUserId(user_id);
+  
+        return c.json({
+          success: true as const,
+          message: "Push subscription deleted successfully",
+        }, 200);
+      } catch (error) {
+        console.error("Error deleting subscription:", error);
+        return c.json({
+          success: false as const,
+          message: `Failed to delete subscription: ${(error as Error).message}`,
+          error: null,
+        }, 500);
+      }
+    });
+  }  
 }

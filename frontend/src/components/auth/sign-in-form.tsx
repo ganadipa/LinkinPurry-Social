@@ -19,6 +19,7 @@ import { signInFormSchema } from "@/schemas/auth/sign-in-form.schema";
 import toast from "react-hot-toast";
 import { useAuth } from "@/hooks/auth";
 import { redirect } from "@/lib/utils";
+import { NotificationService } from "@/lib/notification";
 
 export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -41,11 +42,36 @@ export function SignInForm() {
       error: (err) => err.message,
     });
 
-    promise.then((result) => {
+    promise.then(async (result) => {
       if (result.ok) {
+        const userId = result.user?.id;
+        console.log('User ID AAAAAAAAA:', result.user?.id); // debug
+        if (userId) {
+            if (userId !== undefined) {
+                const notificationService = NotificationService.getInstance(userId);
+                console.log("Notification service:", notificationService); // debug
+              try {
+                  const subscription = await notificationService.subscribeToPush();
+                  if (subscription) {
+                    console.log(JSON.stringify(subscription)); // debug
+                    await fetch("/api/notifications/subscribe", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify(subscription),
+                    });
+                    console.log("Push subscription successful"); // debug
+                  }
+              } catch (error) {
+                console.error("Failed to subscribe to push notifications:", error);
+              }    
+            }
+
         redirect({
           to: "/",
-        });
+          });
+        }
       }
     });
   }

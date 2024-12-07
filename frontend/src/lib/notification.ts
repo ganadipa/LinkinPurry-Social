@@ -64,6 +64,26 @@ export class NotificationService {
     }
   }
 
+  async unsubscribeFromPush(): Promise<void> {
+    if (!this.registration) {
+      throw new Error("Service Worker not registered");
+    }
+  
+    const subscription = await this.registration.pushManager.getSubscription();
+    if (subscription) {
+      await subscription.unsubscribe();
+      console.log("Unsubscribed from push notifications");
+  
+      await fetch("/api/notifications/unsubscribe", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ user_id: this.user_id }),
+      });
+    }
+  }  
+
   private arrayBufferToBase64(buffer: ArrayBuffer): string {
     const bytes = new Uint8Array(buffer);
     return btoa(String.fromCharCode.apply(null, Array.from(bytes)));

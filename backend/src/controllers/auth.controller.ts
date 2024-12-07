@@ -25,6 +25,7 @@ import {
   MeSuccessSchema,
 } from "../constants/response-body";
 import { URL_PUBLIC_UPLOADS } from "../constants/constants";
+import { NotificationService } from "../services/notification.service";
 
 @injectable()
 export class AuthController implements Controller {
@@ -33,7 +34,8 @@ export class AuthController implements Controller {
     @inject(CONFIG.AuthService) private readonly authService: AuthService,
     @inject(CONFIG.ZodValidationService)
     private readonly zodValidationService: ZodValidationService,
-    @inject(CONFIG.AuthStrategy) private readonly authStrategy: IAuthStrategy
+    @inject(CONFIG.AuthStrategy) private readonly authStrategy: IAuthStrategy,
+    @inject(CONFIG.NotificationService) private  notificationService: NotificationService,
   ) {}
 
   public registerMiddlewaresbeforeGlobal(): void {}
@@ -229,6 +231,17 @@ export class AuthController implements Controller {
     this.hono.app.openapi(route, async (c) => {
       try {
         deleteCookie(c, "authorization");
+
+        if (!c.var.user) {
+            throw new BadRequestException("No user found");
+        }
+        
+        if (c.var.user && c.var.user.id !== undefined) {
+          await this.notificationService.deleteSubscriptionByUserId(Number(c.var.user.id));
+        } else {
+          throw new BadRequestException("User ID is undefined");
+        }
+
         return c.json(
           {
             success: true as const,

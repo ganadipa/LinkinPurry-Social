@@ -72,4 +72,9 @@ export class NotificationService {
       );
     }
   }  
+
+  // delete push subscription by user id   
+  async deleteSubscriptionByUserId(userId: number) {
+    return await this.pushSubscriptionRepo.deleteByUserId(userId);
+  }
 }

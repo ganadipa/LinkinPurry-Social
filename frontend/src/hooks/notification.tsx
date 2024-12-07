@@ -15,7 +15,7 @@ export function useNotifications() {
 
   useEffect(() => {
     checkNotificationStatus();
-  }, []);
+  }, [user.user?.id]);
 
   const checkNotificationStatus = async () => {
     const supported = 'Notification' in window;
