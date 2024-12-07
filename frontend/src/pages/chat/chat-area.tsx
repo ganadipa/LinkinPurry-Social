@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Send } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Contact, Message } from "../../types/chat";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth";
@@ -159,7 +159,7 @@ export default function ChatArea({
             const showTimeDivider = shouldShowTimeDivider(message, prevMessage);
 
             return (
-              <>
+              <React.Fragment key={message.id}>
                 {showTimeDivider && (
                   <div className="flex justify-center my-4">
                     <span className="text-xs bg-gray-100 text-gray-500 px-3 py-1 rounded-full">
@@ -219,7 +219,7 @@ export default function ChatArea({
                     </div>
                   </div>
                 </div>
-              </>
+              </React.Fragment>
             );
           })}
         </div>
