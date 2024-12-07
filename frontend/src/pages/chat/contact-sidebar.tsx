@@ -2,7 +2,8 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { debounce } from "lodash";
 import { Contact } from "../../types/chat";
 import { cn } from "@/lib/utils";
 
@@ -45,14 +46,23 @@ export function ContactSidebar({
   className,
 }: ContactSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  useEffect(() => {
-    const filtered = contacts.filter((contact) =>
-      contact.full_name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredContacts(filtered);
-  }, [searchQuery, contacts]);
-
   const [filteredContacts, setFilteredContacts] = useState(contacts);
+
+  const debouncedFilter = useMemo(() => {
+    return debounce((query: string) => {
+      const filtered = contacts.filter((contact) =>
+        contact.full_name.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredContacts(filtered);
+    }, 300); // 300 ms delay
+  }, [contacts]);
+
+  useEffect(() => {
+    debouncedFilter(searchQuery);
+    return () => {
+      debouncedFilter.cancel();
+    };
+  }, [searchQuery, debouncedFilter]);
 
   return (
     <div
