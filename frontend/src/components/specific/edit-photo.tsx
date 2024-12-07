@@ -7,8 +7,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { MdFileUpload } from "react-icons/md";
-import { set } from "zod";
+import { MdFileUpload, MdDelete } from "react-icons/md";
 
 interface EditPhotoModalsProps {
   photoModalOpen: boolean;
@@ -44,28 +43,52 @@ export default function EditPhotoModals({
   };
 
   const handleSave = async () => {
-    if (!selectedPhoto) return;
-
     setIsLoading(true);
     try {
-      const formData = new FormData();
-      formData.append("profile_photo", selectedPhoto);
+      if (selectedPhoto) {
+        const formData = new FormData();
+        formData.append("profile_photo", selectedPhoto);
 
-      const response = await fetch(`/api/profile/${userId}`, {
-        method: "PUT",
-        body: formData,
-      });
+        const response = await fetch(`/api/profile/${userId}`, {
+          method: "PUT",
+          body: formData,
+        });
 
-      if (!response.ok) {
-        throw new Error("Failed to update profile photo");
+        if (!response.ok) {
+          throw new Error("Failed to update profile photo");
+        }
+
+        const data = await response.json();
+        setProfilePhoto(data.body.profile_photo);
       }
 
       setPhotoModalOpen(false);
-      const data = await response.json();
-      setProfilePhoto(data.body.profile_photo);
       setSelectedPhoto(null);
     } catch (error) {
       console.error("Error updating profile photo:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/profile/${userId}/photo`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete profile photo");
+      }
+
+      const data = await response.json();
+      setProfilePhoto(data.body.profile_photo);
+      setPreviewUrl(data.body.profile_photo);
+      setPhotoModalOpen(false);
+      setSelectedPhoto(null);
+    } catch (error) {
+      console.error("Error deleting profile photo:", error);
     } finally {
       setIsLoading(false);
     }
@@ -100,6 +123,16 @@ export default function EditPhotoModals({
                   Change Image
                   <MdFileUpload className="ml-2" />
                 </Button>
+                {!selectedPhoto && (
+                  <Button
+                    onClick={handleDelete}
+                    className="bg-white text-[#0a66c2] border border-[#0a66c2] hover:bg-[#f3f6f8]"
+                    disabled={isLoading}
+                  >
+                    Delete Image
+                    <MdDelete className="ml-2" />
+                  </Button>
+                )}
                 <input
                   type="file"
                   id="fileInput"
@@ -112,14 +145,14 @@ export default function EditPhotoModals({
                 <div className="flex gap-4 justify-center">
                   <Button
                     onClick={handleSave}
-                    className="bg-green-600 text-white hover:bg-green-700"
+                    className="bg-[#0a66c2] text-white hover:bg-[#004182]"
                     disabled={isLoading}
                   >
                     {isLoading ? "Saving..." : "Save Changes"}
                   </Button>
                   <Button
-                    variant="secondary"
                     onClick={handleCancel}
+                    className="bg-white text-[#0a66c2] border border-[#0a66c2] hover:bg-[#f3f6f8]"
                     disabled={isLoading}
                   >
                     Cancel

@@ -23,6 +23,7 @@ import {
 import { UpdateProfileEnv } from "../constants/context-env.types";
 import { BadRequestException } from "../exceptions/bad-request.exception";
 import { FileService } from "../services/file.service";
+import { ForbiddenException } from "../exceptions/forbidden.exception";
 
 @injectable()
 export class ProfileController implements Controller {
@@ -40,6 +41,7 @@ export class ProfileController implements Controller {
   public registerRoutes(): void {
     this.registerGetProfileRoute();
     this.registerUpdateProfileRoute();
+    this.registerDeleteProfilePhotoRoute();
   }
 
   private setUpdateProfilePayloadMiddleware =
@@ -50,13 +52,10 @@ export class ProfileController implements Controller {
         username: formData.get("username")?.toString(),
         work_history: formData.get("work_history")?.toString(),
         skills: formData.get("skills")?.toString(),
-        profile_photo: (formData.get("profile_photo") ?? undefined) as
-          | File
-          | undefined,
+        profile_photo: formData.get("profile_photo") as File | undefined,
       };
 
       UpdateProfileFormDataSchema.parse(payload);
-      console.log(payload);
       c.set("updateProfilePayload", payload);
       return next();
     });
@@ -223,7 +222,6 @@ export class ProfileController implements Controller {
 
         let path: string | undefined;
         if (parsed.data.profile_photo) {
-          // Get the new path
           path = await this.fileService.upload(
             parsed.data.profile_photo,
             FileService.Visibility.PUBLIC
@@ -233,7 +231,6 @@ export class ProfileController implements Controller {
             updateUser.profile_photo_path &&
             updateUser.profile_photo_path !== "/default-profile-picture.jpg"
           ) {
-            console.log("Deleting old photo");
             const the_photo = updateUser.profile_photo_path;
             console.log(the_photo);
             await this.fileService.delete(the_photo);
@@ -261,6 +258,127 @@ export class ProfileController implements Controller {
           {
             success: true as const,
             message: "Profile data updated",
+            body: profileData,
+          },
+          200
+        );
+      } catch (exception) {
+        if (exception instanceof HTTPException) {
+          let status: 400 | 401 | 500;
+          switch (exception.status) {
+            case 400:
+              status = 400;
+              break;
+            case 401:
+              status = 401;
+              break;
+            default:
+              status = 500;
+              break;
+          }
+
+          return c.json(
+            {
+              success: false as const,
+              message: exception.message,
+              error: null,
+            },
+            status
+          );
+        }
+
+        return c.json(
+          {
+            success: false as const,
+            message: "Internal server error",
+            error: null,
+          },
+          500
+        );
+      }
+    });
+  }
+
+  private registerDeleteProfilePhotoRoute() {
+    const route = createRoute({
+      method: "delete",
+      tags: ["Profile"],
+      path: "/api/profile/{user_id}/photo",
+      security: [{ BearerAuth: [] }],
+      request: {
+        params: UpdateProfileURLParamSchema,
+      },
+      responses: {
+        200: {
+          description: "Profile photo deleted",
+          content: {
+            "application/json": {
+              schema: GetAuthenticatedProfileSuccessSchema,
+            },
+          },
+        },
+        400: {
+          description: "Bad request",
+          content: {
+            "application/json": {
+              schema: NullErrorResponseSchema,
+            },
+          },
+        },
+        401: {
+          description: "Unauthorized",
+          content: {
+            "application/json": {
+              schema: NullErrorResponseSchema,
+            },
+          },
+        },
+        500: {
+          description: "Internal server error",
+          content: {
+            "application/json": {
+              schema: NullErrorResponseSchema,
+            },
+          },
+        },
+      },
+    });
+
+    this.hono.app.openapi(route, async (c) => {
+      try {
+        const userId = c.req.param("user_id");
+        const user_id = Number(userId);
+        if (isNaN(user_id)) {
+          throw new BadRequestException("Invalid user ID");
+        }
+        const updateUser = c.var.user;
+
+        if (!updateUser) {
+          throw new UnauthorizedException("Unauthorized access");
+        }
+
+        if (user_id !== Number(updateUser.id)) {
+          throw new ForbiddenException("Unauthorized access");
+        }
+
+        if (
+          updateUser.profile_photo_path &&
+          updateUser.profile_photo_path !== "/default-profile-picture.jpg"
+        ) {
+          await this.fileService.delete(updateUser.profile_photo_path);
+        }
+
+        updateUser.profile_photo_path = "/default-profile-picture.jpg";
+
+        const profileData = await this.profileService.updateProfile(
+          Number(userId),
+          updateUser
+        );
+
+        return c.json(
+          {
+            success: true as const,
+            message: "Profile photo deleted",
             body: profileData,
           },
           200

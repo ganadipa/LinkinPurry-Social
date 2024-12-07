@@ -88,7 +88,7 @@ export function ContactSidebar({
         </div>
       </div>
 
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 overflow-y-auto">
         {filteredContacts.map((contact) => (
           <button
             key={contact.user_id}
