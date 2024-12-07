@@ -9,7 +9,13 @@ import { Feeds } from "@/components/specific/profile/Feeds";
 
 export default function ProfilePage({ id }: { id: number }) {
   const { user, isLoading: isAuthLoading } = useAuth();
-  const { profile, loading: isProfileLoading, posts } = useProfile(id);
+  const {
+    profile,
+    loading: isProfileLoading,
+    posts,
+    deletePost,
+    updatePost,
+  } = useProfile(id);
 
   const isOwnProfile = user?.id === id;
   const isLoading = isAuthLoading || isProfileLoading;
@@ -42,7 +48,13 @@ export default function ProfilePage({ id }: { id: number }) {
       <div className="mt-6">
         <h2 className="text-xl font-semibold mb-4">Posts</h2>
         {posts && posts.length > 0 ? (
-          <Feeds />
+          <Feeds
+            profile={profile}
+            deletePost={deletePost}
+            updatePost={updatePost}
+            loading={isProfileLoading}
+            posts={posts}
+          />
         ) : (
           <p className="text-gray-500 text-sm text-center">No posts found</p>
         )}

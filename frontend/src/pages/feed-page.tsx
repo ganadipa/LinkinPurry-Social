@@ -36,6 +36,8 @@ import toast from "react-hot-toast";
 import { useTitle } from "@/hooks/title";
 import { Link } from "@tanstack/react-router";
 
+const MAX_CHARS = 280;
+
 const Feed = () => {
   const {
     feed,
@@ -56,6 +58,20 @@ const Feed = () => {
 
   useTitle("Feed");
 
+  const handleNewPostChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const content = e.target.value;
+    if (content.length <= MAX_CHARS) {
+      setNewPost(content);
+    }
+  };
+
+  const handleEditChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const content = e.target.value;
+    if (content.length <= MAX_CHARS) {
+      setEditContent(content);
+    }
+  };
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       async (entries) => {
@@ -63,9 +79,6 @@ const Feed = () => {
         if (target.isIntersecting && hasMore && !isFetchingMore && feed) {
           try {
             setIsFetchingMore(true);
-
-            await new Promise((resolve) => setTimeout(resolve, 1000)); // Nanti dihapus
-
             const lastPost = feed[feed.length - 1];
             const cursor = lastPost ? lastPost.post.id : undefined;
             await fetchFeed(cursor);
@@ -77,9 +90,7 @@ const Feed = () => {
           }
         }
       },
-      {
-        threshold: 1.0,
-      }
+      { threshold: 1.0 }
     );
 
     const currentObserverTarget = observerTarget.current;
@@ -101,9 +112,7 @@ const Feed = () => {
   if (!user) {
     redirect({
       to: "/signin",
-      params: {
-        redirect: "/",
-      },
+      params: { redirect: "/" },
     });
     return null;
   }
@@ -123,16 +132,15 @@ const Feed = () => {
   };
 
   const handleSaveEdit = (postId: number) => {
-    const promise = updatePost(postId, editContent);
-    toast.promise(promise, {
-      loading: "Updating post...",
-      success: "Post updated",
-      error: (err) => {
-        if (err.message) return err.message;
-        return "Failed to update post";
-      },
-    });
-    setEditingId(null);
+    if (editContent.trim() && editContent.length <= MAX_CHARS) {
+      const promise = updatePost(postId, editContent);
+      toast.promise(promise, {
+        loading: "Updating post...",
+        success: "Post updated",
+        error: (err) => err.message || "Failed to update post",
+      });
+      setEditingId(null);
+    }
   };
 
   const handleDelete = (postId: number) => {
@@ -140,35 +148,30 @@ const Feed = () => {
     toast.promise(promise, {
       loading: "Deleting post...",
       success: "Post deleted",
-      error: (err) => {
-        if (err.message) return err.message;
-        return "Failed to delete post";
-      },
+      error: (err) => err.message || "Failed to delete post",
     });
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      if (newPost.trim()) {
+      if (newPost.trim() && newPost.length <= MAX_CHARS) {
         setShowConfirmModal(true);
       }
     }
   };
 
   const handleSubmitPost = () => {
-    const promise = createPost(newPost);
-    toast.promise(promise, {
-      loading: "Posting...",
-      success: "Post shared",
-      error: (err) => {
-        if (err.message) return err.message;
-        return "Failed to post";
-      },
-    });
-
-    setShowConfirmModal(false);
-    setNewPost("");
+    if (newPost.trim() && newPost.length <= MAX_CHARS) {
+      const promise = createPost(newPost);
+      toast.promise(promise, {
+        loading: "Posting...",
+        success: "Post shared",
+        error: (err) => err.message || "Failed to post",
+      });
+      setShowConfirmModal(false);
+      setNewPost("");
+    }
   };
 
   return (
@@ -181,17 +184,28 @@ const Feed = () => {
             className="w-12 h-12 rounded-full"
           />
           <div className="flex-1">
-            <Textarea
-              placeholder="What do you want to talk about?"
-              value={newPost}
-              onChange={(e) => setNewPost(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="min-h-[100px] mb-2 resize-none"
-            />
+            <div className="relative">
+              <Textarea
+                placeholder="What do you want to talk about?"
+                value={newPost}
+                onChange={handleNewPostChange}
+                onKeyDown={handleKeyDown}
+                className="min-h-[100px] mb-2 resize-none"
+                maxLength={MAX_CHARS}
+              />
+              <span
+                className={`absolute bottom-4 right-4 text-sm ${
+                  newPost.length >= MAX_CHARS ? "text-red-500" : "text-gray-500"
+                }`}
+              >
+                {newPost.length}/{MAX_CHARS}
+              </span>
+            </div>
             <div className="flex justify-end">
               <Button
                 onClick={() => newPost.trim() && setShowConfirmModal(true)}
                 className="bg-[#0A66C2] hover:bg-[#084c8e] text-white"
+                disabled={newPost.length > MAX_CHARS || !newPost.trim()}
               >
                 <Send className="h-4 w-4 mr-2" />
                 Post
@@ -265,12 +279,24 @@ const Feed = () => {
 
           {editingId === item.post.id ? (
             <div className="mt-3">
-              <Textarea
-                value={editContent}
-                onChange={(e) => setEditContent(e.target.value)}
-                className="min-h-[100px] mb-2"
-                autoFocus
-              />
+              <div className="relative">
+                <Textarea
+                  value={editContent}
+                  onChange={handleEditChange}
+                  className="min-h-[100px] mb-2"
+                  maxLength={MAX_CHARS}
+                  autoFocus
+                />
+                <span
+                  className={`absolute bottom-4 right-4 text-sm ${
+                    editContent.length >= MAX_CHARS
+                      ? "text-red-500"
+                      : "text-gray-500"
+                  }`}
+                >
+                  {editContent.length}/{MAX_CHARS}
+                </span>
+              </div>
               <div className="flex justify-end space-x-2">
                 <Button
                   variant="ghost"
@@ -285,6 +311,9 @@ const Feed = () => {
                   size="sm"
                   onClick={() => handleSaveEdit(item.post.id)}
                   className="h-8"
+                  disabled={
+                    editContent.length > MAX_CHARS || !editContent.trim()
+                  }
                 >
                   <Check className="h-4 w-4 mr-1" />
                   Save

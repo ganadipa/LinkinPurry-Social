@@ -23,7 +23,9 @@ export const GetFeedSuccessSchema = SuccessResponseSchema.extend({
 export type FeedRelated = z.infer<typeof FeedRelatedSchemas>;
 
 export const CreatePostRequestSchema = z.object({
-  content: z.string(),
+  content: z.string().max(280, {
+    message: "Content must not exceed 280 characters",
+  }),
 });
 
 export const CreatePostSuccessSchema = SuccessResponseSchema.extend({
@@ -37,7 +39,9 @@ export const DeletePostRequestSchema = z.object({
 export const DeletePostSuccessSchema = SuccessResponseSchema;
 
 export const EditPostRequestSchema = z.object({
-  content: z.string(),
+  content: z.string().max(280, {
+    message: "Content must not exceed 280 characters",
+  }),
 });
 
 export const EditPostSuccessSchema = SuccessResponseSchema.extend({
