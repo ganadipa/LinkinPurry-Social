@@ -24,17 +24,17 @@ const WorkHistory: React.FC<WorkHistoryProps> = ({
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow border p-6">
+      <div className="bg-white rounded-lg shadow border p-4 md:p-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Work History</h2>
           {isOwnProfile && (
             <Button
               variant="ghost"
-              className="bg-white shadow-sm"
+              className="bg-white rounded-md p-1.5 sm:p-2 shadow-sm hover:bg-gray-100"
               onClick={() => setWorkHistoryModalOpen(true)}
             >
-              Edit
-              <MdEditSquare />
+              <span className="hidden sm:inline mr-1">Edit</span>
+              <MdEditSquare className="w-4 h-4" />
             </Button>
           )}
         </div>

@@ -10,7 +10,7 @@ self.addEventListener('push', (event: PushEvent) => {
   event.waitUntil(
     self.registration.showNotification(payload.title, {
       body: payload.body,
-      icon: payload.icon || '/icon.png',
+      icon: payload.icon || '/public/linkedin.png',
       data: payload.data,
       requireInteraction: true,
       vibrate: [200, 100, 200]
