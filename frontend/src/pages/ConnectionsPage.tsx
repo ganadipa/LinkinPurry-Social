@@ -87,24 +87,29 @@ export default function ConnectionsPage({ id }: ConnectionsPageProps) {
     fetchConnections();
   }, [id, currentUser]);
 
-  return (
-    <div className="max-w-4xl mx-auto mt-10 p-6 space-y-4">
-      {loading ? (
-        <p>Loading...</p>
-      ) : connectionsList.length === 0 ? (
-        <p>No connections found.</p>
-      ) : (
-        connectionsList.map((connection) => (
-          <UserCard
-            key={connection.id}
-            id={connection.id}
-            name={connection.full_name}
-            profilePhoto={connection.profile_photo_path}
-            status="connected"
-            hideStatus={true}
-          />
-        ))
-      )}
-    </div>
-  );
+    return (
+        <div className="max-w-4xl bg-white mx-4 sm:mx-auto mt-6 sm:mt-10 rounded-lg border border-gray-300">
+            <h1 className="text-xl sm:text-2xl font-semibold p-3 sm:p-4">Connections</h1>
+            <div className="max-w-4xl mx-auto p-6 space-y-4">
+                {loading ? (
+                    <p className="text-center pb-3 sm:pb-4">Loading...</p>
+                ) : connectionsList.length === 0 ? (
+                    <p className="text-center text-gray-500 text-sm sm:text-base pb-3 sm:pb-4">
+                    No connection found.
+                    </p>
+                ) : (
+                    connectionsList.map((connection) => (
+                        <UserCard
+                            key={connection.id}
+                            id={connection.id}
+                            name={connection.full_name}
+                            profilePhoto={connection.profile_photo_path}
+                            status="connected"
+                            hideStatus={true}
+                        />
+                    ))
+                )}
+            </div>
+        </div>
+    );
 }

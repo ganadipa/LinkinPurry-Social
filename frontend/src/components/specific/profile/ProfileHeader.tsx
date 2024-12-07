@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { MdEditSquare } from "react-icons/md";
 import { Link } from "@tanstack/react-router";
 import EditPhotoModals from "@/components/specific/edit-photo";
-import EditModals from "@/components/specific/edit-modals";
+import EditModals from "@/components/specific/edit-modals-profile";
 import { useConnectionStatus } from "@/hooks/connection-status";
 import toast from "react-hot-toast";
 // import EditProfileModals from "@/components/specific/edit-modals-profile";
@@ -34,6 +34,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   );
 
   const [name, setName] = useState<string>(profile.name);
+  const [username, setUsername] = useState<string>(profile.username);
   const [photoUrl, setPhotoUrl] = useState<string>(profile.profile_photo);
 
   const [photoModalOpen, setPhotoModalOpen] = useState<boolean>(false);
@@ -51,8 +52,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   //   setSkills(newSkills);
   // };
 
-  const handleNameUpdate = (newName: string) => {
+  const handleUpdate = (newName: string, newUsername: string) => {
     setName(newName);
+    setUsername(newUsername);
     toast.success("Name updated successfully");
   };
 
@@ -92,7 +94,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           <div className="text-start mt-4">
             <h1 className="text-xl sm:text-2xl font-semibold">{name}</h1>
             <p className="text-gray-600 text-sm sm:text-base">
-              {profile.username}
+              {username}
             </p>
             <div className="text-blue-500">
               <Link
@@ -156,13 +158,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         /> */}
 
       <EditModals
-        labelModal="Name"
-        value={name || ""}
+        value={{ name, username }}
         isModalOpen={editModalOpen}
         setIsModalOpen={setEditModalOpen}
         userId={user?.id ?? 0}
-        field="name"
-        onUpdateSuccess={handleNameUpdate}
+        onUpdateSuccess={handleUpdate}
       />
     </>
   );

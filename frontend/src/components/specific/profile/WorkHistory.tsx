@@ -43,7 +43,9 @@ const WorkHistory: React.FC<WorkHistoryProps> = ({
             </Button>
           )}
         </div>
-        <div>{workHistoryValue}</div>
+        <div className="break-words whitespace-pre-wrap overflow-x-hidden overflow-y-auto max-h-96">
+          {workHistoryValue}
+        </div>
       </div>
 
       <EditModals

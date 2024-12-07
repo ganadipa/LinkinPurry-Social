@@ -38,7 +38,9 @@ const Skills: React.FC<SkillsProps> = ({ skills, isOwnProfile }) => {
             </Button>
           )}
         </div>
-        <div>{skillsValue}</div>
+        <div className="break-words whitespace-pre-wrap overflow-x-hidden overflow-y-auto max-h-96">
+          {skillsValue}
+        </div>
       </div>
 
       <EditModals

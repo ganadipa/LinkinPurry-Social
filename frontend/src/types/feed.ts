@@ -2,17 +2,17 @@ import { FeedRelatedSchemas } from "@/schemas/feed.schema";
 import { z } from "zod";
 
 export type Post = {
-  created_at: string | null;
+  created_at: number | null;
   id: number | null;
   content: string;
-  updated_at: string | null;
+  updated_at: number | null;
 };
 
 export const PostSchema = z.object({
-  created_at: z.string().nullable(),
+  created_at: z.number().nullable(),
   id: z.number().nullable(),
   content: z.string(),
-  updated_at: z.string().nullable(),
+  updated_at: z.number().nullable(),
 });
 
 export type Feed = Post & {

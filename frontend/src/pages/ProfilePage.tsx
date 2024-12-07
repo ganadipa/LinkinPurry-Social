@@ -5,10 +5,11 @@ import ProfileHeader from "@/components/specific/profile/ProfileHeader";
 import WorkHistory from "@/components/specific/profile/WorkHistory";
 import Skills from "@/components/specific/profile/Skills";
 import { useTitle } from "@/hooks/title";
+import { Feeds } from "@/components/specific/profile/Feeds";
 
 export default function ProfilePage({ id }: { id: number }) {
   const { user, isLoading: isAuthLoading } = useAuth();
-  const { profile, loading: isProfileLoading } = useProfile(id);
+  const { profile, loading: isProfileLoading, posts } = useProfile(id);
 
   const isOwnProfile = user?.id === id;
   const isLoading = isAuthLoading || isProfileLoading;
@@ -37,6 +38,15 @@ export default function ProfilePage({ id }: { id: number }) {
       />
 
       <Skills skills={profile.skills} isOwnProfile={isOwnProfile} />
+
+      <div className="mt-6">
+        <h2 className="text-xl font-semibold mb-4">Posts</h2>
+        {posts && posts.length > 0 ? (
+          <Feeds />
+        ) : (
+          <p className="text-gray-500 text-sm text-center">No posts found</p>
+        )}
+      </div>
     </div>
   );
 }
