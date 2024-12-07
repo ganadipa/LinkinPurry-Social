@@ -31,15 +31,15 @@ const Skills: React.FC<SkillsProps> = ({
           {isOwnProfile && (
             <Button
               variant="ghost"
-              className="bg-white shadow-sm"
+              className="bg-white rounded-md p-1.5 sm:p-2 shadow-sm hover:bg-gray-100"
               onClick={() => setSkillModalOpen(true)}
             >
-              Edit
-              <MdEditSquare />
+              <span className="hidden sm:inline mr-1">Edit</span>
+              <MdEditSquare className="w-4 h-4" />
             </Button>
           )}
         </div>
-        <div className="flex flex-wrap gap-2">{skillsValue}</div>
+        <div>{skillsValue}</div>
       </div>
 
       <EditModals

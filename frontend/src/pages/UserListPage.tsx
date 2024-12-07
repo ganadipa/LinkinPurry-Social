@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { debounce } from "lodash";
 import { UserCard } from "@/components/ui/user-card";
 import { useAuth } from "@/hooks/auth";
 import { getUsersResponse } from "@/types/response";
@@ -12,12 +13,12 @@ export default function UserListPage() {
     const [loading, setLoading] = useState(false);
     const [statuses, setStatuses] = useState<{ [key: number]: "connected" | "pending" | "not_connected" }>({});
 
-    useEffect(() => {
-        const fetchUsers = async () => {
+    const fetchUsersDebounced = useCallback(
+        debounce(async (searchQuery: string) => {
             setLoading(true);
             try {
                 const response = await fetch(
-                    `/api/users${search ? `?search=${search}` : ""}`,
+                    `/api/users${searchQuery ? `?search=${searchQuery}` : ""}`,
                     {
                         method: "GET",
                         headers: {
@@ -83,10 +84,13 @@ export default function UserListPage() {
             } finally {
                 setLoading(false);
             }
-        };
+        }, 300), // 300ms debounce delay
+        [currentUser]
+    );
 
-        fetchUsers();
-    }, [search, currentUser]);
+    useEffect(() => {
+        fetchUsersDebounced(search);
+    }, [search, fetchUsersDebounced]);
 
     const handleConnect = async (userId: number) => {
         try {

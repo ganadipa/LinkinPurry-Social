@@ -12,7 +12,7 @@ export class NotificationService {
 
   static getInstance(user_id: number): NotificationService {
     if (!NotificationService.instance) {
-      console.log("User IDtrr:", user_id);
+      // console.log("User IDtrr:", user_id);
       NotificationService.instance = new NotificationService(user_id);
     }
     return NotificationService.instance;
@@ -25,7 +25,7 @@ export class NotificationService {
 
     try {
       this.registration =
-        await navigator.serviceWorker.register("/service-worker.ts");
+        await navigator.serviceWorker.register("/public/service-worker.ts"); // need to adjust this
       await navigator.serviceWorker.ready;
     } catch (error) {
       throw new Error(`Service Worker registration failed: ${error}`);

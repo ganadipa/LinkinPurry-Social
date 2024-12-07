@@ -102,10 +102,20 @@ export class DbUserRepository implements UserRepository {
     const users = await this.prisma.prisma.users.findMany({
       where: keyword
         ? {
-            username: {
-              contains: keyword,
-              mode: "insensitive",
-            },
+            OR: [
+              {
+                username: {
+                  contains: keyword,
+                  mode: "insensitive",
+                },
+              },
+              {
+                full_name: {
+                  contains: keyword,
+                  mode: "insensitive",
+                },
+              },
+            ],
           }
         : {},
     });
