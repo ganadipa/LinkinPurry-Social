@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/auth";
 import { getUsersResponse } from "@/types/response";
 import { determineStatus } from "@/lib/connectionUtils";
 import Loading from "@/components/loading";
+import { useTitle } from "@/hooks/title";
 
 export default function UserListPage() {
   const { user: currentUser } = useAuth();
@@ -100,6 +101,8 @@ export default function UserListPage() {
     }, 600), // 600ms debounce delay
     [currentUser]
   );
+
+  useTitle("People at LinkinPurry");
 
   useEffect(() => {
     fetchUsersDebounced(search);

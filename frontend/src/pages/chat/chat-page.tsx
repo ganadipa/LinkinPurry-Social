@@ -5,6 +5,7 @@ import { useChat } from "@/hooks/chat";
 import Loading from "@/components/loading";
 import { useAuth } from "@/hooks/auth";
 import { cn } from "@/lib/utils";
+import { useTitle } from "@/hooks/title";
 
 export default function ChatPage() {
   const { user } = useAuth();
@@ -20,6 +21,7 @@ export default function ChatPage() {
     sendTypingStatus,
     isTyping: isOtherTyping,
   } = useChat({ user_id: user?.id });
+  useTitle("Chat");
 
   if (isLoading) {
     return <Loading />;

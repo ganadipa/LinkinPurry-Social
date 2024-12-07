@@ -1,7 +1,9 @@
 import { SignInForm } from "@/components/auth/sign-in-form";
+import { useTitle } from "@/hooks/title";
 import { Link } from "@tanstack/react-router";
 
 export default function SignInPage() {
+  useTitle("Sign In");
   return (
     <>
       <SignInForm />

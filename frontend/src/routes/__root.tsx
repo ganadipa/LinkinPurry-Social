@@ -19,6 +19,7 @@ function RootComponent() {
     <>
       {user && <NotificationPrompt />}
       <Header />
+
       <main className="w-full flex-col flex-1">
         <div className="mx-auto overflow-y w-full xl:w-[1120px]">
           <Outlet />

@@ -4,6 +4,7 @@ import Loading from "@/components/loading";
 import ProfileHeader from "@/components/specific/profile/ProfileHeader";
 import WorkHistory from "@/components/specific/profile/WorkHistory";
 import Skills from "@/components/specific/profile/Skills";
+import { useTitle } from "@/hooks/title";
 
 export default function ProfilePage({ id }: { id: number }) {
   const { user, isLoading: isAuthLoading } = useAuth();
@@ -11,6 +12,7 @@ export default function ProfilePage({ id }: { id: number }) {
 
   const isOwnProfile = user?.id === id;
   const isLoading = isAuthLoading || isProfileLoading;
+  useTitle("Profile " + (profile?.name ?? "Not Found"), [profile]);
 
   if (isLoading) {
     return <Loading />;

@@ -1,7 +1,9 @@
 import SignUpForm from "@/components/auth/sign-up-form";
+import { useTitle } from "@/hooks/title";
 import { Link } from "@tanstack/react-router";
 
 export default function SignUpPage() {
+  useTitle("Sign Up");
   return (
     <>
       <SignUpForm />

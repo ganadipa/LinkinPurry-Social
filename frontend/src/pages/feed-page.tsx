@@ -33,9 +33,18 @@ import Loading from "@/components/loading";
 import { useAuth } from "@/hooks/auth";
 import { redirect } from "@/lib/utils";
 import toast from "react-hot-toast";
+import { useTitle } from "@/hooks/title";
 
 const Feed = () => {
-  const { feed, loading, hasMore, fetchFeed, updatePost, deletePost, createPost } = useFeed();
+  const {
+    feed,
+    loading,
+    hasMore,
+    fetchFeed,
+    updatePost,
+    deletePost,
+    createPost,
+  } = useFeed();
   const { isLoading, user } = useAuth();
   const [newPost, setNewPost] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -43,6 +52,8 @@ const Feed = () => {
   const [editContent, setEditContent] = useState("");
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const observerTarget = useRef<HTMLDivElement | null>(null);
+
+  useTitle("Feed");
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -52,14 +63,14 @@ const Feed = () => {
           try {
             setIsFetchingMore(true);
 
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Nanti dihapus
+            await new Promise((resolve) => setTimeout(resolve, 1000)); // Nanti dihapus
 
             const lastPost = feed[feed.length - 1];
             const cursor = lastPost ? lastPost.post.id : undefined;
             await fetchFeed(cursor);
           } catch (error) {
-            console.error('Error fetching more posts:', error);
-            toast.error('Failed to load more posts');
+            console.error("Error fetching more posts:", error);
+            toast.error("Failed to load more posts");
           } finally {
             setIsFetchingMore(false);
           }
@@ -285,11 +296,7 @@ const Feed = () => {
         ref={observerTarget}
         className="h-10 flex items-center justify-center"
       >
-        {isFetchingMore && (
-          <div>
-            Loading...
-          </div>
-        )}
+        {isFetchingMore && <div>Loading...</div>}
         {!hasMore && feed && feed.length > 0 && (
           <p className="text-gray-500 text-sm">No more posts to load</p>
         )}
