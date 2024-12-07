@@ -1,7 +1,71 @@
 services:
-  backend:
-  frontend:
+  be-dev:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+      - fe-dev
+    env_file:
+      - .env.docker
+    environment:
+      - ENVIRONMENT=dev
+    networks:
+      - internal-network
+    volumes:
+      - ./backend:/app/backend
+      - ./uploads:/var/www/uploads
+      - /app/backend/node_modules
+
+  fe-dev:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    env_file:
+      - .env.docker
+    environment:
+      - REACT_ENVIRONMENT=dev
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
+    networks:
+      - internal-network
+
   db:
-    image: postgres:latest
+    image: postgres:13
+    ports:
+      - "5433:5432"
+    env_file:
+      - .env.docker
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - internal-network
+
   redis:
     image: redis:latest
+
+  prod:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - internal-network
+    env_file:
+      - .env.docker
+    environment:
+      - ENVIRONMENT=prod
+    volumes:
+      - ./uploads:/var/www/uploads
+
+networks:
+  internal-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:

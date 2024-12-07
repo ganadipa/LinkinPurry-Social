@@ -1,16 +1,19 @@
 FROM node:20-alpine
 
-RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
+# Set the working directory
+WORKDIR /app/backend
 
-WORKDIR /home/node/app
+# Install dependencies
+COPY package*.json ./
 
-USER node
+COPY prisma ./prisma
+RUN npm install
 
-COPY --chown=node:node package*.json ./
+# Copy source code and config
+COPY . .
 
-RUN npm ci
-
-COPY --chown=node:node . .
+# TypeScript configuration
+COPY tsconfig.json ./
 
 COPY ./.env.example ./.env
 

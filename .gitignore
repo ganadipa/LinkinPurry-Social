@@ -1,3 +1,12 @@
 node_modules
 .env
 .DS_Store
+
+.env.docker
+.env.local
+
+
+uploads/public/*
+uploads/private/*
+!uploads/private/.gitkeep
+!uploads/public/default-profile-picture.jpg
