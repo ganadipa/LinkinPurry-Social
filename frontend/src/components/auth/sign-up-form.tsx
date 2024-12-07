@@ -70,7 +70,7 @@ const SignUpForm = () => {
           Create Account
         </CardTitle>
         <p className="text-sm text-gray-600 text-center">
-          Fill in tomake an account at LinkinPurry
+          Fill in to make an account at LinkinPurry
         </p>
       </CardHeader>
       <CardContent>

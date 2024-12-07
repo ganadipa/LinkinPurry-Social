@@ -84,7 +84,7 @@ export default function UserListPage() {
             } finally {
                 setLoading(false);
             }
-        }, 300), // 300ms debounce delay
+        }, 600), // 600ms debounce delay
         [currentUser]
     );
 
