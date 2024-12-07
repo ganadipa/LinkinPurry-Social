@@ -54,7 +54,7 @@ export function ContactSidebar({
         contact.full_name.toLowerCase().includes(query.toLowerCase())
       );
       setFilteredContacts(filtered);
-    }, 300); // 300 ms delay
+    }, 600); // 600 ms delay
   }, [contacts]);
 
   useEffect(() => {

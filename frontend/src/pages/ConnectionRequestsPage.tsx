@@ -98,9 +98,10 @@ export default function ConnectionRequestsPage() {
         <div className="max-w-4xl bg-white mx-auto mt-10 rounded-lg border border-gray-300">
             <h1 className="text-2xl font-semibold p-4">Connection Requests</h1>
             {loading ? (
-                <p>Loading...</p>
+                    <p className="text-center pb-4" >Loading...</p>
             ) : requests.length === 0 ? (
-                <p>No connection requests found.</p>
+                    <p className="text-center pb-4">No connection requests found.</p>
+
             ) : (
                 requests.map((req) => (
                     <UserCard

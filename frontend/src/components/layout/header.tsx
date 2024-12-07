@@ -1,7 +1,6 @@
 import { useAuth } from "@/hooks/auth";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import NotificationMain from "../specific/notification/notification-main";
 
 const Header = () => {
   const [isSidenavOpen, setSidenavOpen] = useState(false);
@@ -85,7 +84,17 @@ const Header = () => {
                 </Link>
               )}
               // */}
-              <NotificationMain />
+              <Link
+                href="/users"
+                className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
+              >
+                <img
+                  src="/images/people.png"
+                  alt="Users"
+                  className="w-6 h-6 mb-1"
+                />
+                <span className="text-xs">People</span>
+              </Link>
               <Link
                 href={`/connections/${user.id}`}
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
