@@ -141,6 +141,7 @@ export class DbFeedRepository implements FeedRepository {
         content: true,
         users: {
           select: {
+            id: true,
             username: true,
             full_name: true,
             profile_photo_path: true,
@@ -157,6 +158,7 @@ export class DbFeedRepository implements FeedRepository {
         content: feed.content,
       },
       user: {
+        id: Number(feed.users.id),
         username: feed.users.username,
         fullname: feed.users.full_name ?? "",
         profile_photo_path: feed.users.profile_photo_path,

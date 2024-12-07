@@ -34,6 +34,7 @@ import { useAuth } from "@/hooks/auth";
 import { redirect } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { useTitle } from "@/hooks/title";
+import { Link } from "@tanstack/react-router";
 
 const Feed = () => {
   const {
@@ -207,7 +208,13 @@ const Feed = () => {
           className="bg-white rounded-lg shadow-sm border border-gray-200 p-4"
         >
           <div className="flex items-start justify-between">
-            <div className="flex items-center space-x-3">
+            <Link
+              className="flex items-center space-x-3"
+              to="/profile/$id"
+              params={{
+                id: item.user.id.toString(),
+              }}
+            >
               <img
                 src={item.user.profile_photo_path}
                 alt={item.user.fullname}
@@ -229,7 +236,7 @@ const Feed = () => {
                   )}
                 </div>
               </div>
-            </div>
+            </Link>
 
             {editingId !== item.post.id &&
               item.user.username === user.username && (

@@ -398,6 +398,7 @@ export class FeedController implements Controller {
                 updated_at: feed.updated_at.getTime(),
               },
               user: {
+                id: Number(user.id),
                 fullname: user.full_name,
                 username: user.username,
                 profile_photo_path:
@@ -551,6 +552,7 @@ export class FeedController implements Controller {
                 updated_at: feed.updated_at.getTime(),
               },
               user: {
+                id: Number(user.id),
                 fullname: user.full_name,
                 username: user.username,
                 profile_photo_path:

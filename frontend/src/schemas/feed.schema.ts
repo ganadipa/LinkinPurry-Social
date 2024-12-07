@@ -9,6 +9,7 @@ export const FeedRelatedSchemas = z.object({
     content: z.string(),
   }),
   user: z.object({
+    id: z.number(),
     username: z.string(),
     fullname: z.string(),
     profile_photo_path: z.string(),
