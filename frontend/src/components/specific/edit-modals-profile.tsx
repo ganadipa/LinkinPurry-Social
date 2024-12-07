@@ -4,49 +4,52 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import axios from 'axios';
+import { Profile } from '@/types/profile';
 
 interface EditModalsProps {
+  value: {
+    name: string;
+    username: string;
+  };
   isModalOpen: boolean;
   setIsModalOpen: (open: boolean) => void;
   userId: number;
-  initialData: {
-    name: string;
-    username: string;
-    work_history: string;
-    skills: string;
-  };
-  onUpdateSuccess?: (updatedData: Partial<EditModalsProps['initialData']>) => void;
+  onUpdateSuccess?: (newName: string, newUsername: string) => void;
 }
 
-export default function EditProfileModals({
-  isModalOpen,
-  setIsModalOpen,
+export default function EditModalsProfile({ 
+  value, 
+  isModalOpen, 
+  setIsModalOpen, 
   userId,
-  initialData,
-  onUpdateSuccess,
+  onUpdateSuccess 
 }: EditModalsProps) {
-  const [formData, setFormData] = useState(initialData);
+  const [inputUsername, setInputUsername] = useState(value.username);
+  const [inputName, setInputName] = useState(value.name);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const handleChange = (field: keyof typeof initialData) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: e.target.value,
-    }));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
-
+  
     try {
-      const response = await axios.put(`/api/profile/${userId}`, formData);
-      const data = response.data as { success: boolean; message?: string };
-
+      const updatePayload: Partial<Profile> = {
+        username: inputUsername.trim(),
+        name: inputName.trim(),
+      };
+      const response = await axios.put(`/api/profile/${userId}`, updatePayload, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+      
+      const data = response.data as { success: boolean; message?: string, body?: Profile };
+      console.log(data);
+  
       if (data.success) {
-        onUpdateSuccess?.(formData);
+        onUpdateSuccess?.(inputName, inputUsername);
         setIsModalOpen(false);
       } else {
         setError(data.message || 'Failed to update profile');
@@ -56,53 +59,41 @@ export default function EditProfileModals({
     } finally {
       setIsSubmitting(false);
     }
-  };
+  };  
 
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
       <DialogContent className="bg-white">
         <DialogHeader>
-          <DialogTitle>Edit your profile</DialogTitle>
-          <DialogDescription>Update your profile details below.</DialogDescription>
+          <DialogTitle>Edit your profile here</DialogTitle>
+          <DialogDescription>Make changes to your profile here.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block font-medium text-gray-700">Name</label>
+            <label className="block font-medium text-gray-700">
+              Name
+            </label>
             <Input
               name="name"
-              value={formData.name}
-              onChange={handleChange('name')}
+              value={inputName}
+              onChange={(e) => setInputName(e.target.value)}
               required
             />
           </div>
           <div>
-            <label className="block font-medium text-gray-700">Username</label>
+            <label className="block font-medium text-gray-700">
+              Username
+            </label>
             <Input
               name="username"
-              value={formData.username}
-              onChange={handleChange('username')}
+              value={inputUsername}
+              onChange={(e) => setInputUsername(e.target.value)}
               required
             />
           </div>
-          <div>
-            <label className="block font-medium text-gray-700">Work History</label>
-            <Input
-              name="work_history"
-              value={formData.work_history}
-              onChange={handleChange('work_history')}
-              required
-            />
-          </div>
-          <div>
-            <label className="block font-medium text-gray-700">Skills</label>
-            <Input
-              name="skills"
-              value={formData.skills}
-              onChange={handleChange('skills')}
-              required
-            />
-          </div>
-          {error && <p className="text-red-500 mt-2">{error}</p>}
+          {error && (
+            <p className="text-red-500 mt-2">{error}</p>
+          )}
           <DialogFooter className="mt-6 flex justify-end gap-2">
             <Button
               variant="ghost"

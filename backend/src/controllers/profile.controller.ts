@@ -57,6 +57,8 @@ export class ProfileController implements Controller {
           | undefined,
       };
 
+      console.log(payload);
+
       UpdateProfileFormDataSchema.parse(payload);
       c.set("updateProfilePayload", payload);
       return next();

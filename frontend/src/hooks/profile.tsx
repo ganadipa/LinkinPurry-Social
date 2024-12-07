@@ -1,3 +1,5 @@
+import { ErrorSchema } from "@/schemas/error.schema";
+import { CreatePostSuccessSchema, DeletePostSuccessSchema } from "@/schemas/feed.schema";
 import { Post } from "@/types/feed";
 import { Profile } from "@/types/profile";
 import { profileResponse } from "@/types/response";
@@ -58,8 +60,8 @@ export function useProfile(id: number) {
           return {
             id: post.id,
             content: post.content,
-            created_at: new Date(post.created_at).toLocaleDateString(),
-            updated_at: new Date(post.updated_at).toLocaleDateString(),
+            created_at: post.created_at,
+            updated_at: post.updated_at,
           };
         });
       }
@@ -75,10 +77,94 @@ export function useProfile(id: number) {
     setLoading(false);
   };
 
+  const updatePost = async (id: number, content: string) => {
+    const response = await fetch(`/api/feed/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ content }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update post");
+    }
+
+    const data = await response.json();
+    const failureCheck = ErrorSchema.safeParse(data);
+    if (failureCheck.success) {
+      throw new Error(failureCheck.data.message);
+    }
+
+    const expect = CreatePostSuccessSchema.safeParse(data);
+    if (!expect.success) {
+      throw new Error("Server response was not as expected");
+    }
+
+    if (!expect.data.success) {
+      throw new Error("Failed to update post");
+    }
+
+    if (expect.data.body === null) {
+      throw new Error("Failed to update post");
+    }
+
+    if (posts === null) {
+      return;
+    }
+
+    const updatedPosts = posts.map((post) => {
+      if (post.id === id) {
+        return {
+          ...post,
+          content,
+        };
+      }
+
+      return post;
+    });
+
+    setPosts(updatedPosts);
+  }
+
+  const deletePost = async (id: number) => {
+    const response = await fetch(`/api/feed/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete post");
+    }
+
+    const data = await response.json();
+    const failureCheck = ErrorSchema.safeParse(data);
+    if (failureCheck.success) {
+      throw new Error(failureCheck.data.message);
+    }
+
+    const expect = DeletePostSuccessSchema.safeParse(data);
+    if (!expect.success) {
+      throw new Error("Server response was not as expected");
+    }
+
+    if (!expect.data.success) {
+      throw new Error("Failed to delete post");
+    }
+
+    if (posts === null) {
+      return;
+    }
+
+    const updatedPosts = posts.filter((post) => post.id !== id);
+    setPosts(updatedPosts);
+  }
+
   return {
     success,
     profile,
     loading,
     posts,
+    updatePost,
+    deletePost,
   };
 }

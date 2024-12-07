@@ -27,7 +27,9 @@ export class NotificationService {
     const payload = JSON.stringify({
       title: `Message from ${sender}`,
       body: message,
-      url: `/chat/${toUserId}`,
+      data: {
+        url: "/chat",
+      }
     });
 
     await Promise.all(
@@ -52,7 +54,9 @@ export class NotificationService {
       const payload = JSON.stringify({
         title: `${poster} has a new post`,
         body: "Check it out on your timeline!",
-        url: `/post/${postId}`,
+        data: {
+          url: `/`,
+        }
       });
   
       await Promise.all(

@@ -48,13 +48,10 @@ export function useFeed() {
         throw new Error("Failed to fetch feed");
       }
 
-      // If we received fewer posts than requested, there are no more posts
       if (expect.data.body.length < POSTS_PER_PAGE) {
         setHasMore(false);
       }
 
-      // If this is a new fetch (no cursor), replace the feed
-      // If this is a fetch more (with cursor), append to the feed
       setFeed(prevFeed => {
         if (!cursor) return expect.data.body;
         return [...(prevFeed || []), ...expect.data.body];

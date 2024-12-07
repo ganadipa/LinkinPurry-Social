@@ -33,19 +33,19 @@ const Header = () => {
             <img src={"/images/home.png"} alt="Home" className="w-6 h-6 mb-1" />
             <span className="text-xs">Home</span>
           </Link>
+          <Link
+            href="/users"
+            className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
+          >
+            <img
+              src="/images/people.png"
+              alt="Users"
+              className="w-6 h-6 mb-1"
+            />
+            <span className="text-xs">People</span>
+          </Link>
           {user === null ? (
             <>
-              <Link
-                href="/users"
-                className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
-              >
-                <img
-                  src="/images/people.png"
-                  alt="Users"
-                  className="w-6 h-6 mb-1"
-                />
-                <span className="text-xs">People</span>
-              </Link>
               <Link
                 href="/signin"
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
@@ -84,7 +84,7 @@ const Header = () => {
                 </Link>
               )}
               // */}
-              <Link
+              {/* <Link
                 href="/users"
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
               >
@@ -94,17 +94,28 @@ const Header = () => {
                   className="w-6 h-6 mb-1"
                 />
                 <span className="text-xs">People</span>
-              </Link>
+              </Link> */}
               <Link
                 href={`/connections/${user.id}`}
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
               >
                 <img
-                  src="/images/people.png"
+                  src="/images/network.png"
                   alt="Connections"
                   className="w-6 h-6 mb-1"
                 />
                 <span className="text-xs">Connections</span>
+              </Link>
+              <Link
+                href={`/requests`}
+                className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
+              >
+                <img
+                  src="/images/add.png"
+                  alt="Messages"
+                  className="w-6 h-6 mb-1"
+                />
+                <span className="text-xs">Request</span>
               </Link>
               <Link
                 href={`/chat`}
@@ -116,17 +127,6 @@ const Header = () => {
                   className="w-6 h-6 mb-1"
                 />
                 <span className="text-xs">Messaging</span>
-              </Link>
-              <Link
-                href={`/requests`}
-                className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
-              >
-                <img
-                  src="/images/bell.png"
-                  alt="Messages"
-                  className="w-6 h-6 mb-1"
-                />
-                <span className="text-xs">Request</span>
               </Link>
               <Link
                 href={`/profile/${user.id}`}
@@ -176,18 +176,18 @@ const Header = () => {
             >
               &times;
             </button>
-            <Link href="/" className="block text-gray-700 mb-4">
+            <Link onClick={() => setSidenavOpen(false)} href="/" className="block text-gray-700 mb-4">
               Home
+            </Link>
+            <Link onClick={() => setSidenavOpen(false)} href="/users" className="block text-gray-700 mb-4">
+              People
             </Link>
             {user === null ? (
               <>
-                <Link href="/users" className="block text-gray-700 mb-4">
-                  People
-                </Link>
-                <Link href="/signin" className="block text-gray-700 mb-4">
+                <Link onClick={() => setSidenavOpen(false)} href="/signin" className="block text-gray-700 mb-4">
                   Login
                 </Link>
-                <Link href="/signup" className="block text-gray-700 mb-4">
+                <Link onClick={() => setSidenavOpen(false)} href="/signup" className="block text-gray-700 mb-4">
                   Register
                 </Link>
               </>
@@ -202,23 +202,25 @@ const Header = () => {
                   </Link>
                 )}
                 {user.role.value === "company" && (
-                  <Link href="/profile" className="block text-gray-700 mb-4">
+                  <Link onClick={() => setSidenavOpen(false)} href="/profile" className="block text-gray-700 mb-4">
                     Profile
                   </Link>
                 )} */}
                 <Link
+                  onClick={() => setSidenavOpen(false)}
                   href={`/connections/${user.id}`}
                   className="block text-gray-700 mb-4"
                 >
                   Connections
                 </Link>
-                <Link href={`/chat`} className="block text-gray-700 mb-4">
-                  Messaging
-                </Link>
-                <Link href={`/requests`} className="block text-gray-700 mb-4">
+                <Link onClick={() => setSidenavOpen(false)} href={`/requests`} className="block text-gray-700 mb-4">
                   Request
                 </Link>
+                <Link onClick={() => setSidenavOpen(false)} href={`/chat`} className="block text-gray-700 mb-4">
+                  Messaging
+                </Link>
                 <Link
+                  onClick={() => setSidenavOpen(false)}
                   href={`/profile/${user.id}`}
                   className="block text-gray-700 mb-4"
                 >

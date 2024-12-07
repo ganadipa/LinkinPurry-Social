@@ -40,7 +40,7 @@ async function createUsers(count: number) {
       skills: Array.from({ length: 5 }, () => faker.person.jobArea()).join(
         ", "
       ),
-      profile_photo_path: faker.image.avatar(),
+      profile_photo_path: "/default-profile-picture.jpg",
       updated_at: new Date(),
     },
   });

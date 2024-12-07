@@ -128,7 +128,7 @@ export default function UserListPage() {
         return;
       }
 
-      alert("Connection request sent successfully!");
+            // alert("Connection request sent successfully!");
 
       // update status locally
       setStatuses((prev) => ({ ...prev, [userId]: "pending" }));

@@ -22,9 +22,13 @@ self.addEventListener('notificationclick', (event: NotificationEvent) => {
   event.notification.close();
 
   const baseUrl = self.location.origin;
-  const chatUrl = `${baseUrl}/chat`;
+  const notificationUrl = event.notification.data?.url || '/';
+  const url = `${baseUrl}${notificationUrl}`;
+
+  // console.log('Opening notification:', url, 'from:', baseUrl);
+  // console.log('Notification :', event.notification.data);
 
   event.waitUntil(
-    clients.openWindow(chatUrl)
+    self.clients.openWindow(url)
   );
 });

@@ -108,26 +108,30 @@ export default function ConnectionRequestsPage() {
     }
   };
 
-  return (
-    <div className="max-w-4xl bg-white mx-auto mt-10 rounded-lg border border-gray-300">
-      <h1 className="text-2xl font-semibold p-4">Connection Requests</h1>
-      {loading ? (
-        <p className="text-center pb-4">Loading...</p>
-      ) : requests.length === 0 ? (
-        <p className="text-center pb-4">No connection requests found.</p>
-      ) : (
-        requests.map((req) => (
-          <UserCard
-            key={req.from_id}
-            id={req.from_id}
-            name={req.full_name}
-            profilePhoto={req.profile_photo_path}
-            status="pending"
-            onAccept={() => handleResponse(req.from_id, true)}
-            onDecline={() => handleResponse(req.from_id, false)}
-          />
-        ))
-      )}
-    </div>
-  );
+    return (
+        <div className="max-w-4xl bg-white mx-4 sm:mx-auto mt-6 sm:mt-10 rounded-lg border border-gray-300">
+            <h1 className="text-xl sm:text-2xl font-semibold p-3 sm:p-4">Connection Requests</h1>
+            {loading ? (
+                <p className="text-center pb-3 sm:pb-4">Loading...</p>
+            ) : requests.length === 0 ? (
+                <p className="text-center text-gray-500 text-sm sm:text-base pb-3 sm:pb-4">
+                No connection requests found.
+                </p>
+            ) : (
+                <div className="divide-y divide-gray-200">
+                {requests.map((req) => (
+                    <UserCard
+                        key={req.from_id}
+                        id={req.from_id}
+                        name={req.full_name}
+                        profilePhoto={req.profile_photo_path}
+                        status="pending"
+                        onAccept={() => handleResponse(req.from_id, true)}
+                        onDecline={() => handleResponse(req.from_id, false)}
+                    />
+                ))}
+                </div>
+            )}
+            </div>
+    );
 }
