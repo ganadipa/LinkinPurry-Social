@@ -16,6 +16,7 @@ export const CONFIG = {
   FeedService: Symbol.for("FeedService"),
   ChatService: Symbol.for("ChatService"),
   NotificationService: Symbol.for("NotificationService"),
+  FileService: Symbol.for("FileService"),
 
   AuthStrategy: Symbol.for("Jwt"),
   JwtAuthStrategy: Symbol.for("Jwt"),

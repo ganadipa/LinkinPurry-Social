@@ -6,7 +6,7 @@ import { ProfileService } from "../services/profile.service";
 import { ZodValidationService } from "../services/zod-validation.service";
 import { InternalErrorException } from "../exceptions/internal-error.exception";
 import { UnauthorizedException } from "../exceptions/unauthorized.exception";
-import { UpdateProfilePayloadSchema } from "../constants/request-payload";
+import { UpdateProfileFormDataSchema } from "../constants/request-payload";
 import { createMiddleware } from "hono/factory";
 import { createRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
@@ -22,6 +22,7 @@ import {
 } from "../schemas/profile.schema";
 import { UpdateProfileEnv } from "../constants/context-env.types";
 import { BadRequestException } from "../exceptions/bad-request.exception";
+import { FileService } from "../services/file.service";
 
 @injectable()
 export class ProfileController implements Controller {
@@ -29,8 +30,7 @@ export class ProfileController implements Controller {
     @inject(CONFIG.OpenApiHonoProvider) private hono: OpenApiHonoProvider,
     @inject(CONFIG.ProfileService)
     private readonly profileService: ProfileService,
-    @inject(CONFIG.ZodValidationService)
-    private readonly zodValidationService: ZodValidationService
+    @inject(CONFIG.FileService) private readonly fileService: FileService
   ) {}
 
   public registerMiddlewaresbeforeGlobal(): void {}
@@ -44,8 +44,19 @@ export class ProfileController implements Controller {
 
   private setUpdateProfilePayloadMiddleware =
     createMiddleware<UpdateProfileEnv>(async (c, next) => {
-      const payload = await c.req.json();
-      this.zodValidationService.validate(payload, UpdateProfilePayloadSchema);
+      const formData = await c.req.formData();
+      const payload = {
+        name: formData.get("name")?.toString(),
+        username: formData.get("username")?.toString(),
+        work_history: formData.get("work_history")?.toString(),
+        skills: formData.get("skills")?.toString(),
+        profile_photo: (formData.get("profile_photo") ?? undefined) as
+          | File
+          | undefined,
+      };
+
+      UpdateProfileFormDataSchema.parse(payload);
+      console.log(payload);
       c.set("updateProfilePayload", payload);
       return next();
     });
@@ -153,8 +164,8 @@ export class ProfileController implements Controller {
         params: UpdateProfileURLParamSchema,
         body: {
           content: {
-            "application/json": {
-              schema: UpdateProfilePayloadSchema,
+            "multipart/form-data": {
+              schema: UpdateProfileFormDataSchema,
             },
           },
         },
@@ -164,10 +175,7 @@ export class ProfileController implements Controller {
           description: "Profile data updated",
           content: {
             "application/json": {
-              schema: z.union([
-                GetPublicProfileSuccessSchema,
-                GetAuthenticatedProfileSuccessSchema,
-              ]),
+              schema: GetAuthenticatedProfileSuccessSchema,
             },
           },
         },
@@ -208,9 +216,28 @@ export class ProfileController implements Controller {
           throw new UnauthorizedException("Unauthorized access");
         }
 
-        const parsed = UpdateProfilePayloadSchema.safeParse(payload);
+        const parsed = UpdateProfileFormDataSchema.safeParse(payload);
         if (!parsed.success) {
           throw new InternalErrorException("Invalid payload format");
+        }
+
+        let path: string | undefined;
+        if (parsed.data.profile_photo) {
+          // Get the new path
+          path = await this.fileService.upload(
+            parsed.data.profile_photo,
+            FileService.Visibility.PUBLIC
+          );
+
+          if (
+            updateUser.profile_photo_path &&
+            updateUser.profile_photo_path !== "/default-profile-picture.jpg"
+          ) {
+            console.log("Deleting old photo");
+            const the_photo = updateUser.profile_photo_path;
+            console.log(the_photo);
+            await this.fileService.delete(the_photo);
+          }
         }
 
         const updateData = parsed.data;
@@ -219,6 +246,7 @@ export class ProfileController implements Controller {
         updateUser.work_history =
           updateData.work_history ?? updateUser.work_history;
         updateUser.username = updateData.username ?? updateUser.username;
+        updateUser.profile_photo_path = path ?? updateUser.profile_photo_path;
 
         const profileData = await this.profileService.updateProfile(
           Number(userId),

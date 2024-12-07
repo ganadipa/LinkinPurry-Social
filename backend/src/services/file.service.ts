@@ -49,7 +49,7 @@ export class FileService {
 
       const path =
         visibility === "PUBLIC"
-          ? `/uploads/public/${fileName}`
+          ? `/${fileName}`
           : `/uploads/private/${fileName}`;
 
       return `${path}`;
@@ -59,22 +59,24 @@ export class FileService {
     }
   }
 
-  public async delete(fileUrl: string): Promise<void> {
+  public async delete(filePath: string): Promise<void> {
     try {
-      const url = new URL(fileUrl);
-      const urlPath = url.pathname;
+      // Remove leading slash if present
+      const cleanPath = filePath.startsWith("/") ? filePath.slice(1) : filePath;
 
-      const pathSegments = urlPath.split("/");
-      const fileName = pathSegments[pathSegments.length - 1];
-      const visibility = pathSegments.includes("public") ? "PUBLIC" : "PRIVATE";
-
-      const filePath =
-        visibility === "PUBLIC"
-          ? path.join(this.publicPath, fileName)
-          : path.join(this.privatePath, fileName);
-
-      await fs.access(filePath);
-      await fs.unlink(filePath);
+      // Check if it's a private path
+      if (cleanPath.startsWith("uploads/private/")) {
+        const fileName = cleanPath.split("/").pop();
+        if (!fileName) throw new Error("Invalid file path");
+        const fullPath = path.join(this.privatePath, fileName);
+        await fs.access(fullPath);
+        await fs.unlink(fullPath);
+      } else {
+        // It's a public file
+        const fullPath = path.join(this.publicPath, cleanPath);
+        await fs.access(fullPath);
+        await fs.unlink(fullPath);
+      }
     } catch (error) {
       console.error("File deletion error:", error);
       throw new Error("Failed to delete file");

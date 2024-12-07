@@ -43,6 +43,7 @@ import { NotificationService } from "../services/notification.service";
 import { PushSubscription } from "web-push";
 import { PushSubscriptionRepository } from "../interfaces/push-subscription-repository.interface";
 import { DbPushSubscriptionRepository } from "../repositories/db/push-subscription.repository";
+import { FileService } from "../services/file.service";
 
 export class Application {
   private ioc: IOCContainer;
@@ -221,5 +222,6 @@ class MainBindingConfigurator {
       CONFIG.NotificationService,
       NotificationService
     );
+    this.ioc.bind<FileService>(CONFIG.FileService, FileService);
   }
 }

@@ -82,30 +82,16 @@ export const fromId_toIdSchema = z.object({
   to_id: z.number(),
 });
 
-export const UpdateProfilePayloadSchema = z.object({
-  name: z
-    .string({
-      message: "Name must be a string",
-    })
-    .optional(),
-  username: z
-    .string({
-      message: "Username must be a string",
-    })
-    .optional(),
+export const UpdateProfileFormDataSchema = z.object({
+  name: z.string().optional(),
+  username: z.string().optional(),
+  work_history: z.string().optional(),
+  skills: z.string().optional(),
   profile_photo: z
-    .string({
-      message: "Profile photo must be a string",
-    })
-    .optional(),
-  work_history: z
-    .string({
-      message: "Work history must be a string",
-    })
-    .optional(),
-  skills: z
-    .string({
-      message: "skills must be a string",
-    })
-    .optional(),
+    .instanceof(File)
+    .optional()
+    .refine((file) => {
+      if (!file) return true;
+      return ["image/jpeg", "image/png", "image/gif"].includes(file.type);
+    }, "Only image files are allowed"),
 });
