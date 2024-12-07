@@ -52,7 +52,9 @@ export class ProfileController implements Controller {
         username: formData.get("username")?.toString(),
         work_history: formData.get("work_history")?.toString(),
         skills: formData.get("skills")?.toString(),
-        profile_photo: formData.get("profile_photo") as File | undefined,
+        profile_photo: (formData.get("profile_photo") ?? undefined) as
+          | File
+          | undefined,
       };
 
       UpdateProfileFormDataSchema.parse(payload);

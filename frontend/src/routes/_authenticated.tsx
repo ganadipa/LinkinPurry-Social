@@ -8,6 +8,8 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 function RouteComponent() {
+  const url = new URL(window.location.href);
+
   const { user, isLoading } = useAuth();
   if (isLoading) {
     return <Loading />;
@@ -16,6 +18,7 @@ function RouteComponent() {
   if (!user) {
     redirect({
       to: "/signin",
+      params: { redirect: url.pathname },
     });
     return;
   }
