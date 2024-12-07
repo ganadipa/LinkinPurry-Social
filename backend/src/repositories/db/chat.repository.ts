@@ -95,9 +95,6 @@ export class DbChatRepository implements ChatRepository {
           },
         },
       },
-      orderBy: {
-        created_at: "desc",
-      },
     });
 
     const latestMessages = await this.prisma.prisma.chat.findMany({
@@ -123,7 +120,7 @@ export class DbChatRepository implements ChatRepository {
       distinct: ["from_id", "to_id"],
     });
 
-    return contacts.map((contact) => {
+    const ret = contacts.map((contact) => {
       const lastMessage = latestMessages.find(
         (msg) =>
           (Number(msg.from_id) === userId && msg.to_id === contact.to_id) ||
@@ -136,11 +133,29 @@ export class DbChatRepository implements ChatRepository {
         profile_photo_path:
           contact.users_connection_to_idTousers.profile_photo_path,
         last_message: lastMessage?.message ?? null,
-        last_message_time: lastMessage
-          ? Date.parse(lastMessage.timestamp.toString())
-          : null,
+        last_message_time: lastMessage ? lastMessage.timestamp.getTime() : null,
       };
     });
+
+    // sort it by last message time, if null it will be at the end
+    // the latest message will be at the top
+    ret.sort((a, b) => {
+      if (a.last_message_time === null && b.last_message_time === null) {
+        return 0;
+      }
+
+      if (a.last_message_time === null) {
+        return 1;
+      }
+
+      if (b.last_message_time === null) {
+        return -1;
+      }
+
+      return b.last_message_time - a.last_message_time;
+    });
+
+    return ret;
   }
 
   public async addMessage(message: Chat): Promise<Chat> {

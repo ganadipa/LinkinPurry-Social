@@ -68,12 +68,18 @@ export default function ChatAreaMobile({
   }
 
   if (isChatLoading) {
-    return <div className="self-center mx-auto p-4">Loading messages...</div>;
+    return (
+      <div className={`self-center mx-auto p-4 ${className}`}>
+        Loading messages...
+      </div>
+    );
   }
 
   if (messages === null) {
     return (
-      <div className="self-center mx-auto p-4">Failed to load messages</div>
+      <div className={`self-center mx-auto p-4 ${className}`}>
+        Failed to load messages
+      </div>
     );
   }
 
