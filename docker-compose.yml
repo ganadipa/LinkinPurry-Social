@@ -1,6 +1,8 @@
 services:
   be-dev:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
     ports:
       - "8000:8000"
     depends_on:
