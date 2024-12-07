@@ -8,14 +8,24 @@ import {
 import { FeedRelated } from "@/types/feed";
 import { useEffect, useState } from "react";
 
+const POSTS_PER_PAGE = 10;
+
 export function useFeed() {
   const [feed, setFeed] = useState<FeedRelated[] | null>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [hasMore, setHasMore] = useState<boolean>(true);
 
-  const fetchFeed = async () => {
+  const fetchFeed = async (cursor?: number) => {
     try {
-      const response = await fetch("/api/feed");
+      const url = new URL("/api/feed", window.location.origin);
+      url.searchParams.append("limit", POSTS_PER_PAGE.toString());
+      if (cursor) {
+        url.searchParams.append("cursor", cursor.toString());
+      }
+
+      const response = await fetch(url);
       const data = await response.json();
+      
       const failureCheck = ErrorSchema.safeParse(data);
       if (failureCheck.success) {
         throw new Error(failureCheck.data.message);
@@ -38,9 +48,22 @@ export function useFeed() {
         throw new Error("Failed to fetch feed");
       }
 
-      setFeed(expect.data.body);
+      // If we received fewer posts than requested, there are no more posts
+      if (expect.data.body.length < POSTS_PER_PAGE) {
+        setHasMore(false);
+      }
+
+      // If this is a new fetch (no cursor), replace the feed
+      // If this is a fetch more (with cursor), append to the feed
+      setFeed(prevFeed => {
+        if (!cursor) return expect.data.body;
+        return [...(prevFeed || []), ...expect.data.body];
+      });
+
+      return expect.data.body;
     } catch (error) {
       console.log(error);
+      return [];
     } finally {
       setLoading(false);
     }
@@ -164,5 +187,5 @@ export function useFeed() {
     setFeed(feed.filter((post) => post.post.id !== id));
   };
 
-  return { feed, loading, fetchFeed, createPost, updatePost, deletePost };
+  return { feed, loading, hasMore, fetchFeed, createPost, updatePost, deletePost };
 }

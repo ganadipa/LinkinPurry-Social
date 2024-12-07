@@ -57,31 +57,31 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow border">
-        <div className="relative h-52">
+      <div className="bg-white rounded-lg shadow border w-full">
+        <div className="relative h-32 sm:h-40 md:h-52">
           <img
             src="/images/banner-placeholder.svg"
             alt="Background"
             className="w-full h-full object-cover rounded-t-lg"
           />
           {isOwnProfile && (
-            <Button
+            <Button 
               variant="ghost"
-              className="absolute right-0 bg-white rounded-md m-2 p-2 shadow-sm hover:bg-gray-100"
+              className="absolute right-2 top-2 bg-white rounded-md p-1.5 sm:p-2 shadow-sm hover:bg-gray-100"
               onClick={() => setEditModalOpen(true)}
             >
-              Edit
-              <MdEditSquare />
+              <span className="hidden sm:inline mr-1">Edit</span>
+              <MdEditSquare className="w-4 h-4" />
             </Button>
           )}
         </div>
-        <div className="p-6 -mt-32">
+        <div className="p-4 sm:p-6 -mt-16 sm:-mt-24 md:-mt-32">
           <div className="flex flex-col items-start">
             <div className="relative">
               <img
                 src={profile.profile_photo}
                 alt="Profile Picture"
-                className="w-40 h-40 rounded-full border-4 border-white shadow-lg object-cover cursor-pointer"
+                className="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-lg object-cover cursor-pointer"
                 onClick={
                   isOwnProfile ? () => setPhotoModalOpen(true) : undefined
                 }
@@ -89,22 +89,22 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             </div>
           </div>
           <div className="text-start mt-4">
-            <h1 className="text-2xl font-semibold">{name}</h1>
-            <p className="text-gray-600">{profile.username}</p>
+            <h1 className="text-xl sm:text-2xl font-semibold">{name}</h1>
+            <p className="text-gray-600 text-sm sm:text-base">{profile.username}</p>
             <div className="text-blue-500">
               <Link
                 to={`/connections/${profileId}`}
-                className="text-blue-500 hover:underline"
+                className="text-sm sm:text-base text-blue-500 hover:underline"
               >
                 <b>{profile.connection_count}</b> connections
               </Link>
             </div>
           </div>
-          <div className="mt-4">
+          <div className="mt-4 sm:mt-0">
             {user && user.id !== profileId && (
               <Button
                 variant="default"
-                className={`rounded-full ${
+                className={`w-full sm:w-auto rounded-full ${
                   status
                     ? "bg-white text-[#0a66c2] border border-[#0a66c2] hover:bg-[#0a66c2] hover:text-white"
                     : "bg-[#0a66c2] text-white hover:bg-[#004182]"

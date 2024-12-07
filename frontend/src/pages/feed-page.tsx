@@ -1,4 +1,4 @@
-import { useState, KeyboardEvent } from "react";
+import { useState, useEffect, useRef, KeyboardEvent } from "react";
 import {
   MoreHorizontal,
   Pencil,
@@ -35,12 +35,52 @@ import { redirect } from "@/lib/utils";
 import toast from "react-hot-toast";
 
 const Feed = () => {
-  const { feed, loading, updatePost, deletePost, createPost } = useFeed();
+  const { feed, loading, hasMore, fetchFeed, updatePost, deletePost, createPost } = useFeed();
   const { isLoading, user } = useAuth();
   const [newPost, setNewPost] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editContent, setEditContent] = useState("");
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const observerTarget = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      async (entries) => {
+        const target = entries[0];
+        if (target.isIntersecting && hasMore && !isFetchingMore && feed) {
+          try {
+            setIsFetchingMore(true);
+
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Nanti dihapus
+
+            const lastPost = feed[feed.length - 1];
+            const cursor = lastPost ? lastPost.post.id : undefined;
+            await fetchFeed(cursor);
+          } catch (error) {
+            console.error('Error fetching more posts:', error);
+            toast.error('Failed to load more posts');
+          } finally {
+            setIsFetchingMore(false);
+          }
+        }
+      },
+      {
+        threshold: 1.0,
+      }
+    );
+
+    const currentObserverTarget = observerTarget.current;
+    if (currentObserverTarget) {
+      observer.observe(currentObserverTarget);
+    }
+
+    return () => {
+      if (currentObserverTarget) {
+        observer.unobserve(currentObserverTarget);
+      }
+    };
+  }, [feed, hasMore, isFetchingMore, fetchFeed]);
 
   if (loading || feed === null || isLoading) {
     return <Loading />;
@@ -149,7 +189,7 @@ const Feed = () => {
         </div>
       </Card>
 
-      {feed.map((item) => (
+      {feed?.map((item) => (
         <div
           id={item.post.id.toString()}
           key={item.post.id}
@@ -240,6 +280,20 @@ const Feed = () => {
           )}
         </div>
       ))}
+
+      <div
+        ref={observerTarget}
+        className="h-10 flex items-center justify-center"
+      >
+        {isFetchingMore && (
+          <div>
+            Loading...
+          </div>
+        )}
+        {!hasMore && feed && feed.length > 0 && (
+          <p className="text-gray-500 text-sm">No more posts to load</p>
+        )}
+      </div>
 
       <AlertDialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
         <AlertDialogContent className="bg-white">

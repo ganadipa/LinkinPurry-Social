@@ -172,6 +172,9 @@ const Header = () => {
             </Link>
             {user === null ? (
               <>
+                <Link href="/users" className="block text-gray-700 mb-4">
+                  People
+                </Link>
                 <Link href="/signin" className="block text-gray-700 mb-4">
                   Login
                 </Link>
@@ -194,6 +197,25 @@ const Header = () => {
                     Profile
                   </Link>
                 )} */}
+                <Link
+                  href={`/connections/${user.id}`}
+                  className="block text-gray-700 mb-4"
+                >
+                  Connections
+                </Link>
+                <Link href={`/chat`} className="block text-gray-700 mb-4">
+                  Messaging
+                </Link>
+                <Link href={`/requests`} className="block text-gray-700 mb-4">
+                  Request
+                </Link>
+                <Link
+                  href={`/profile/${user.id}`}
+                  className="block text-gray-700 mb-4"
+                >
+                  Profile
+                </Link>
+                {/* <NotificationMain /> */}
                 <button className="block text-gray-700 mb-4" onClick={logout}>
                   Logout
                 </button>
