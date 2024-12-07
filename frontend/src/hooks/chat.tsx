@@ -12,7 +12,7 @@ import toast from "react-hot-toast";
 import io from "socket.io-client";
 import { z } from "zod";
 
-const socket = io("http://localhost:8000", {
+const socket = io("http://localhost:3000", {
   path: "/ws",
   reconnection: true,
   reconnectionAttempts: 3,
