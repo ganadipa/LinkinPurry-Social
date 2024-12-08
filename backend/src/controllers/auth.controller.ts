@@ -35,7 +35,8 @@ export class AuthController implements Controller {
     @inject(CONFIG.ZodValidationService)
     private readonly zodValidationService: ZodValidationService,
     @inject(CONFIG.AuthStrategy) private readonly authStrategy: IAuthStrategy,
-    @inject(CONFIG.NotificationService) private  notificationService: NotificationService,
+    @inject(CONFIG.NotificationService)
+    private notificationService: NotificationService
   ) {}
 
   public registerMiddlewaresbeforeGlobal(): void {}
@@ -53,7 +54,6 @@ export class AuthController implements Controller {
     async (c, next) => {
       const payload = await c.req.json();
       this.zodValidationService.validate(payload, LoginPayloadSchema);
-      console.log(payload);
       c.set("loginPayload", payload);
       return next();
     }
@@ -233,11 +233,13 @@ export class AuthController implements Controller {
         deleteCookie(c, "authorization");
 
         if (!c.var.user) {
-            throw new BadRequestException("No user found");
+          throw new BadRequestException("No user found");
         }
-        
+
         if (c.var.user && c.var.user.id !== undefined) {
-          await this.notificationService.deleteSubscriptionByUserId(Number(c.var.user.id));
+          await this.notificationService.deleteSubscriptionByUserId(
+            Number(c.var.user.id)
+          );
         } else {
           throw new BadRequestException("User ID is undefined");
         }

@@ -96,6 +96,27 @@ export class Application {
         return c.json(formattedResponse);
       }
 
+      if (err instanceof SyntaxError) {
+        c.status(400);
+
+        return c.json({
+          status: false,
+          message:
+            "Invalid JSON. Perhaps you are missing a field? a curly braces?",
+          body: null,
+        });
+      }
+
+      if (err instanceof Error) {
+        c.status(500);
+
+        return c.json({
+          status: false,
+          message: err.message,
+          body: null,
+        });
+      }
+
       c.status(500);
 
       return c.json({

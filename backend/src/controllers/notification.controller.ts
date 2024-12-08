@@ -239,6 +239,7 @@ export class NotificationController implements Controller {
     const route = createRoute({
       method: "delete",
       path: "/api/notifications/unsubscribe",
+      tags: ["Notifications"],
       request: {
         body: {
           content: {
@@ -272,24 +273,32 @@ export class NotificationController implements Controller {
         },
       },
     });
-  
+
     this.hono.app.openapi(route, async (c) => {
       try {
         const { user_id } = await c.req.json();
         await this.notificationService.deleteSubscriptionByUserId(user_id);
-  
-        return c.json({
-          success: true as const,
-          message: "Push subscription deleted successfully",
-        }, 200);
+
+        return c.json(
+          {
+            success: true as const,
+            message: "Push subscription deleted successfully",
+          },
+          200
+        );
       } catch (error) {
         console.error("Error deleting subscription:", error);
-        return c.json({
-          success: false as const,
-          message: `Failed to delete subscription: ${(error as Error).message}`,
-          error: null,
-        }, 500);
+        return c.json(
+          {
+            success: false as const,
+            message: `Failed to delete subscription: ${
+              (error as Error).message
+            }`,
+            error: null,
+          },
+          500
+        );
       }
     });
-  }  
+  }
 }

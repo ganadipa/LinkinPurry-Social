@@ -54,7 +54,7 @@ export class FeedService {
     }
 
     if (Number(targetFeed.user_id) !== userId) {
-      throw new BadRequestException("Unauthorized");
+      throw new ForbiddenException("You are not allowed to update this post");
     }
 
     targetFeed.content = content;

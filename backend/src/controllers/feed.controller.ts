@@ -88,9 +88,13 @@ export class FeedController implements Controller {
 
   private createPostBodyMiddleware = createMiddleware<CreatePostEnv>(
     async (c, next) => {
+      console.log("in duh middleware");
       const json = await c.req.json();
+      console.log(json);
       const expected = CreatePostRequestSchema.safeParse(json);
+      console.log(expected);
       if (!expected.success) {
+        console.log("invalid request body");
         throw new BadRequestException("Invalid request body");
       }
 
@@ -494,6 +498,14 @@ export class FeedController implements Controller {
             },
           },
         },
+        403: {
+          description: "Forbidden",
+          content: {
+            "application/json": {
+              schema: NullErrorResponseSchema,
+            },
+          },
+        },
         500: {
           description: "Internal server error",
           content: {
@@ -565,7 +577,7 @@ export class FeedController implements Controller {
       } catch (err) {
         console.log(err);
         if (err instanceof HTTPException) {
-          let status: 400 | 401 | 500;
+          let status: 400 | 401 | 403 | 500;
 
           switch (err.status) {
             case 400:
@@ -573,6 +585,9 @@ export class FeedController implements Controller {
               break;
             case 401:
               status = 401;
+              break;
+            case 403:
+              status = 403;
               break;
             default:
               status = 500;
@@ -640,6 +655,14 @@ export class FeedController implements Controller {
             },
           },
         },
+        403: {
+          description: "Forbidden",
+          content: {
+            "application/json": {
+              schema: NullErrorResponseSchema,
+            },
+          },
+        },
         500: {
           description: "Internal server error",
           content: {
@@ -681,7 +704,7 @@ export class FeedController implements Controller {
         );
       } catch (err) {
         if (err instanceof HTTPException) {
-          let status: 400 | 401 | 500;
+          let status: 400 | 401 | 403 | 500;
 
           switch (err.status) {
             case 400:
@@ -689,6 +712,9 @@ export class FeedController implements Controller {
               break;
             case 401:
               status = 401;
+              break;
+            case 403:
+              status = 403;
               break;
             default:
               status = 500;
