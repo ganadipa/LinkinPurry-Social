@@ -130,6 +130,7 @@ export class ChatController implements Controller {
         const contacts = await this.chatService.getContactsByUserId(
           Number(user.id)
         );
+        console.log(contacts);
 
         return c.json(
           {

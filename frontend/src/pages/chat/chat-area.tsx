@@ -7,6 +7,7 @@ import { Contact, Message } from "../../types/chat";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth";
 import { Textarea } from "@/components/ui/textarea";
+import { Link } from "@tanstack/react-router";
 
 interface ChatAreaProps {
   selectedContact: Contact | null;
@@ -129,7 +130,13 @@ export default function ChatArea({
   return (
     <div className={cn(`flex flex-col w-[70%]`, className)}>
       <div className="bg-white border-b border-[#e0e0e0] p-4 flex items-center justify-between">
-        <div className="flex items-center">
+        <Link
+          className="flex items-center"
+          to="/profile/$id"
+          params={{
+            id: selectedContact.user_id.toString(),
+          }}
+        >
           <Avatar className="h-12 w-12 mr-3">
             <AvatarImage
               src={selectedContact.profile_photo_path}
@@ -144,7 +151,7 @@ export default function ChatArea({
               {selectedContact.full_name}
             </h2>
           </div>
-        </div>
+        </Link>
       </div>
       <ScrollArea className="h-full p-4 bg-[#f8f9fa] overflow-y-auto">
         <div className="space-y-1">
