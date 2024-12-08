@@ -5,11 +5,15 @@ import { Contact, Message } from "../schemas/chat.schema";
 import { InternalErrorException } from "../exceptions/internal-error.exception";
 import { Chat } from "../models/chat.model";
 import { URL_PUBLIC_UPLOADS } from "../constants/constants";
+import { ConnectionRepository } from "../interfaces/connection-repository.interface";
+import { BadRequestException } from "../exceptions/bad-request.exception";
 
 @injectable()
 export class ChatService {
   constructor(
-    @inject(CONFIG.ChatRepository) private chatRepository: ChatRepository
+    @inject(CONFIG.ChatRepository) private chatRepository: ChatRepository,
+    @inject(CONFIG.ConnectionRepository)
+    private connectionRepository: ConnectionRepository
   ) {}
 
   public async getContactsByUserId(userId: number): Promise<Contact[]> {
@@ -28,6 +32,14 @@ export class ChatService {
     contactId: number
   ): Promise<Message[]> {
     const chat = await this.chatRepository.getChat(userId, contactId);
+    const connected = await this.connectionRepository.checkConnection(
+      BigInt(userId),
+      BigInt(contactId)
+    );
+
+    if (!connected) {
+      throw new BadRequestException("You are not connected to this user");
+    }
 
     return chat.map((c) => {
       if (!c.id) {
