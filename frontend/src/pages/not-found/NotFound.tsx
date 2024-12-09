@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router';
 
 const NotFound: React.FC = () => {
   return (
-    <div className="min-h-screen bg-transparent flex flex-col items-center justify-center px-4">
+    <div className="min-h-[80vh] bg-transparent flex flex-col items-center justify-center px-4">
       <div className="max-w-xl w-full text-center space-y-6">
         {/* SVG Illustration */}
         <div className="relative w-[300px] sm:w-[400px] mx-auto">

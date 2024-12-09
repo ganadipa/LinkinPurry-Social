@@ -7,6 +7,7 @@ export const Route = createFileRoute("/bruh")({
 
 function RouteComponent() {
   const { users: recommendations } = useConnectionRecommendation();
+  console.log(recommendations);
 
   return "Hello /bruh!";
 }
