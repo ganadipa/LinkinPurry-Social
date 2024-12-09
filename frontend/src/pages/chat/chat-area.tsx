@@ -48,19 +48,6 @@ export default function ChatArea({
     sendTypingStatus(isTyping);
   }, [isTyping]);
 
-  useEffect(() => {
-    if (isChatLoading) {
-    //   toast.loading("Loading messages...");
-    } else {
-      toast.dismiss();
-      if (messages) {
-        // toast.success("Messages loaded successfully.");
-      } else {
-        toast.error("Failed to load messages.");
-      }
-    }
-  }, [isChatLoading, messages]);
-
   if (selectedContact === null) {
     return (
       <div className={`self-center mx-auto ${className}`}>
@@ -86,7 +73,7 @@ export default function ChatArea({
     if (inputMessage.trim()) {
       sendMessage(inputMessage);
       setInputMessage("");
-    //   toast.success("Message sent.");
+      //   toast.success("Message sent.");
     }
   };
 
