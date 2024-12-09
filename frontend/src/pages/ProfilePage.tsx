@@ -6,6 +6,7 @@ import WorkHistory from "@/components/specific/profile/WorkHistory";
 import Skills from "@/components/specific/profile/Skills";
 import { useTitle } from "@/hooks/title";
 import { Feeds } from "@/components/specific/profile/Feeds";
+import ProfileNotFound from "./not-found/ProfileNotFound";
 
 export default function ProfilePage({ id }: { id: number }) {
   const { user, isLoading: isAuthLoading } = useAuth();
@@ -26,7 +27,7 @@ export default function ProfilePage({ id }: { id: number }) {
   }
 
   if (!profile) {
-    return <div>Profile not found</div>;
+    return <ProfileNotFound />;
   }
 
   return (

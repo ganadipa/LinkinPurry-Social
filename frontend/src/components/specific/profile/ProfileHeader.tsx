@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MdEditSquare } from "react-icons/md";
 import { Link } from "@tanstack/react-router";
@@ -7,6 +7,8 @@ import EditModals from "@/components/specific/edit-modals-profile";
 import { useConnectionStatus } from "@/hooks/connection-status";
 import toast from "react-hot-toast";
 // import EditProfileModals from "@/components/specific/edit-modals-profile";
+
+type status = "connected" | "not_connected" | "pending";
 
 interface ProfileHeaderProps {
   profile: {
@@ -28,10 +30,37 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   profileId,
   isOwnProfile,
 }) => {
-  const { status, loading, toggleConnection } = useConnectionStatus(
+  const { loading, toggleConnection } = useConnectionStatus(
     user?.id || null,
     profileId
   );
+
+  const [statusLabel, setStatusLabel] = useState<status | null>("not_connected");
+
+  const getStatusLabel = async () => {
+    try {
+      const response = await fetch(`/api/connections/status/${profileId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch connection status");
+      }
+
+      const json = await response.json();
+      setStatusLabel(json.body.status);
+    } catch (error) {
+      console.error("Failed to fetch connection status:", error);
+    }
+  }
+
+  useEffect(() => {
+    console.log(statusLabel);
+    getStatusLabel();
+  });
 
   const [name, setName] = useState<string>(profile.name);
   const [username, setUsername] = useState<string>(profile.username);
@@ -41,7 +70,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
 
   const onConnect = async () => {
-    if (loading) return;
+    if (loading || statusLabel == "pending") return;
     await toggleConnection();
   };
 
@@ -56,6 +85,39 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     setName(newName);
     setUsername(newUsername);
     toast.success("Name updated successfully");
+  };
+
+  const getButtonText = () => {
+    if (loading) {
+      return "Loading...";
+    }
+    switch (statusLabel) {
+      case "connected":
+        return "Connected";
+      case "pending":
+        return "Pending";
+      default:
+        return "Connect";
+    }
+  };
+
+  const getButtonStyle = () => {
+    const baseStyle = "w-full sm:w-auto text-sm sm:text-base font-medium rounded-full transition duration-200 ease-in-out px-4 sm:px-6 py-1.5 sm:py-2";
+    
+    if (loading) {
+      return `${baseStyle} bg-gray-200 text-gray-600 cursor-not-allowed`;
+    }
+  
+    switch (statusLabel) {
+      case "connected":
+        return `${baseStyle} bg-white text-[#0a66c2] border border-[#0a66c2] hover:bg-[#0a66c2] hover:text-white`;
+      case "pending":
+        return `${baseStyle} bg-gray-100 text-gray-500 cursor-not-allowed border border-gray-300`;
+      case "not_connected":
+        return `${baseStyle} bg-[#0a66c2] text-white hover:bg-[#004182]`;
+      default:
+        return `${baseStyle} bg-[#0a66c2] text-white hover:bg-[#004182]`;
+    }
   };
 
   return (
@@ -108,16 +170,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           <div className="mt-4 sm:mt-0">
             {user && user.id !== profileId && (
               <Button
-                variant="default"
-                className={`w-full sm:w-auto rounded-full ${
-                  status
-                    ? "bg-white text-[#0a66c2] border border-[#0a66c2] hover:bg-[#0a66c2] hover:text-white"
-                    : "bg-[#0a66c2] text-white hover:bg-[#004182]"
-                }`}
-                onClick={onConnect}
-              >
-                {status ? "Connected" : "Connect"}
-              </Button>
+              variant="default"
+              className={`w-full sm:w-auto rounded-full px-6 py-2 font-medium text-sm ${getButtonStyle()}`}
+              onClick={onConnect}
+              disabled={loading || statusLabel === "pending"}
+            >
+              {getButtonText()}
+            </Button>
             )}
           </div>
         </div>

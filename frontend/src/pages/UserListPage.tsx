@@ -60,7 +60,10 @@ export default function UserListPage() {
   
             const statusData = await statusResponse.json();
             const statusMap = statusData.body.reduce(
-              (acc: any, { userId, status }: any) => {
+              (acc: Record<number, "connected" | "pending" | "not_connected"> , { userId, status }: {
+                userId: number;
+                status: "connected" | "pending" | "not_connected";
+              }) => {
                 acc[userId] = status;
                 return acc;
               },
