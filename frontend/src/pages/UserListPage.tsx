@@ -3,7 +3,6 @@ import { debounce } from "lodash";
 import { UserCard } from "@/components/ui/user-card";
 import { useAuth } from "@/hooks/auth";
 import { getUsersResponse } from "@/types/response";
-import { determineStatus } from "@/lib/connectionUtils";
 import Loading from "@/components/loading";
 import { useTitle } from "@/hooks/title";
 
@@ -47,58 +46,42 @@ export default function UserListPage() {
         const validatedUsers = parsed.data.body;
         setUsers(validatedUsers);
 
-        const connectionsResponse = await fetch("/api/connections", {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
-        const requestsResponse = await fetch("/api/connections/requests", {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
-        const requestsFromResponse = await fetch(
-          "/api/connections/requests-from",
-          {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
+        if (currentUser) {
+            // Fetch statuses in bulk
+            const statusResponse = await fetch("/api/connections/statuses", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ userIds: validatedUsers.map((u) => u.id) }),
+            });
+  
+            if (!statusResponse.ok) {
+              throw new Error("Failed to fetch connection statuses");
+            }
+  
+            const statusData = await statusResponse.json();
+            const statusMap = statusData.body.reduce(
+              (acc: any, { userId, status }: any) => {
+                acc[userId] = status;
+                return acc;
+              },
+              {}
+            );
+  
+            setStatuses(statusMap);
+          } else {
+            setStatuses(
+              validatedUsers.reduce((acc, user) => {
+                acc[user.id] = "not_connected";
+                return acc;
+              }, {} as { [key: number]: "connected" | "pending" | "not_connected" })
+            );
           }
-        );
-
-        if (
-          !connectionsResponse.ok ||
-          !requestsResponse.ok ||
-          !requestsFromResponse.ok
-        ) {
-          throw new Error("Failed to fetch connection data");
+        } catch (error) {
+          console.error("Error fetching users:", error);
+        } finally {
+          setLoading(false);
         }
-
-        const connectionsData = await connectionsResponse.json();
-        const requestsData = await requestsResponse.json();
-        const requestsFromData = await requestsFromResponse.json();
-
-        const connections = connectionsData.body || [];
-        const connectionRequests = requestsData.body || [];
-        const connectionRequestsFrom = requestsFromData.body || [];
-
-        const statusMap: {
-          [key: number]: "connected" | "pending" | "not_connected";
-        } = {};
-        validatedUsers.forEach((user) => {
-          statusMap[user.id] = determineStatus(
-            user.id,
-            currentUser?.id || 0,
-            connections,
-            connectionRequests,
-            connectionRequestsFrom
-          );
-        });
-
-        setStatuses(statusMap);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      } finally {
-        setLoading(false);
-      }
-    }, 600), // 600ms debounce delay
+      }, 600), // 600ms debounce delay
     [currentUser]
   );
 
@@ -127,8 +110,6 @@ export default function UserListPage() {
         alert(`Failed to send connection request: ${data.message}`);
         return;
       }
-
-            // alert("Connection request sent successfully!");
 
       // update status locally
       setStatuses((prev) => ({ ...prev, [userId]: "pending" }));
