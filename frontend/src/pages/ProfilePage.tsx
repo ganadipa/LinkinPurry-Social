@@ -19,6 +19,12 @@ export default function ProfilePage({ id }: { id: number }) {
     deletePost,
     updatePost,
   } = useProfile(id);
+  let showing = [];
+  if (posts) {
+    showing = posts;
+  }
+  const LIMIT_3 = Math.min(3, showing.length); 
+  const LIMITED_POSTS = showing.slice(0, LIMIT_3);
 
   const isOwnProfile = user?.id === id;
   const isLoading = isAuthLoading || isProfileLoading;
@@ -69,7 +75,7 @@ export default function ProfilePage({ id }: { id: number }) {
             deletePost={deletePost}
             updatePost={updatePost}
             loading={isProfileLoading}
-            posts={posts}
+            posts={LIMITED_POSTS}
           />
         ) : (
           <p className="text-gray-500 text-sm text-center">No posts found</p>

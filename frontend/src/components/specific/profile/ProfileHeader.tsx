@@ -58,9 +58,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   }
 
   useEffect(() => {
-    console.log(statusLabel);
-    getStatusLabel();
-  });
+    if (user) {
+        console.log(statusLabel);
+        getStatusLabel();
+    }
+  }, [user, profileId]);
 
   const [name, setName] = useState<string>(profile.name);
   const [username, setUsername] = useState<string>(profile.username);
