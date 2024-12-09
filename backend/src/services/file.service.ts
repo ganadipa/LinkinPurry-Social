@@ -11,7 +11,7 @@ export class FileService {
   } as const;
 
   private readonly uploadPath =
-    process.env.ENVIROMENT === "docker"
+    process.env.ENVIRONMENT === "docker"
       ? "/var/www/uploads"
       : path.join(__dirname, "../../uploads/public");
   private readonly publicPath = path.join(this.uploadPath, "public");
@@ -28,6 +28,9 @@ export class FileService {
   }
 
   private generateFileName(originalName: string): string {
+    console.log(this.uploadPath);
+    console.log(this.publicPath);
+    console.log(this.privatePath);
     const timestamp = Date.now();
     const randomString = crypto.randomBytes(8).toString("hex");
     const extension = path.extname(originalName);
