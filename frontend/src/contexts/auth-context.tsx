@@ -89,8 +89,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const userId = user?.id;
     if (userId !== undefined) {
       const notificationService = NotificationService.getInstance(userId);
-      await notificationService.unsubscribeFromPush();
+      if (await notificationService.isServiceWorkerRegistered()) {
+        await notificationService.unsubscribeFromPush();
+      } else {
+        console.log("Not registered yet but let's just log out");
+      }
     }
+
+    NotificationService.resetInstance();
 
     const resp = await fetch("/api/logout", {
       method: "POST",

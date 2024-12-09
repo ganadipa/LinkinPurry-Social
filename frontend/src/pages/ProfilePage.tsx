@@ -53,7 +53,7 @@ export default function ProfilePage({ id }: { id: number }) {
   }
 
   return (
-    <div className="max-w-5xl mx-auto pb-6 space-y-6">
+    <div className="max-w-5xl mx-auto pb-6 px-6 space-y-6">
       <ProfileHeader
         profile={profile}
         user={user ?? undefined}
