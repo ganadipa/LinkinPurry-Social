@@ -19,6 +19,7 @@ import {
   CheckConnectionResponseSchema,
   GetConnectionRequestsFromResponseSchema,
 } from "../schemas/connection.schema";
+import { URL_PUBLIC_UPLOADS } from "../constants/constants";
 
 @injectable()
 export class ConnectionController implements Controller {
@@ -869,10 +870,15 @@ export class ConnectionController implements Controller {
         const recommendations =
           await this.connectionService.getConnectionRecommendations(userId);
 
-        const jsonFriendlyRecommendations = recommendations.map((user) => ({
-          ...user,
-          id: Number(user.id),
-        }));
+        const jsonFriendlyRecommendations = recommendations.map((user) => {
+          return {
+            id: Number(user.id),
+            name: user.full_name,
+            email: user.email,
+            username: user.username,
+            profile_photo_path: URL_PUBLIC_UPLOADS + user.profile_photo_path,
+          };
+        });
 
         return c.json(
           {
