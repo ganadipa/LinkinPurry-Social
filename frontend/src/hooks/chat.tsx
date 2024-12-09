@@ -210,13 +210,13 @@ export function useChat({ user_id }: { user_id: number | undefined }) {
       const response = await fetch(`/api/chat/${other_id}`);
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch messages");
-      }
-
       const error = ErrorSchema.safeParse(data);
       if (error.success) {
         throw new Error(error.data.message);
+      }
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch messages");
       }
 
       const result = ChatSpecificResponseSuccessSchema.safeParse(data);

@@ -97,6 +97,10 @@ export class ConnectionController implements Controller {
         const jsonFriendlyUsers = users.map((user) => ({
           ...user,
           id: Number(user.id),
+          profile_photo_path: URL_PUBLIC_UPLOADS + user.profile_photo_path,
+          username: user.username,
+          email: user.email,
+          name: user.full_name,
         }));
 
         return c.json(

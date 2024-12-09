@@ -9,6 +9,8 @@ export const GetUsersResponseSchema = z.object({
       id: z.number(),
       username: z.string(),
       email: z.string().optional(),
+      name: z.string().optional(),
+      profile_photo_path: z.string().optional(),
     })
   ),
 });
