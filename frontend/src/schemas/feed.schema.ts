@@ -17,7 +17,10 @@ export const FeedRelatedSchemas = z.object({
 });
 
 export const GetFeedSuccessSchema = SuccessResponseSchema.extend({
-  body: z.array(FeedRelatedSchemas),
+  body: z.object({
+    cursor: z.union([z.number(), z.null(), z.string()]),
+    posts: z.array(FeedRelatedSchemas),
+  }),
 });
 
 export const CreatePostSuccessSchema = SuccessResponseSchema.extend({

@@ -17,8 +17,13 @@ export const FeedRelatedSchemas = z.object({
 });
 
 export const GetFeedSuccessSchema = SuccessResponseSchema.extend({
-  body: z.array(FeedRelatedSchemas),
+  body: z.object({
+    cursor: z.union([z.number(), z.null(), z.string()]),
+    posts: z.array(FeedRelatedSchemas),
+  }),
 });
+
+export type GetFeedSuccess = z.infer<typeof GetFeedSuccessSchema>;
 
 export type FeedRelated = z.infer<typeof FeedRelatedSchemas>;
 

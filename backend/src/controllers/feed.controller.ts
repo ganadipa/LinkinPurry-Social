@@ -241,6 +241,11 @@ export class FeedController implements Controller {
           limit,
           cursor
         );
+
+        const cursorAfter = feed.reduce((max, post) => {
+          return post.post.id > max ? post.post.id : max;
+        }, -1);
+
         const feed_adjusted_profile_photo = feed.map((post) => {
           return {
             ...post,
@@ -256,7 +261,10 @@ export class FeedController implements Controller {
           {
             success: true as const,
             message: "Successfully get feed",
-            body: feed_adjusted_profile_photo,
+            body: {
+              cursor: cursorAfter,
+              posts: feed_adjusted_profile_photo,
+            },
           },
           200
         );

@@ -29,6 +29,7 @@ export class FeedService {
     }
     visible.push(BigInt(userid));
 
+    console.log("cursor is", cursor);
     const feeds = await this.feedRepository.getPaginatedFeeds(
       visible,
       limit,

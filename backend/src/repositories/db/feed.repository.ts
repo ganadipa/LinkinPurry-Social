@@ -122,6 +122,8 @@ export class DbFeedRepository implements FeedRepository {
     limit: number,
     cursor: number
   ): Promise<FeedRelated[]> {
+    console.log(cursor);
+
     const feeds = await this.prisma.prisma.feed.findMany({
       where: {
         user_id: {
@@ -131,7 +133,7 @@ export class DbFeedRepository implements FeedRepository {
       orderBy: {
         created_at: "desc",
       },
-      cursor: cursor ? { id: cursor } : undefined,
+      cursor: cursor != -1 ? { id: cursor } : undefined,
       skip: cursor ? 1 : 0,
       take: limit,
       select: {

@@ -1,4 +1,3 @@
-import * as React from "react";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import ChatPage from "@/pages/chat/chat-page";
 

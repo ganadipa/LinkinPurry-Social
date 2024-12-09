@@ -79,9 +79,7 @@ const Feed = () => {
         if (target.isIntersecting && hasMore && !isFetchingMore && feed) {
           try {
             setIsFetchingMore(true);
-            const lastPost = feed[feed.length - 1];
-            const cursor = lastPost ? lastPost.post.id : undefined;
-            await fetchFeed(cursor);
+            await fetchFeed();
           } catch (error) {
             console.error("Error fetching more posts:", error);
             toast.error("Failed to load more posts");

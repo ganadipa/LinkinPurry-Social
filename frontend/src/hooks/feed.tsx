@@ -14,8 +14,10 @@ export function useFeed() {
   const [feed, setFeed] = useState<FeedRelated[] | null>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [hasMore, setHasMore] = useState<boolean>(true);
+  const [cursor, setCursor] = useState<number>(-1);
+  console.log(cursor);
 
-  const fetchFeed = async (cursor?: number) => {
+  const fetchFeed = async () => {
     try {
       const url = new URL("/api/feed", window.location.origin);
       url.searchParams.append("limit", POSTS_PER_PAGE.toString());
@@ -25,7 +27,7 @@ export function useFeed() {
 
       const response = await fetch(url);
       const data = await response.json();
-      
+
       const failureCheck = ErrorSchema.safeParse(data);
       if (failureCheck.success) {
         throw new Error(failureCheck.data.message);
@@ -48,14 +50,28 @@ export function useFeed() {
         throw new Error("Failed to fetch feed");
       }
 
-      if (expect.data.body.length < POSTS_PER_PAGE) {
+      if (expect.data.body.posts.length < POSTS_PER_PAGE) {
         setHasMore(false);
       }
 
-      setFeed(prevFeed => {
-        if (!cursor) return expect.data.body;
-        return [...(prevFeed || []), ...expect.data.body];
+      setFeed((prevFeed) => {
+        if (!cursor) return expect.data.body.posts;
+        return [...(prevFeed || []), ...expect.data.body.posts];
       });
+
+      let the_cursor = expect.data.body.cursor;
+      if (typeof the_cursor === "string") {
+        the_cursor = parseInt(the_cursor);
+        if (isNaN(the_cursor)) {
+          the_cursor = null;
+        }
+      }
+
+      if (typeof the_cursor === "number") {
+        setCursor(the_cursor);
+      } else {
+        setCursor(-1);
+      }
 
       return expect.data.body;
     } catch (error) {
@@ -184,5 +200,13 @@ export function useFeed() {
     setFeed(feed.filter((post) => post.post.id !== id));
   };
 
-  return { feed, loading, hasMore, fetchFeed, createPost, updatePost, deletePost };
+  return {
+    feed,
+    loading,
+    hasMore,
+    fetchFeed,
+    createPost,
+    updatePost,
+    deletePost,
+  };
 }
