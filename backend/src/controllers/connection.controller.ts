@@ -51,6 +51,7 @@ export class ConnectionController implements Controller {
     this.registerGetConnectionRequestsFromRoute();
     this.registerGetConnectionStatusesRoute();
     this.registerCheckConnectionStatusRoute();
+    this.registerConnectionRecommendationRoute();
   }
 
   // search users
@@ -96,7 +97,6 @@ export class ConnectionController implements Controller {
           ...user,
           id: Number(user.id),
         }));
-
 
         return c.json(
           {
@@ -246,9 +246,9 @@ export class ConnectionController implements Controller {
         }
 
         if (BigInt(user.id) === BigInt(to_id)) {
-            throw new BadRequestException(
-                "You cannot send a connection request to yourself"
-            );
+          throw new BadRequestException(
+            "You cannot send a connection request to yourself"
+          );
         }
 
         const from_id = BigInt(user.id);
@@ -687,21 +687,23 @@ export class ConnectionController implements Controller {
         },
       },
     });
-  
+
     this.hono.app.openapi(route, async (c) => {
       try {
         const { userIds } = await c.req.json();
         const currentUser = c.var.user;
-  
+
         if (!currentUser || !currentUser.id) {
-          throw new BadRequestException("User not found or user ID is undefined");
+          throw new BadRequestException(
+            "User not found or user ID is undefined"
+          );
         }
-  
+
         const statuses = await this.connectionService.getConnectionStatuses(
           BigInt(currentUser.id),
           userIds
         );
-  
+
         return c.json(
           {
             success: true,
@@ -756,21 +758,23 @@ export class ConnectionController implements Controller {
         },
       },
     });
-  
+
     this.hono.app.openapi(route, async (c) => {
       try {
         const userId = parseInt(c.req.param("userId"), 10);
         const currentUser = c.var.user;
-  
+
         if (!currentUser || !currentUser.id) {
-          throw new BadRequestException("User not found or user ID is undefined");
+          throw new BadRequestException(
+            "User not found or user ID is undefined"
+          );
         }
-  
+
         const status = await this.connectionService.getConnectionStatus(
           BigInt(currentUser.id),
           BigInt(userId)
         );
-  
+
         return c.json(
           {
             success: true,
@@ -808,5 +812,79 @@ export class ConnectionController implements Controller {
       },
       500
     );
+  }
+
+  private registerConnectionRecommendationRoute() {
+    const route = createRoute({
+      method: "get",
+      path: "/api/connections/recommendations",
+      tags: ["Connection"],
+      responses: {
+        200: {
+          description: "Recommendations retrieved successfully",
+          content: {
+            "application/json": {
+              schema: GetUsersResponseSchema,
+            },
+          },
+        },
+        400: {
+          description: "Bad Request",
+          content: {
+            "application/json": {
+              schema: NullErrorResponseSchema,
+            },
+          },
+        },
+        401: {
+          description: "Unauthorized",
+          content: {
+            "application/json": {
+              schema: NullErrorResponseSchema,
+            },
+          },
+        },
+        500: {
+          description: "Internal Server Error",
+          content: {
+            "application/json": {
+              schema: NullErrorResponseSchema,
+            },
+          },
+        },
+      },
+    });
+
+    this.hono.app.openapi(route, async (c) => {
+      try {
+        const user = c.var.user;
+
+        if (!user || user.id === undefined) {
+          throw new BadRequestException(
+            "User not found or user ID is undefined"
+          );
+        }
+
+        const userId = BigInt(user.id);
+        const recommendations =
+          await this.connectionService.getConnectionRecommendations(userId);
+
+        const jsonFriendlyRecommendations = recommendations.map((user) => ({
+          ...user,
+          id: Number(user.id),
+        }));
+
+        return c.json(
+          {
+            success: true,
+            message: "Recommendations retrieved successfully",
+            body: jsonFriendlyRecommendations,
+          },
+          200
+        );
+      } catch (exception) {
+        return this.handleException(c, exception);
+      }
+    });
   }
 }

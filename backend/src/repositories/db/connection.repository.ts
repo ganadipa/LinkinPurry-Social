@@ -3,6 +3,8 @@ import { PrismaProvider } from "../../prisma/prisma";
 import { ConnectionRepository } from "../../interfaces/connection-repository.interface";
 import { CONFIG } from "../../ioc/config";
 import { Connection, ConnectionRequest } from "../../models/connection.model";
+import { User } from "../../models/user.model";
+import { InternalErrorException } from "../../exceptions/internal-error.exception";
 
 @injectable()
 export class DbConnectionRepository implements ConnectionRepository {
@@ -105,5 +107,106 @@ export class DbConnectionRepository implements ConnectionRepository {
     });
 
     return connections.map((connection) => connection.to_id);
+  }
+
+  async getConnectionRecommendations(userId: bigint): Promise<User[]> {
+    // Get direct connections first
+    const directConnections = await this.prisma.prisma.connection.findMany({
+      where: {
+        OR: [{ from_id: userId }, { to_id: userId }],
+      },
+    });
+
+    // Get IDs of direct connections
+    const connectedIds = new Set(
+      directConnections
+        .flatMap((conn) => [conn.from_id, conn.to_id])
+        .filter((id) => id !== userId)
+    );
+
+    // Find recommendations (2nd and 3rd degree)
+    const ret = await this.prisma.prisma.users.findMany({
+      where: {
+        AND: [
+          { id: { not: userId } }, // Exclude self
+          { id: { notIn: Array.from(connectedIds) } }, // Exclude direct connections
+          {
+            OR: [
+              // 2nd degree connections
+              {
+                connection_connection_to_idTousers: {
+                  some: {
+                    from_id: {
+                      in: Array.from(connectedIds),
+                    },
+                  },
+                },
+              },
+              {
+                connection_connection_from_idTousers: {
+                  some: {
+                    to_id: {
+                      in: Array.from(connectedIds),
+                    },
+                  },
+                },
+              },
+              // 3rd degree connections
+              {
+                connection_connection_to_idTousers: {
+                  some: {
+                    from_id: {
+                      in: Array.from(connectedIds),
+                    },
+                  },
+                },
+              },
+              {
+                connection_connection_from_idTousers: {
+                  some: {
+                    to_id: {
+                      in: Array.from(connectedIds),
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      },
+      take: 10,
+      orderBy: {
+        created_at: "desc",
+      },
+      select: {
+        id: true,
+        username: true,
+        full_name: true,
+        profile_photo_path: true,
+        work_history: true,
+        skills: true,
+        email: true,
+        password_hash: true,
+        created_at: true,
+        updated_at: true,
+      },
+    });
+
+    return ret.map((user) => {
+      if (!user.full_name) {
+        throw new InternalErrorException("User full name is missing");
+      }
+
+      return new User(
+        user.username,
+        user.email,
+        user.password_hash,
+        user.full_name,
+        user.profile_photo_path,
+        user.id,
+        user.created_at,
+        user.updated_at
+      );
+    });
   }
 }

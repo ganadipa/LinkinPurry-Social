@@ -1,3 +1,4 @@
+import { User } from "../models/user.model";
 import { Connection, ConnectionRequest } from "../models/connection.model";
 
 export interface ConnectionRepository {
@@ -11,4 +12,5 @@ export interface ConnectionRepository {
   checkConnection(fromId: bigint, toId: bigint): Promise<boolean>;
   getConnectionRequestsFrom(userId: bigint): Promise<ConnectionRequest[]>;
   getFriendsId(userId: bigint): Promise<bigint[]>;
+  getConnectionRecommendations(userId: bigint): Promise<User[]>;
 }
