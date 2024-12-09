@@ -334,11 +334,16 @@ export class ChatController implements Controller {
           throw new InternalErrorException("User full name not found");
         }
 
+        if (!user.id) {
+            throw new InternalErrorException("User id not found");
+        }
+
         console.log("Sending chat notification to:", to_id);
         this.notificationService.sendChatNotification(
           Number(to_id),
           expect.data.content,
-          user.full_name
+          user.full_name,
+          Number(user.id),
         );
 
         if (!message.id) {
