@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@tanstack/react-router";
-import toast from "react-hot-toast";
 
 interface ChatAreaProps {
   selectedContact: Contact | null;

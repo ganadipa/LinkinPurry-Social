@@ -6,6 +6,7 @@ import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, path.resolve(__dirname, ".."), "");
+  console.log("Loaded environment variables:", process.env);
   // only get the prefix REACT_
   Object.keys(env).forEach((key) => {
     if (!key.startsWith("REACT_")) {
@@ -31,7 +32,7 @@ export default defineConfig(({ mode }) => {
         },
         "/ws": {
           target:
-            env.ENVIRONMENT === "dev"
+            env.REACT_ENVIRONMENT === "dev"
               ? "http://be-dev:3000"
               : "http://localhost:3000",
           ws: true,
