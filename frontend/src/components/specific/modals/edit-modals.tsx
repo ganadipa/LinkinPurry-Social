@@ -9,6 +9,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { ErrorSchema } from "@/schemas/error.schema";
+import toast from "react-hot-toast";
 
 interface EditModalsProps {
   labelModal: string;
@@ -48,15 +50,22 @@ export default function EditModals({
       });
 
       const data = await response.json();
+      const error = ErrorSchema.safeParse(data);
+      if (error.success) {
+        throw new Error(error.data?.message || "Unknown error");
+      }
+
+      if (!response.ok) {
+        throw new Error("Failed to update work history");
+      }
 
       if (data.success) {
         onUpdateSuccess?.(inputValue);
         setIsModalOpen(false);
-      } else {
-        setError(data.message || "Failed to update profile");
       }
-    } catch (error) {
-      setError("Error updating profile");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+      toast.error(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsSubmitting(false);
     }
