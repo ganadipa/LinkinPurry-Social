@@ -49,6 +49,8 @@ export class ConnectionController implements Controller {
     this.registerCheckConnectionRoute();
     // get all connection requests from current user
     this.registerGetConnectionRequestsFromRoute();
+    this.registerGetConnectionStatusesRoute();
+    this.registerCheckConnectionStatusRoute();
   }
 
   // search users
@@ -623,6 +625,160 @@ export class ConnectionController implements Controller {
             message:
               "Connection requests from this user retrieved successfully",
             body: jsonFriendlyRequests,
+          },
+          200
+        );
+      } catch (exception) {
+        return this.handleException(c, exception);
+      }
+    });
+  }
+
+  private registerGetConnectionStatusesRoute() {
+    const route = createRoute({
+      method: "post",
+      path: "/api/connections/statuses",
+      security: [{ BearerAuth: [] }],
+      tags: ["Connection"],
+      request: {
+        body: {
+          content: {
+            "application/json": {
+              schema: z.object({
+                userIds: z.array(z.number()), // Array of user IDs to check status
+              }),
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: "Connection statuses retrieved successfully",
+          content: {
+            "application/json": {
+              schema: z.object({
+                success: z.boolean(),
+                message: z.string(),
+                body: z.array(
+                  z.object({
+                    userId: z.number(),
+                    status: z.enum(["connected", "pending", "not_connected"]),
+                  })
+                ),
+              }),
+            },
+          },
+        },
+        400: {
+          description: "Bad Request",
+          content: {
+            "application/json": {
+              schema: NullErrorResponseSchema,
+            },
+          },
+        },
+        500: {
+          description: "Internal Server Error",
+          content: {
+            "application/json": {
+              schema: NullErrorResponseSchema,
+            },
+          },
+        },
+      },
+    });
+  
+    this.hono.app.openapi(route, async (c) => {
+      try {
+        const { userIds } = await c.req.json();
+        const currentUser = c.var.user;
+  
+        if (!currentUser || !currentUser.id) {
+          throw new BadRequestException("User not found or user ID is undefined");
+        }
+  
+        const statuses = await this.connectionService.getConnectionStatuses(
+          BigInt(currentUser.id),
+          userIds
+        );
+  
+        return c.json(
+          {
+            success: true,
+            message: "Connection statuses retrieved successfully",
+            body: statuses,
+          },
+          200
+        );
+      } catch (exception) {
+        return this.handleException(c, exception);
+      }
+    });
+  }
+
+  private registerCheckConnectionStatusRoute() {
+    const route = createRoute({
+      method: "get",
+      path: "/api/connections/status/{userId}",
+      security: [{ BearerAuth: [] }],
+      tags: ["Connection"],
+      responses: {
+        200: {
+          description: "Connection status retrieved successfully",
+          content: {
+            "application/json": {
+              schema: z.object({
+                success: z.boolean(),
+                message: z.string(),
+                body: z.object({
+                  userId: z.number(),
+                  status: z.enum(["connected", "pending", "not_connected"]),
+                }),
+              }),
+            },
+          },
+        },
+        400: {
+          description: "Bad Request",
+          content: {
+            "application/json": {
+              schema: NullErrorResponseSchema,
+            },
+          },
+        },
+        500: {
+          description: "Internal Server Error",
+          content: {
+            "application/json": {
+              schema: NullErrorResponseSchema,
+            },
+          },
+        },
+      },
+    });
+  
+    this.hono.app.openapi(route, async (c) => {
+      try {
+        const userId = parseInt(c.req.param("userId"), 10);
+        const currentUser = c.var.user;
+  
+        if (!currentUser || !currentUser.id) {
+          throw new BadRequestException("User not found or user ID is undefined");
+        }
+  
+        const status = await this.connectionService.getConnectionStatus(
+          BigInt(currentUser.id),
+          BigInt(userId)
+        );
+  
+        return c.json(
+          {
+            success: true,
+            message: "Connection status retrieved successfully",
+            body: {
+              userId,
+              status,
+            },
           },
           200
         );
