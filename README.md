@@ -168,5 +168,5 @@ We made a great team! one task is not purely done alone
 (Bonus)
 
 9. UI UX Linkedin: 13522066, 13522072, 13522096
-10. Connection Recommendation:13522066
+10. Connection Recommendation: 13522066, 13522072 
 11. Typing Indicator: 13522066
