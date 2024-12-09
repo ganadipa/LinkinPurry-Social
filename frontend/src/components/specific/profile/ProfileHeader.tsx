@@ -6,9 +6,6 @@ import EditPhotoModals from "@/components/specific/modals/edit-photo";
 import EditModals from "@/components/specific/modals/edit-modals-profile";
 import { useConnectionStatus } from "@/hooks/connection-status";
 import toast from "react-hot-toast";
-// import EditProfileModals from "@/components/specific/edit-modals-profile";
-
-type status = "connected" | "not_connected" | "pending";
 
 interface ProfileHeaderProps {
   profile: {
@@ -16,8 +13,6 @@ interface ProfileHeaderProps {
     username: string;
     profile_photo: string;
     connection_count: number;
-    // work_history?: string;
-    // skills?: string;
   };
   user?: { id: number };
   profileId: number;
@@ -35,33 +30,27 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     profileId
   );
 
-  const [statusLabel, setStatusLabel] = useState<status | null>("not_connected");
+  const [status, setStatus] = useState<"connected" | "not_connected" | "pending">("not_connected");
 
-  const getStatusLabel = async () => {
+  const getStatus = async () => {
     try {
       const response = await fetch(`/api/connections/status/${profileId}`, {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" }
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch connection status");
-      }
+      if (!response.ok) throw new Error("Failed to fetch connection status");
 
-      const json = await response.json();
-      setStatusLabel(json.body.status);
+      const data = await response.json();
+      setStatus(data.body.status);
     } catch (error) {
       console.error("Failed to fetch connection status:", error);
+      toast.error("Failed to load connection status");
     }
-  }
+  };
 
   useEffect(() => {
-    if (user) {
-        console.log(statusLabel);
-        getStatusLabel();
-    }
+    if (user) getStatus();
   }, [user, profileId]);
 
   const [name, setName] = useState<string>(profile.name);
@@ -72,16 +61,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
 
   const onConnect = async () => {
-    if (loading || statusLabel == "pending") return;
+    if (loading || status == "pending") return;
     await toggleConnection();
+    await getStatus();
   };
-
-  // const handleUpdate = (newName: string, newUsername: string, newWorkHistory: string, newSkills: string) => {
-  //   setName(newName);
-  //   setUsername(newUsername);
-  //   setWorkHistory(newWorkHistory);
-  //   setSkills(newSkills);
-  // };
 
   const handleUpdate = (newName: string, newUsername: string) => {
     setName(newName);
@@ -93,7 +76,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     if (loading) {
       return "Loading...";
     }
-    switch (statusLabel) {
+    switch (status) {
       case "connected":
         return "Connected";
       case "pending":
@@ -110,7 +93,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       return `${baseStyle} bg-gray-200 text-gray-600 cursor-not-allowed`;
     }
   
-    switch (statusLabel) {
+    switch (status) {
       case "connected":
         return `${baseStyle} bg-white text-[#0a66c2] border border-[#0a66c2] hover:bg-[#0a66c2] hover:text-white`;
       case "pending":
@@ -175,7 +158,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               variant="default"
               className={`w-full sm:w-auto rounded-full px-6 py-2 font-medium text-sm ${getButtonStyle()}`}
               onClick={onConnect}
-              disabled={loading || statusLabel === "pending"}
+              disabled={loading || status === "pending"}
             >
               {getButtonText()}
             </Button>
@@ -184,7 +167,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </div>
       </div>
 
-      {/* Modals */}
       <EditPhotoModals
         photoModalOpen={photoModalOpen}
         setPhotoModalOpen={setPhotoModalOpen}
@@ -195,28 +177,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         onEditPhoto={() => {}}
         onDeletePhoto={() => {}}
       />
-
-      {/* <EditProfileModals
-          isModalOpen={editModalOpen}
-          setIsModalOpen={setEditModalOpen}
-          userId={user?.id ?? 0}
-          initialData={{
-            name: name || '',
-            username: username || '',
-            work_history: workHistory || '',
-            skills: skills || '',
-          }}
-          onUpdateSuccess={(updatedData) => {
-            console.log('Profile updated successfully:', updatedData);
-            // Handle UI state or refetch updated data
-            handleUpdate(
-              updatedData.name || '',
-              updatedData.username || '',
-              updatedData.work_history || '',
-              updatedData.skills || ''
-            );
-          }}
-        /> */}
 
       <EditModals
         value={{ name, username }}

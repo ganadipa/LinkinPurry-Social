@@ -71,30 +71,6 @@ const Header = () => {
             </>
           ) : (
             <>
-              {/* {user.role.value === "jobseeker" && (
-                <Link href="/jobseeker/history" className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0">
-                  <img src="/images/history.png" alt="History" className="w-6 h-6 mb-1" />
-                  <span className="text-xs">History</span>
-                </Link>
-              )}
-              {user.role.value === "company" && (
-                <Link href="/profile" className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0">
-                  <img src="/images/account.png" alt="Profile" className="w-6 h-6 mb-1" />
-                  <span className="text-xs">Profile</span>
-                </Link>
-              )}
-              // */}
-              {/* <Link
-                href="/users"
-                className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
-              >
-                <img
-                  src="/images/people.png"
-                  alt="Users"
-                  className="w-6 h-6 mb-1"
-                />
-                <span className="text-xs">People</span>
-              </Link> */}
               <Link
                 href={`/connections/${user.id}`}
                 className="flex flex-col items-center text-gray-500 invert-[0.5] hover:invert-0"
@@ -193,19 +169,6 @@ const Header = () => {
               </>
             ) : (
               <>
-                {/* {user.role.value === "jobseeker" && (
-                  <Link
-                    href="/jobseeker/history"
-                    className="block text-gray-700 mb-4"
-                  >
-                    History
-                  </Link>
-                )}
-                {user.role.value === "company" && (
-                  <Link onClick={() => setSidenavOpen(false)} href="/profile" className="block text-gray-700 mb-4">
-                    Profile
-                  </Link>
-                )} */}
                 <Link
                   onClick={() => setSidenavOpen(false)}
                   href={`/connections/${user.id}`}
@@ -226,7 +189,6 @@ const Header = () => {
                 >
                   Profile
                 </Link>
-                {/* <NotificationMain /> */}
                 <button className="block text-gray-700 mb-4" onClick={logout}>
                   Logout
                 </button>

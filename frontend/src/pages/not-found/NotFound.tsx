@@ -5,13 +5,10 @@ const NotFound: React.FC = () => {
   return (
     <div className="min-h-[80vh] bg-transparent flex flex-col items-center justify-center px-4">
       <div className="max-w-xl w-full text-center space-y-6">
-        {/* SVG Illustration */}
         <div className="relative w-[300px] sm:w-[400px] mx-auto">
-          {/* Insert the SVG code here */}
             <img src="/images/404-not-found.svg" alt="404" />
         </div>
 
-        {/* Text Content */}
         <div className="space-y-4">
           <h1 className="text-3xl font-semibold text-gray-900">
             This page doesn't exist
@@ -21,7 +18,6 @@ const NotFound: React.FC = () => {
           </p>
         </div>
 
-        {/* Action Button */}
         <div className="pt-4">
           <Link
             href="/"

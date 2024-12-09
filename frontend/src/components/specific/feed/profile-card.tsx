@@ -13,12 +13,9 @@ const ProfileCard = () => {
 
   return (
     <Card className="overflow-hidden bg-white">
-      {/* Background Cover */}
       <img src="/images/banner-placeholder.svg" alt="Cover" className="w-full h-24 object-cover" />
       
-      {/* Profile Section */}
       <div className="px-4 pt-0 pb-4">
-        {/* Profile Picture */}
         <div className="flex justify-start">
           <Link
             href={`/profile/${user?.id}`}
@@ -32,7 +29,6 @@ const ProfileCard = () => {
           </Link>
         </div>
 
-        {/* Profile Info */}
         <div className="mt-3 text-start">
           <Link
             href={`/profile/${user?.id}`}

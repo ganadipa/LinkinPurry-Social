@@ -36,7 +36,6 @@ export class SocketProvider {
 
     this.io.on("connection", (socket) => {
       console.log("Client connected:", socket.id);
-      // ... rest of your socket code
     });
   }
 }

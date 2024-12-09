@@ -1,5 +1,3 @@
-// frontend/src/services/notification.service.ts
-
 export class NotificationService {
   private user_id: number;
 
