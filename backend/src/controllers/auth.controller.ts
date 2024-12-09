@@ -129,6 +129,7 @@ export class AuthController implements Controller {
           );
         }
 
+        console.log("Ging to the service!");
         if (!user) {
           token = await this.authService.login(payload);
         } else {
@@ -148,7 +149,7 @@ export class AuthController implements Controller {
 
         const { iat, exp } = tokenPayload;
 
-        setCookie(c, "authorization", token, {
+        setCookie(c, "token", token, {
           httpOnly: true,
           secure: true,
           sameSite: "strict",
@@ -230,7 +231,7 @@ export class AuthController implements Controller {
 
     this.hono.app.openapi(route, async (c) => {
       try {
-        deleteCookie(c, "authorization");
+        deleteCookie(c, "token");
 
         if (!c.var.user) {
           throw new BadRequestException("No user found");

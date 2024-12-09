@@ -13,7 +13,6 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as BruhImport } from './routes/bruh'
 import { Route as AuthenticatedImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedRequestsImport } from './routes/_authenticated/requests'
@@ -35,12 +34,6 @@ const authorizationImport = createFileRoute('/(authorization)')()
 
 const authorizationRoute = authorizationImport.update({
   id: '/(authorization)',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const BruhRoute = BruhImport.update({
-  id: '/bruh',
-  path: '/bruh',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -125,13 +118,6 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: ''
       preLoaderRoute: typeof AuthenticatedImport
-      parentRoute: typeof rootRoute
-    }
-    '/bruh': {
-      id: '/bruh'
-      path: '/bruh'
-      fullPath: '/bruh'
-      preLoaderRoute: typeof BruhImport
       parentRoute: typeof rootRoute
     }
     '/(authorization)': {
@@ -279,7 +265,6 @@ const authorizationRouteWithChildren = authorizationRoute._addFileChildren(
 
 export interface FileRoutesByFullPath {
   '': typeof AuthenticatedRouteWithChildren
-  '/bruh': typeof BruhRoute
   '/': typeof AuthenticatedIndexRoute
   '/users': typeof publicUsersRoute
   '/chat': typeof AuthenticatedChatRouteWithChildren
@@ -293,7 +278,6 @@ export interface FileRoutesByFullPath {
 }
 
 export interface FileRoutesByTo {
-  '/bruh': typeof BruhRoute
   '/': typeof AuthenticatedIndexRoute
   '/users': typeof publicUsersRoute
   '/requests': typeof AuthenticatedRequestsRoute
@@ -308,7 +292,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/bruh': typeof BruhRoute
   '/(authorization)': typeof authorizationRouteWithChildren
   '/(authorization)/_auth': typeof authorizationAuthRouteWithChildren
   '/(public)/users': typeof publicUsersRoute
@@ -327,7 +310,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | ''
-    | '/bruh'
     | '/'
     | '/users'
     | '/chat'
@@ -340,7 +322,6 @@ export interface FileRouteTypes {
     | '/chat/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/bruh'
     | '/'
     | '/users'
     | '/requests'
@@ -353,7 +334,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_authenticated'
-    | '/bruh'
     | '/(authorization)'
     | '/(authorization)/_auth'
     | '/(public)/users'
@@ -371,7 +351,6 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  BruhRoute: typeof BruhRoute
   authorizationRoute: typeof authorizationRouteWithChildren
   publicUsersRoute: typeof publicUsersRoute
   publicConnectionsIdRoute: typeof publicConnectionsIdRoute
@@ -380,7 +359,6 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  BruhRoute: BruhRoute,
   authorizationRoute: authorizationRouteWithChildren,
   publicUsersRoute: publicUsersRoute,
   publicConnectionsIdRoute: publicConnectionsIdRoute,
@@ -398,7 +376,6 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/_authenticated",
-        "/bruh",
         "/(authorization)",
         "/(public)/users",
         "/(public)/connections/$id",
@@ -412,9 +389,6 @@ export const routeTree = rootRoute
         "/_authenticated/requests",
         "/_authenticated/"
       ]
-    },
-    "/bruh": {
-      "filePath": "bruh.tsx"
     },
     "/(authorization)": {
       "filePath": "(authorization)",

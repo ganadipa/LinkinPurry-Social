@@ -2,6 +2,7 @@
 .PHONY: run backend-run frontend-run tests-run monorepo-run
 .PHONY: clean backend-clean frontend-clean tests-clean monorepo-clean
 .PHONY: fe be test
+.PHONY: dev down dev-build prod prod-build seed prod-test prod-test-build
 
 # Default command
 run: monorepo-run
@@ -81,4 +82,12 @@ prod-build:
 
 seed:
 	@cd backend && node 
+
+prod-test:
+	@cd backend
+	@docker compose up prod-test
+
+prod-test-build:
+	@cd backend
+	@docker compose up prod-test --build
 	

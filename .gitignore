@@ -10,3 +10,4 @@ uploads/public/*
 uploads/private/*
 !uploads/private/.gitkeep
 !uploads/public/default-profile-picture.jpg
+test/*

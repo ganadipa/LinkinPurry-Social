@@ -20,7 +20,7 @@ export class AuthMiddleware {
   public intercept = createMiddleware(async (c, next) => {
     console.log("[AuthMiddleware] intercept");
 
-    const token = getCookie(c, "authorization");
+    const token = getCookie(c, "token");
     if (!token) {
       c.set("user", null);
       await next();

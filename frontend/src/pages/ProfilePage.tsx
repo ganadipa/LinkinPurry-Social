@@ -24,7 +24,7 @@ export default function ProfilePage({ id }: { id: number }) {
   if (posts) {
     showing = posts;
   }
-  const LIMIT_3 = Math.min(3, showing.length); 
+  const LIMIT_3 = Math.min(3, showing.length);
   const LIMITED_POSTS = showing.slice(0, LIMIT_3);
 
   const isOwnProfile = user?.id === id;

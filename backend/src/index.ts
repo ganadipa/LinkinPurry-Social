@@ -12,9 +12,9 @@ BigInt.prototype.toJSON = function () {
   return this.toString();
 };
 
-// dotenv.config({
-//   path: ".env.prod",
-// });
+dotenv.config({
+  path: ".env.example",
+});
 
 const app = new Application();
 const port = Number(process.env.PORT) || 8000;

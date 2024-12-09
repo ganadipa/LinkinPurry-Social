@@ -10,7 +10,10 @@ export class FileService {
     PRIVATE: "PRIVATE",
   } as const;
 
-  private readonly uploadPath = "/var/www/uploads";
+  private readonly uploadPath =
+    process.env.ENVIROMENT === "docker"
+      ? "/var/www/uploads"
+      : path.join(__dirname, "../../uploads/public");
   private readonly publicPath = path.join(this.uploadPath, "public");
   private readonly privatePath = path.join(this.uploadPath, "private");
 

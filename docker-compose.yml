@@ -6,13 +6,13 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - db
+      # - db
       - redis
       - fe-dev
     env_file:
       - .env.docker
     environment:
-      - ENVIRONMENT=dev
+      - ENVIRONMENT=docker
     networks:
       - internal-network
     volumes:
@@ -60,9 +60,33 @@ services:
     env_file:
       - .env.docker
     environment:
-      - ENVIRONMENT=prod
+      - ENVIRONMENT=docker
     volumes:
       - ./uploads:/var/www/uploads
+
+  prod-test:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.test
+    ports:
+      - "3000:3000"
+    depends_on:
+      - nicholasliem-db
+    networks:
+      - internal-network
+    env_file:
+      - ./backend/.env.test
+    environment:
+      - ENVIRONMENT=docker
+    volumes:
+      - ./uploads:/var/www/uploads
+
+  nicholasliem-db:
+    image: nicholasliem/wbd-m2-db-image:latest
+    ports:
+      - "5433:5432"
+    networks:
+      - internal-network
 
 networks:
   internal-network:

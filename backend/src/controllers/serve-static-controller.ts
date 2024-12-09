@@ -16,29 +16,38 @@ export class ServeStaticController implements Controller {
 
   public registerRoutes(): void {
     const distRelativeToRoot = "../frontend/dist";
-    const slash = "../../";
-    const uploadsPath = slash + "var/www/uploads/public";
 
-    this.hono.app.use(
-      "/uploads/*",
-      serveStatic({
-        root: "../../var/www/uploads/public",
-        rewriteRequestPath: (path) => path.replace("/uploads", ""),
-      })
-    );
+    if (process.env.ENVIRONMENT === "docker") {
+      console.log("in the response formatter middleware");
+      this.hono.app.use(
+        "/uploads/*",
+        serveStatic({
+          root: "../../var/www/uploads/public",
+          rewriteRequestPath: (path) => path.replace("/uploads", ""),
+        })
+      );
+    } else {
+      console.log("in the response formatter middleware");
+      this.hono.app.use(
+        "/uploads/*",
+        serveStatic({
+          root: "../uploads/public",
+          rewriteRequestPath: (path) => path.replace("/uploads", ""),
+        })
+      );
+    }
 
-    // this.hono.app.use("/uploads/*", async (c, next) => {
-    //   console.log("uploads path", uploadsPath);
-    //   return await serveStatic({
-    //     root: uploadsPath,
-    //   })(c, next);
-    // });
+    this.hono.app.use("*", async (c, next) => {
+      return await serveStatic({
+        root: distRelativeToRoot,
+      })(c, next);
+    });
 
-    // this.hono.app.get("*", async (c, next) => {
-    //   console.log("uploads path");
-    //   return await serveStatic({
-    //     root: ".",
-    //   })(c, next);
-    // });
+    this.hono.app.get("/*", async (c, next) => {
+      return await serveStatic({
+        root: distRelativeToRoot,
+        path: "index.html",
+      })(c, next);
+    });
   }
 }
