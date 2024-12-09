@@ -3,8 +3,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DialogDescription } from '@radix-ui/react-dialog';
-import axios from 'axios';
-import { Profile } from '@/types/profile';
+import toast from 'react-hot-toast';
+import { ErrorSchema } from '@/schemas/error.schema';
 
 interface EditModalsProps {
   value: {
@@ -32,34 +32,39 @@ export default function EditModalsProfile({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setError(null);
-  
+    
     try {
-      const updatePayload: Partial<Profile> = {
-        username: inputUsername.trim(),
-        name: inputName.trim(),
-      };
-      const response = await axios.put(`/api/profile/${userId}`, updatePayload, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        }
+      const formData = new FormData();
+      formData.append('username', inputUsername.trim());
+      formData.append('name', inputName.trim());
+   
+      const response = await fetch(`/api/profile/${userId}`, {
+        method: 'PUT',
+        body: formData
       });
-      
-      const data = response.data as { success: boolean; message?: string, body?: Profile };
-      console.log(data);
-  
-      if (data.success) {
-        onUpdateSuccess?.(inputName, inputUsername);
-        setIsModalOpen(false);
-      } else {
-        setError(data.message || 'Failed to update profile');
+   
+      const data = await response.json();
+      const error = ErrorSchema.safeParse(data);
+      if (error.success) {
+        throw new Error(error.data?.message || "Unknown error");
       }
-    } catch {
-      setError('Error updating profile');
+
+      if (!response.ok) {
+        throw new Error("Failed to update profile");
+      }
+   
+      if (data.success) {
+        onUpdateSuccess?.(data.body.name, data.body.username);
+        setIsModalOpen(false); 
+      }
+   
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+      toast.error(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsSubmitting(false);
     }
-  };  
+   };
 
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -91,9 +96,6 @@ export default function EditModalsProfile({
               required
             />
           </div>
-          {error && (
-            <p className="text-red-500 mt-2">{error}</p>
-          )}
           <DialogFooter className="mt-6 flex justify-end gap-2">
             <Button
               variant="ghost"

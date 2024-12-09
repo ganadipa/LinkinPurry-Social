@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { MdFileUpload, MdDelete } from "react-icons/md";
+import { ErrorSchema } from "@/schemas/error.schema";
+import toast from "react-hot-toast";
 
 interface EditPhotoModalsProps {
   photoModalOpen: boolean;
@@ -59,13 +61,19 @@ export default function EditPhotoModals({
         }
 
         const data = await response.json();
+        
+        const error = ErrorSchema.safeParse(data);
+        if (error.success) {
+          throw new Error(error.data?.message || "Unknown error");
+        }
+
         setProfilePhoto(data.body.profile_photo);
       }
 
       setPhotoModalOpen(false);
       setSelectedPhoto(null);
-    } catch (error) {
-      console.error("Error updating profile photo:", error);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsLoading(false);
     }
