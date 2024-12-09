@@ -3,7 +3,6 @@ import { Controller } from "./controller";
 import { CONFIG } from "../ioc/config";
 import { OpenApiHonoProvider } from "../core/hono-provider";
 import { ProfileService } from "../services/profile.service";
-import { ZodValidationService } from "../services/zod-validation.service";
 import { InternalErrorException } from "../exceptions/internal-error.exception";
 import { UnauthorizedException } from "../exceptions/unauthorized.exception";
 import { UpdateProfileFormDataSchema } from "../constants/request-payload";
@@ -249,14 +248,14 @@ export class ProfileController implements Controller {
         updateUser.username = updateData.username ?? updateUser.username;
         updateUser.profile_photo_path = path ?? updateUser.profile_photo_path;
 
+        if (updateUser.username.includes(" ")) {
+          throw new BadRequestException("Username cannot contain spaces");
+        }
+
         const profileData = await this.profileService.updateProfile(
           Number(userId),
           updateUser
         );
-
-        if (updateUser.username.includes(" ")) {
-          throw new BadRequestException("Username cannot contain spaces");
-        }
 
         return c.json(
           {
