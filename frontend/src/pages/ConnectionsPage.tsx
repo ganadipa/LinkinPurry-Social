@@ -62,7 +62,7 @@ export default function ConnectionsPage({ id }: ConnectionsPageProps) {
         const data = await response.json();
 
         const detailedConnections = await Promise.all(
-          data.body.map(async (connection: any) => {
+          data.body.map(async (connection: { from_id: number; to_id: number }) => {
             const userId =
               connection.from_id === (id || currentUser?.id)
                 ? connection.to_id

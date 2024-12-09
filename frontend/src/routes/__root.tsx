@@ -23,7 +23,7 @@ function RootComponent() {
 
       <main className="w-full flex-col flex-1">
         <Header />
-        <div className="mx-auto overflow-y w-full xl:w-[1120px]">
+        <div className="mx-auto mt-20 overflow-y w-full xl:w-[1280px]">
           <Outlet />
         </div>
       </main>

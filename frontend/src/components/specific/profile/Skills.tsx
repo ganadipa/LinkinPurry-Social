@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MdEditSquare } from "react-icons/md";
-import EditModals from "@/components/specific/edit-modals";
+import EditModals from "@/components/specific/modals/edit-modals";
 import { useAuth } from "@/hooks/auth";
 import toast from "react-hot-toast";
 // import { useProfile } from "@/hooks/profile";

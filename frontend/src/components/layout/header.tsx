@@ -13,7 +13,7 @@ const Header = () => {
   const toggleSidenav = () => setSidenavOpen((prev) => !prev);
 
   return (
-    <header className="bg-white sticky top-0 left-0 right-0 z-50 shadow-md">
+    <header className="bg-white fixed top-0 left-0 right-0 z-50 shadow-md">
       <nav className="flex justify-between items-center max-w-screen-xl mx-auto h-16 px-4 ">
         <div className="flex items-center space-x-4">
           <Link href="/" aria-label="LinkinPurry Home">

@@ -20,7 +20,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f4f2ee] flex flex-col gap-4 items-center justify-center p-4">
+    <div className="min-h-[80vh] bg-[#f4f2ee] flex flex-col gap-4 items-center justify-center p-4">
       <Outlet />
     </div>
   );

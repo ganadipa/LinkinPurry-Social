@@ -9,6 +9,7 @@ import { useTitle } from "@/hooks/title";
 import { Feeds } from "@/components/specific/profile/Feeds";
 import ProfileNotFound from "./not-found/ProfileNotFound";
 import toast from "react-hot-toast";
+import { Post } from "@/types/feed";
 
 export default function ProfilePage({ id }: { id: number }) {
   const { user, isLoading: isAuthLoading } = useAuth();
@@ -19,7 +20,7 @@ export default function ProfilePage({ id }: { id: number }) {
     deletePost,
     updatePost,
   } = useProfile(id);
-  let showing = [];
+  let showing: Post[] = [];
   if (posts) {
     showing = posts;
   }
@@ -52,7 +53,7 @@ export default function ProfilePage({ id }: { id: number }) {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6 space-y-6">
+    <div className="max-w-5xl mx-auto pb-6 space-y-6">
       <ProfileHeader
         profile={profile}
         user={user ?? undefined}
@@ -67,20 +68,24 @@ export default function ProfilePage({ id }: { id: number }) {
 
       <Skills skills={profile.skills} isOwnProfile={isOwnProfile} />
 
-      <div className="mt-6">
-        <h2 className="text-xl font-semibold mb-4">Posts</h2>
-        {posts && posts.length > 0 ? (
-          <Feeds
-            profile={profile}
-            deletePost={deletePost}
-            updatePost={updatePost}
-            loading={isProfileLoading}
-            posts={LIMITED_POSTS}
-          />
-        ) : (
-          <p className="text-gray-500 text-sm text-center">No posts found</p>
+        {user && (
+          <>
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold mb-4">Posts</h2>
+            {posts && posts.length > 0 ? (
+              <Feeds
+              profile={profile}
+                deletePost={deletePost}
+                updatePost={updatePost}
+                loading={isProfileLoading}
+                posts={LIMITED_POSTS}
+              />
+            ) : (
+              <p className="text-gray-500 text-sm text-center">No posts found</p>
+            )}
+          </div>
+          </>
         )}
-      </div>
     </div>
   );
 }
