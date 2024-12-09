@@ -7,6 +7,7 @@ import {
 } from "@/schemas/feed.schema";
 import { FeedRelated } from "@/types/feed";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 const POSTS_PER_PAGE = 10;
 
@@ -14,10 +15,8 @@ export function useFeed() {
   const [feed, setFeed] = useState<FeedRelated[] | null>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [hasMore, setHasMore] = useState<boolean>(true);
-  const [cursor, setCursor] = useState<number>(-1);
-  console.log(cursor);
 
-  const fetchFeed = async () => {
+  const fetchFeed = async (cursor: number | null) => {
     try {
       const url = new URL("/api/feed", window.location.origin);
       url.searchParams.append("limit", POSTS_PER_PAGE.toString());
@@ -54,6 +53,11 @@ export function useFeed() {
         setHasMore(false);
       }
 
+      const cursorNumber = Number(expect.data.body.cursor);
+      if (isNaN(cursorNumber)) {
+        throw new Error("Failed to fetch feed");
+      }
+
       setFeed((prevFeed) => {
         if (!cursor) return expect.data.body.posts;
         return [...(prevFeed || []), ...expect.data.body.posts];
@@ -63,27 +67,24 @@ export function useFeed() {
       if (typeof the_cursor === "string") {
         the_cursor = parseInt(the_cursor);
         if (isNaN(the_cursor)) {
-          the_cursor = null;
+          the_cursor = -1;
         }
       }
 
-      if (typeof the_cursor === "number") {
-        setCursor(the_cursor);
-      } else {
-        setCursor(-1);
-      }
-
-      return expect.data.body;
+      return the_cursor;
     } catch (error) {
-      console.log(error);
-      return [];
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
     } finally {
       setLoading(false);
     }
+
+    return cursor;
   };
 
   useEffect(() => {
-    fetchFeed();
+    fetchFeed(null);
   }, []);
 
   const createPost = async (content: string) => {

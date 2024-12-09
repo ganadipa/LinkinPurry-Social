@@ -242,9 +242,9 @@ export class FeedController implements Controller {
           cursor
         );
 
-        const cursorAfter = feed.reduce((max, post) => {
-          return post.post.id > max ? post.post.id : max;
-        }, -1);
+        const cursorAfter = feed.reduce((min, post) => {
+          return post.post.id < min ? post.post.id : min;
+        }, Number.MAX_SAFE_INTEGER);
 
         const feed_adjusted_profile_photo = feed.map((post) => {
           return {

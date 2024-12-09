@@ -11,7 +11,7 @@ export interface TokenPayload {
 
 @injectable()
 export class JwtService {
-  private readonly JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
+  private readonly JWT_SECRET = process.env.JWT_SECRET || "gana";
   public readonly TOKEN_EXPIRY_MS = 3600 * 1000;
 
   public generateToken(userId: string, email: string): string {

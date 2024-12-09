@@ -4,6 +4,7 @@ import { Feed } from "../../models/feed.model";
 import { PrismaProvider } from "../../prisma/prisma";
 import { FeedRepository } from "../../interfaces/feed-repository.interface";
 import { FeedRelated } from "../../schemas/feed.schema";
+import { watch } from "fs";
 
 @injectable()
 export class DbFeedRepository implements FeedRepository {
@@ -119,22 +120,24 @@ export class DbFeedRepository implements FeedRepository {
 
   public async getPaginatedFeeds(
     visible: bigint[],
-    limit: number,
-    cursor: number
+    limit?: number,
+    cursor?: number
   ): Promise<FeedRelated[]> {
-    console.log(cursor);
+    if (!limit) {
+      limit = 100;
+    }
 
     const feeds = await this.prisma.prisma.feed.findMany({
       where: {
         user_id: {
           in: visible,
         },
+        // If cursor provided, get posts with id less than cursor
+        ...(cursor ? { id: { lt: cursor } } : {}),
       },
       orderBy: {
         created_at: "desc",
       },
-      cursor: cursor != -1 ? { id: cursor } : undefined,
-      skip: cursor ? 1 : 0,
       take: limit,
       select: {
         id: true,

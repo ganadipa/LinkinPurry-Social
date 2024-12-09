@@ -33,7 +33,6 @@ import Loading from "@/components/loading";
 import { useAuth } from "@/hooks/auth";
 import { redirect } from "@/lib/utils";
 import toast from "react-hot-toast";
-import { useTitle } from "@/hooks/title";
 import { Link } from "@tanstack/react-router";
 
 const MAX_CHARS = 280;
@@ -55,8 +54,7 @@ const Feed = () => {
   const [editContent, setEditContent] = useState("");
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const observerTarget = useRef<HTMLDivElement | null>(null);
-
-  useTitle("LinkinPurry Feed");
+  const [cursor, setCursor] = useState<number | null>(null);
 
   const handleNewPostChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const content = e.target.value;
@@ -72,6 +70,26 @@ const Feed = () => {
     }
   };
 
+  // Initial feed load
+  useEffect(() => {
+    const loadInitialFeed = async () => {
+      try {
+        const initialCursor = await fetchFeed(null);
+        if (initialCursor) {
+          setCursor(initialCursor);
+        }
+      } catch (error) {
+        console.error("Error loading initial feed:", error);
+        toast.error("Failed to load feed");
+      }
+    };
+
+    if (!loading && feed === null) {
+      loadInitialFeed();
+    }
+  }, [loading, feed, fetchFeed]);
+
+  // Infinite scroll handling
   useEffect(() => {
     const observer = new IntersectionObserver(
       async (entries) => {
@@ -79,7 +97,10 @@ const Feed = () => {
         if (target.isIntersecting && hasMore && !isFetchingMore && feed) {
           try {
             setIsFetchingMore(true);
-            await fetchFeed();
+            const newCursor = await fetchFeed(cursor);
+            if (newCursor !== undefined) {
+              setCursor(newCursor);
+            }
           } catch (error) {
             console.error("Error fetching more posts:", error);
             toast.error("Failed to load more posts");
@@ -101,7 +122,7 @@ const Feed = () => {
         observer.unobserve(currentObserverTarget);
       }
     };
-  }, [feed, hasMore, isFetchingMore, fetchFeed]);
+  }, [feed, hasMore, isFetchingMore, fetchFeed, cursor]);
 
   if (loading || feed === null || isLoading) {
     return <Loading />;
