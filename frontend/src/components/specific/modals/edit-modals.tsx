@@ -33,12 +33,10 @@ export default function EditModals({
 }: EditModalsProps) {
   const [inputValue, setInputValue] = useState(value);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setError(null);
 
     try {
       const formData = new FormData();
@@ -64,7 +62,6 @@ export default function EditModals({
         setIsModalOpen(false);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
       toast.error(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsSubmitting(false);
@@ -91,7 +88,6 @@ export default function EditModals({
               onChange={(e) => setInputValue(e.target.value)}
               required={!["work_history", "skills"].includes(field)}
             />
-            {error && <p className="text-red-500 mt-2">{error}</p>}
           </div>
           <DialogFooter className="mt-6 flex justify-end gap-2">
             <Button

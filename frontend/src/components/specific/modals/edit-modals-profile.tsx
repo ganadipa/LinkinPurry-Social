@@ -27,7 +27,6 @@ export default function EditModalsProfile({
   const [inputUsername, setInputUsername] = useState(value.username);
   const [inputName, setInputName] = useState(value.name);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +58,6 @@ export default function EditModalsProfile({
       }
    
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
       toast.error(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsSubmitting(false);

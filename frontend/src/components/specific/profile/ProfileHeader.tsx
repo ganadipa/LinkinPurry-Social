@@ -35,33 +35,27 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     profileId
   );
 
-  const [statusLabel, setStatusLabel] = useState<status | null>("not_connected");
+  const [status, setStatus] = useState<"connected" | "not_connected" | "pending">("not_connected");
 
-  const getStatusLabel = async () => {
+  const getStatus = async () => {
     try {
       const response = await fetch(`/api/connections/status/${profileId}`, {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" }
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch connection status");
-      }
+      if (!response.ok) throw new Error("Failed to fetch connection status");
 
-      const json = await response.json();
-      setStatusLabel(json.body.status);
+      const data = await response.json();
+      setStatus(data.body.status);
     } catch (error) {
       console.error("Failed to fetch connection status:", error);
+      toast.error("Failed to load connection status");
     }
-  }
+  };
 
   useEffect(() => {
-    if (user) {
-        console.log(statusLabel);
-        getStatusLabel();
-    }
+    if (user) getStatus();
   }, [user, profileId]);
 
   const [name, setName] = useState<string>(profile.name);
@@ -72,8 +66,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
 
   const onConnect = async () => {
-    if (loading || statusLabel == "pending") return;
+    if (loading || status == "pending") return;
     await toggleConnection();
+    await getStatus();
   };
 
   // const handleUpdate = (newName: string, newUsername: string, newWorkHistory: string, newSkills: string) => {
@@ -93,7 +88,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     if (loading) {
       return "Loading...";
     }
-    switch (statusLabel) {
+    switch (status) {
       case "connected":
         return "Connected";
       case "pending":
@@ -110,7 +105,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       return `${baseStyle} bg-gray-200 text-gray-600 cursor-not-allowed`;
     }
   
-    switch (statusLabel) {
+    switch (status) {
       case "connected":
         return `${baseStyle} bg-white text-[#0a66c2] border border-[#0a66c2] hover:bg-[#0a66c2] hover:text-white`;
       case "pending":
@@ -175,7 +170,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               variant="default"
               className={`w-full sm:w-auto rounded-full px-6 py-2 font-medium text-sm ${getButtonStyle()}`}
               onClick={onConnect}
-              disabled={loading || statusLabel === "pending"}
+              disabled={loading || status === "pending"}
             >
               {getButtonText()}
             </Button>
