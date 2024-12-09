@@ -1,5 +1,3 @@
-// frontend/src/hooks/useNotifications.ts
-
 import { useState, useEffect } from 'react';
 import { NotificationService } from '@/lib/notification';
 import { useAuth } from '@/hooks/auth';
@@ -52,7 +50,6 @@ export function useNotifications() {
       if (permissionGranted) {
         const subscription = await service.subscribeToPush();
         if (subscription) {
-          // Send subscription to your backend
           console.log(JSON.stringify(subscription));
           await fetch('/api/notifications/subscribe', {
             method: 'POST',

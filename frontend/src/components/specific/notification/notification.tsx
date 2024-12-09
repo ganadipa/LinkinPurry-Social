@@ -1,5 +1,3 @@
-// // frontend/src/components/specific/NotificationManager.tsx
-
 // import { useEffect } from 'react';
 // import { useNotification } from '@/hooks/notification';
 

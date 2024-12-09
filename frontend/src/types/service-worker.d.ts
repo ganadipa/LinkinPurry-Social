@@ -1,5 +1,3 @@
-// frontend/src/types/service-worker.d.ts
-
 interface NotificationPayload {
   title: string;
   body: string;

@@ -1,4 +1,3 @@
-// frontend/public/service-worker.ts
 declare const self: ServiceWorkerGlobalScope;
 
 self.addEventListener('push', (event: PushEvent) => {
@@ -24,9 +23,6 @@ self.addEventListener('notificationclick', (event: NotificationEvent) => {
   const baseUrl = self.location.origin;
   const notificationUrl = event.notification.data?.url || '/';
   const url = `${baseUrl}${notificationUrl}`;
-
-  // console.log('Opening notification:', url, 'from:', baseUrl);
-  // console.log('Notification :', event.notification.data);
 
   event.waitUntil(
     self.clients.openWindow(url)

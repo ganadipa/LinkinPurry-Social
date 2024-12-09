@@ -446,6 +446,8 @@ export class AuthController implements Controller {
           );
         }
 
+        console.log(exception);
+
         return c.json(
           {
             success: false as const,

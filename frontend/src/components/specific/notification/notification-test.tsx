@@ -1,4 +1,3 @@
-// frontend/src/components/NotificationPrompt.tsx
 import { useNotifications } from '@/hooks/notification';
 import { useEffect } from 'react';
 

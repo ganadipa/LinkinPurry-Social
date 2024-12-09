@@ -72,7 +72,8 @@ export class AuthService {
       throw new BadRequestException("Username is already in use");
     }
 
-    const password_hash = bcrypt.hashSync(password, "10");
+    
+    const password_hash = bcrypt.hashSync(password, 10);
     const userModel = new User(username, email, password_hash, name);
     const user = await this.userRepository.save(userModel);
 

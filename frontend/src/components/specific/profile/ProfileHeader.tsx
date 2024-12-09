@@ -6,9 +6,6 @@ import EditPhotoModals from "@/components/specific/modals/edit-photo";
 import EditModals from "@/components/specific/modals/edit-modals-profile";
 import { useConnectionStatus } from "@/hooks/connection-status";
 import toast from "react-hot-toast";
-// import EditProfileModals from "@/components/specific/edit-modals-profile";
-
-type status = "connected" | "not_connected" | "pending";
 
 interface ProfileHeaderProps {
   profile: {
@@ -16,8 +13,6 @@ interface ProfileHeaderProps {
     username: string;
     profile_photo: string;
     connection_count: number;
-    // work_history?: string;
-    // skills?: string;
   };
   user?: { id: number };
   profileId: number;
@@ -70,13 +65,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     await toggleConnection();
     await getStatus();
   };
-
-  // const handleUpdate = (newName: string, newUsername: string, newWorkHistory: string, newSkills: string) => {
-  //   setName(newName);
-  //   setUsername(newUsername);
-  //   setWorkHistory(newWorkHistory);
-  //   setSkills(newSkills);
-  // };
 
   const handleUpdate = (newName: string, newUsername: string) => {
     setName(newName);
@@ -179,7 +167,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </div>
       </div>
 
-      {/* Modals */}
       <EditPhotoModals
         photoModalOpen={photoModalOpen}
         setPhotoModalOpen={setPhotoModalOpen}
@@ -190,28 +177,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         onEditPhoto={() => {}}
         onDeletePhoto={() => {}}
       />
-
-      {/* <EditProfileModals
-          isModalOpen={editModalOpen}
-          setIsModalOpen={setEditModalOpen}
-          userId={user?.id ?? 0}
-          initialData={{
-            name: name || '',
-            username: username || '',
-            work_history: workHistory || '',
-            skills: skills || '',
-          }}
-          onUpdateSuccess={(updatedData) => {
-            console.log('Profile updated successfully:', updatedData);
-            // Handle UI state or refetch updated data
-            handleUpdate(
-              updatedData.name || '',
-              updatedData.username || '',
-              updatedData.work_history || '',
-              updatedData.skills || ''
-            );
-          }}
-        /> */}
 
       <EditModals
         value={{ name, username }}
