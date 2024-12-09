@@ -24,7 +24,7 @@ const Skills: React.FC<SkillsProps> = ({ skills, isOwnProfile }) => {
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow border p-6">
+      <div className="bg-white rounded-lg shadow border p-4 md:p-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Skills</h2>
           {isOwnProfile && (

@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/auth";
 import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 import Header from "@/components/layout/header";
 import { NotificationPrompt } from "@/components/specific/notification/notification-test";
+import NotFound from "@/pages/not-found/NotFound";
 
 type RouterContext = {
   authentication: AuthContext;
@@ -10,6 +11,7 @@ type RouterContext = {
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootComponent,
+  notFoundComponent: () => <NotFound />,
 });
 
 function RootComponent() {
@@ -18,9 +20,9 @@ function RootComponent() {
   return (
     <>
       {user && <NotificationPrompt />}
-      <Header />
 
       <main className="w-full flex-col flex-1">
+        <Header />
         <div className="mx-auto overflow-y w-full xl:w-[1120px]">
           <Outlet />
         </div>

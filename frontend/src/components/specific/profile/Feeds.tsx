@@ -12,7 +12,6 @@ import { Post } from "@/types/feed";
 import { useAuth } from "@/hooks/auth";
 import Loading from "@/components/loading";
 import toast from "react-hot-toast";
-import { useProfile } from "@/hooks/profile";
 import { Profile } from "@/types/profile";
 
 interface FeedsProps {
@@ -121,13 +120,11 @@ export const Feeds = ({
                     <span className="flex items-center">
                       <Clock className="w-4 h-4 mr-1" />
                       {item.created_at ? formatTime(item.created_at) : ""}
-                      {/* {item.created_at} */}
                     </span>
                     {item.updated_at !== item.created_at && (
                       <span className="ml-2 text-gray-400">
                         • Edited{" "}
                         {item.updated_at ? formatTime(item.updated_at) : ""}
-                        {/* {item.updated_at} */}
                       </span>
                     )}
                   </div>
