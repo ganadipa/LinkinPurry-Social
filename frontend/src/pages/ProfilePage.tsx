@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/auth";
+import { useEffect } from "react";
 import { useProfile } from "@/hooks/profile";
 import Loading from "@/components/loading";
 import ProfileHeader from "@/components/specific/profile/ProfileHeader";
@@ -7,6 +8,7 @@ import Skills from "@/components/specific/profile/Skills";
 import { useTitle } from "@/hooks/title";
 import { Feeds } from "@/components/specific/profile/Feeds";
 import ProfileNotFound from "./not-found/ProfileNotFound";
+import toast from "react-hot-toast";
 
 export default function ProfilePage({ id }: { id: number }) {
   const { user, isLoading: isAuthLoading } = useAuth();
@@ -21,6 +23,19 @@ export default function ProfilePage({ id }: { id: number }) {
   const isOwnProfile = user?.id === id;
   const isLoading = isAuthLoading || isProfileLoading;
   useTitle("Profile " + (profile?.name ?? "Not Found"), [profile]);
+
+  useEffect(() => {
+    if (isLoading) {
+      toast.loading("Loading profile...");
+    } else {
+      toast.dismiss();
+      if (profile) {
+        toast.success("Profile loaded successfully.");
+      } else {
+        toast.error("Failed to load profile.");
+      }
+    }
+  }, [isLoading, profile]);
 
   if (isLoading) {
     return <Loading />;

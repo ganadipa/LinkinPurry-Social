@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/auth";
 import { getUsersResponse } from "@/types/response";
 import Loading from "@/components/loading";
 import { useTitle } from "@/hooks/title";
+import toast from "react-hot-toast";
 
 export default function UserListPage() {
   const { user: currentUser } = useAuth();
@@ -20,6 +21,7 @@ export default function UserListPage() {
   const fetchUsersDebounced = useCallback(
     debounce(async (searchQuery: string) => {
       setLoading(true);
+      toast.loading("Loading users...");
       try {
         const response = await fetch(
           `/api/users${searchQuery ? `?search=${searchQuery}` : ""}`,
@@ -47,44 +49,48 @@ export default function UserListPage() {
         setUsers(validatedUsers);
 
         if (currentUser) {
-            // Fetch statuses in bulk
-            const statusResponse = await fetch("/api/connections/statuses", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ userIds: validatedUsers.map((u) => u.id) }),
-            });
-  
-            if (!statusResponse.ok) {
-              throw new Error("Failed to fetch connection statuses");
-            }
-  
-            const statusData = await statusResponse.json();
-            const statusMap = statusData.body.reduce(
-              (acc: Record<number, "connected" | "pending" | "not_connected"> , { userId, status }: {
+          // Fetch statuses in bulk
+          const statusResponse = await fetch("/api/connections/statuses", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userIds: validatedUsers.map((u) => u.id) }),
+          });
+
+          if (!statusResponse.ok) {
+            throw new Error("Failed to fetch connection statuses");
+          }
+
+          const statusData = await statusResponse.json();
+          const statusMap = statusData.body.reduce(
+            (acc: Record<number, "connected" | "pending" | "not_connected"> , { userId, status }: {
                 userId: number;
                 status: "connected" | "pending" | "not_connected";
               }) => {
-                acc[userId] = status;
-                return acc;
-              },
-              {}
-            );
-  
-            setStatuses(statusMap);
-          } else {
-            setStatuses(
-              validatedUsers.reduce((acc, user) => {
-                acc[user.id] = "not_connected";
-                return acc;
-              }, {} as { [key: number]: "connected" | "pending" | "not_connected" })
-            );
-          }
-        } catch (error) {
-          console.error("Error fetching users:", error);
-        } finally {
-          setLoading(false);
+              acc[userId] = status;
+              return acc;
+            },
+            {}
+          );
+
+          setStatuses(statusMap);
+        } else {
+          setStatuses(
+            validatedUsers.reduce((acc, user) => {
+              acc[user.id] = "not_connected";
+              return acc;
+            }, {} as { [key: number]: "connected" | "pending" | "not_connected" })
+          );
         }
-      }, 600), // 600ms debounce delay
+        toast.dismiss();
+        toast.success("Users loaded successfully.");
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        toast.dismiss();
+        toast.error("Failed to load users.");
+      } finally {
+        setLoading(false);
+      }
+    }, 600), // 600ms debounce delay
     [currentUser]
   );
 
@@ -110,15 +116,16 @@ export default function UserListPage() {
 
       const data = await response.json();
       if (!response.ok) {
-        alert(`Failed to send connection request: ${data.message}`);
+        toast.error(`Failed to send connection request: ${data.message}`);
         return;
       }
 
+      toast.success("Connection request sent.");
       // update status locally
       setStatuses((prev) => ({ ...prev, [userId]: "pending" }));
     } catch (error) {
       console.error("Error sending connection request:", error);
-      alert("Failed to send connection request.");
+      toast.error("Failed to send connection request.");
     }
   };
 

@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/auth";
 import { cn, redirect } from "@/lib/utils";
 import { useTitle } from "@/hooks/title";
 import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 export default function ChatPage({ contact_id }: { contact_id: number }) {
   const { user } = useAuth();
@@ -29,6 +30,7 @@ export default function ChatPage({ contact_id }: { contact_id: number }) {
       if (contact_id) {
         const ok = await handleContactSelect(Number(contact_id));
         if (!ok) {
+          toast.error("Failed to select contact.");
           redirect({ to: "/chat" });
         }
       }
@@ -36,6 +38,19 @@ export default function ChatPage({ contact_id }: { contact_id: number }) {
 
     prepare();
   }, [contact_id]);
+
+  useEffect(() => {
+    if (isLoading) {
+    //   toast.loading("Loading contacts...");
+    } else {
+      toast.dismiss();
+      if (contacts) {
+        // toast.success("Contacts loaded successfully.");
+      } else {
+        toast.error("Failed to load contacts.");
+      }
+    }
+  }, [isLoading, contacts]);
 
   if (isLoading) {
     return <Loading />;

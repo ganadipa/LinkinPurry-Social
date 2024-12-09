@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { UserCard } from "@/components/ui/user-card";
 import { useAuth } from "@/hooks/auth";
 import { useTitle } from "@/hooks/title";
+import toast from "react-hot-toast";
 
 interface ConnectionsPageProps {
   id?: number;
@@ -42,6 +43,7 @@ export default function ConnectionsPage({ id }: ConnectionsPageProps) {
       if (!id && !currentUser) return;
 
       setLoading(true);
+      toast.loading("Loading connections...");
       try {
         const response = await fetch(
           `/api/connections${id ? `?user_id=${id}` : ""}`,
@@ -49,7 +51,7 @@ export default function ConnectionsPage({ id }: ConnectionsPageProps) {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-            },
+            }
           }
         );
 
@@ -77,8 +79,12 @@ export default function ConnectionsPage({ id }: ConnectionsPageProps) {
         );
 
         setConnectionsList(detailedConnections);
+        toast.dismiss();
+        toast.success("Connections loaded successfully.");
       } catch (error) {
         console.error("Error fetching connections:", error);
+        toast.dismiss();
+        toast.error("Failed to load connections.");
       } finally {
         setLoading(false);
       }
@@ -87,29 +93,29 @@ export default function ConnectionsPage({ id }: ConnectionsPageProps) {
     fetchConnections();
   }, [id, currentUser]);
 
-    return (
-        <div className="max-w-4xl bg-white mx-4 sm:mx-auto mt-6 sm:mt-10 rounded-lg border border-gray-300">
-            <h1 className="text-xl sm:text-2xl font-semibold p-3 sm:p-4">Connections</h1>
-            <div className="max-w-4xl mx-auto p-6 space-y-4">
-                {loading ? (
-                    <p className="text-center pb-3 sm:pb-4">Loading...</p>
-                ) : connectionsList.length === 0 ? (
-                    <p className="text-center text-gray-500 text-sm sm:text-base pb-3 sm:pb-4">
-                    No connection found.
-                    </p>
-                ) : (
-                    connectionsList.map((connection) => (
-                        <UserCard
-                            key={connection.id}
-                            id={connection.id}
-                            name={connection.full_name}
-                            profilePhoto={connection.profile_photo_path}
-                            status="connected"
-                            hideStatus={true}
-                        />
-                    ))
-                )}
-            </div>
-        </div>
-    );
+  return (
+    <div className="max-w-4xl bg-white mx-4 sm:mx-auto mt-6 sm:mt-10 rounded-lg border border-gray-300">
+      <h1 className="text-xl sm:text-2xl font-semibold p-3 sm:p-4">Connections</h1>
+      <div className="max-w-4xl mx-auto p-6 space-y-4">
+        {loading ? (
+          <p className="text-center pb-3 sm:pb-4">Loading...</p>
+        ) : connectionsList.length === 0 ? (
+          <p className="text-center text-gray-500 text-sm sm:text-base pb-3 sm:pb-4">
+            No connection found.
+          </p>
+        ) : (
+          connectionsList.map((connection) => (
+            <UserCard
+              key={connection.id}
+              id={connection.id}
+              name={connection.full_name}
+              profilePhoto={connection.profile_photo_path}
+              status="connected"
+              hideStatus={true}
+            />
+          ))
+        )}
+      </div>
+    </div>
+  );
 }

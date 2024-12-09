@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@tanstack/react-router";
+import toast from "react-hot-toast";
 
 interface ChatAreaProps {
   selectedContact: Contact | null;
@@ -47,6 +48,19 @@ export default function ChatArea({
     sendTypingStatus(isTyping);
   }, [isTyping]);
 
+  useEffect(() => {
+    if (isChatLoading) {
+    //   toast.loading("Loading messages...");
+    } else {
+      toast.dismiss();
+      if (messages) {
+        // toast.success("Messages loaded successfully.");
+      } else {
+        toast.error("Failed to load messages.");
+      }
+    }
+  }, [isChatLoading, messages]);
+
   if (selectedContact === null) {
     return (
       <div className={`self-center mx-auto ${className}`}>
@@ -72,6 +86,7 @@ export default function ChatArea({
     if (inputMessage.trim()) {
       sendMessage(inputMessage);
       setInputMessage("");
+    //   toast.success("Message sent.");
     }
   };
 
@@ -82,7 +97,6 @@ export default function ChatArea({
     }
   };
 
-  // Rest of your formatting functions remain the same
   const formatMessageTime = (dateNumber: number) => {
     const date = new Date(dateNumber);
     return date.toLocaleTimeString([], {

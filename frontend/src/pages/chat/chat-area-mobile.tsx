@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@tanstack/react-router";
+import toast from "react-hot-toast";
 
 interface ChatAreaProps {
   selectedContact: Contact | null;
@@ -28,7 +29,7 @@ export default function ChatAreaMobile({
   sendMessage,
   isOtherTyping,
   sendTypingStatus,
-  setSelectedContact,
+//   setSelectedContact,
 }: ChatAreaProps) {
   const [inputMessage, setInputMessage] = useState("");
   const [textareaHeight, setTextareaHeight] = useState("96px"); // 3 rows default
@@ -60,6 +61,19 @@ export default function ChatAreaMobile({
     }
   }, [inputMessage]);
 
+  useEffect(() => {
+    if (isChatLoading) {
+    //   toast.loading("Loading messages...");
+    } else {
+      toast.dismiss();
+      if (messages) {
+        // toast.success("Messages loaded successfully.");
+      } else {
+        toast.error("Failed to load messages.");
+      }
+    }
+  }, [isChatLoading, messages]);
+
   if (selectedContact === null) {
     return (
       <div className={`self-center mx-auto p-4 ${className}`}>
@@ -90,6 +104,7 @@ export default function ChatAreaMobile({
       sendMessage(inputMessage);
       setInputMessage("");
       setTextareaHeight("96px");
+    //   toast.success("Message sent.");
     }
   };
 
