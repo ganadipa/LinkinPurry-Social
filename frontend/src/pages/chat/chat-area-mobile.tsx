@@ -7,6 +7,7 @@ import { Contact, Message } from "../../types/chat";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/auth";
 import { Textarea } from "@/components/ui/textarea";
+import { Link } from "@tanstack/react-router";
 
 interface ChatAreaProps {
   selectedContact: Contact | null;
@@ -92,12 +93,6 @@ export default function ChatAreaMobile({
     }
   };
 
-  const handleBackClick = () => {
-    setInputMessage("");
-    setTextareaHeight("96px");
-    setSelectedContact(null);
-  };
-
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -149,12 +144,12 @@ export default function ChatAreaMobile({
   return (
     <div className={cn("flex flex-col w-full md:w-[70%] h-full", className)}>
       <div className="bg-white border-b border-[#e0e0e0] p-4 flex items-center">
-        <button
-          onClick={handleBackClick}
+        <Link
+          to="/chat"
           className="mr-2 md:hidden text-[#0a66c2] hover:text-[#004182]"
         >
           <ChevronLeft className="h-6 w-6" />
-        </button>
+        </Link>
         <Avatar className="h-10 w-10 mr-3">
           <AvatarImage
             src={selectedContact.profile_photo_path}

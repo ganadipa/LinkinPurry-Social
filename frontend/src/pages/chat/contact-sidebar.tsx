@@ -6,11 +6,11 @@ import { useEffect, useState, useMemo } from "react";
 import { debounce } from "lodash";
 import { Contact } from "../../types/chat";
 import { cn } from "@/lib/utils";
+import { Link } from "@tanstack/react-router";
 
 type ContactSidebarProps = {
   contacts: Contact[];
   selectedContact: number | null;
-  handleContactSelect: (contact_id: number) => void;
   className?: string;
 };
 
@@ -42,7 +42,6 @@ const truncateText = (text: string, maxLength: number) => {
 export function ContactSidebar({
   contacts,
   selectedContact,
-  handleContactSelect,
   className,
 }: ContactSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -67,7 +66,7 @@ export function ContactSidebar({
   return (
     <div
       className={cn(
-        `bg-white border-r border-[#e0e0e0] flex flex-col w-[30%]`,
+        `bg-white border-r border-[#e0e0e0] flex flex-col lg:w-[30%] w-[40%]`,
         className
       )}
     >
@@ -90,13 +89,15 @@ export function ContactSidebar({
 
       <ScrollArea className="flex-1 overflow-y-auto">
         {filteredContacts.map((contact) => (
-          <button
+          <Link
+            to="/chat/$contact_id"
+            params={{ contact_id: contact.user_id.toString() }}
             key={contact.user_id}
-            className={`w-full text-left p-4 hover:bg-[#eef3f8] transition-colors duration-200 
-              ${selectedContact === contact.user_id ? "bg-[#eef3f8]" : ""}`}
-            onClick={() => handleContactSelect(contact.user_id)}
           >
-            <div className="flex items-center">
+            <div
+              className={`flex items-center w-full text-left p-4 hover:bg-[#eef3f8] transition-colors duration-200 
+              ${selectedContact === contact.user_id ? "bg-[#eef3f8]" : ""}`}
+            >
               <Avatar className="h-12 w-12 mr-3">
                 <AvatarImage
                   src={contact.profile_photo_path}
@@ -125,7 +126,7 @@ export function ContactSidebar({
                 </div>
               </div>
             </div>
-          </button>
+          </Link>
         ))}
       </ScrollArea>
     </div>

@@ -56,7 +56,7 @@ const Feed = () => {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const observerTarget = useRef<HTMLDivElement | null>(null);
 
-  useTitle("Feed");
+  useTitle("LinkinPurry Feed");
 
   const handleNewPostChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const content = e.target.value;

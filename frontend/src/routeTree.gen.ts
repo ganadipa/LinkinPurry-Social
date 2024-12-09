@@ -20,6 +20,7 @@ import { Route as AuthenticatedChatImport } from './routes/_authenticated/chat'
 import { Route as publicUsersImport } from './routes/(public)/users'
 import { Route as authorizationAuthImport } from './routes/(authorization)/_auth'
 import { Route as AuthenticatedChatIndexImport } from './routes/_authenticated/chat/index'
+import { Route as AuthenticatedChatContactidImport } from './routes/_authenticated/chat/$contact_id'
 import { Route as publicProfileIdImport } from './routes/(public)/profile.$id'
 import { Route as publicConnectionsIdImport } from './routes/(public)/connections.$id'
 import { Route as authorizationAuthSignupImport } from './routes/(authorization)/_auth/signup'
@@ -75,6 +76,14 @@ const AuthenticatedChatIndexRoute = AuthenticatedChatIndexImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedChatRoute,
 } as any)
+
+const AuthenticatedChatContactidRoute = AuthenticatedChatContactidImport.update(
+  {
+    id: '/$contact_id',
+    path: '/$contact_id',
+    getParentRoute: () => AuthenticatedChatRoute,
+  } as any,
+)
 
 const publicProfileIdRoute = publicProfileIdImport.update({
   id: '/(public)/profile/$id',
@@ -181,6 +190,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof publicProfileIdImport
       parentRoute: typeof rootRoute
     }
+    '/_authenticated/chat/$contact_id': {
+      id: '/_authenticated/chat/$contact_id'
+      path: '/$contact_id'
+      fullPath: '/chat/$contact_id'
+      preLoaderRoute: typeof AuthenticatedChatContactidImport
+      parentRoute: typeof AuthenticatedChatImport
+    }
     '/_authenticated/chat/': {
       id: '/_authenticated/chat/'
       path: '/'
@@ -194,10 +210,12 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AuthenticatedChatRouteChildren {
+  AuthenticatedChatContactidRoute: typeof AuthenticatedChatContactidRoute
   AuthenticatedChatIndexRoute: typeof AuthenticatedChatIndexRoute
 }
 
 const AuthenticatedChatRouteChildren: AuthenticatedChatRouteChildren = {
+  AuthenticatedChatContactidRoute: AuthenticatedChatContactidRoute,
   AuthenticatedChatIndexRoute: AuthenticatedChatIndexRoute,
 }
 
@@ -255,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof authorizationAuthSignupRoute
   '/connections/$id': typeof publicConnectionsIdRoute
   '/profile/$id': typeof publicProfileIdRoute
+  '/chat/$contact_id': typeof AuthenticatedChatContactidRoute
   '/chat/': typeof AuthenticatedChatIndexRoute
 }
 
@@ -266,6 +285,7 @@ export interface FileRoutesByTo {
   '/signup': typeof authorizationAuthSignupRoute
   '/connections/$id': typeof publicConnectionsIdRoute
   '/profile/$id': typeof publicProfileIdRoute
+  '/chat/$contact_id': typeof AuthenticatedChatContactidRoute
   '/chat': typeof AuthenticatedChatIndexRoute
 }
 
@@ -282,6 +302,7 @@ export interface FileRoutesById {
   '/(authorization)/_auth/signup': typeof authorizationAuthSignupRoute
   '/(public)/connections/$id': typeof publicConnectionsIdRoute
   '/(public)/profile/$id': typeof publicProfileIdRoute
+  '/_authenticated/chat/$contact_id': typeof AuthenticatedChatContactidRoute
   '/_authenticated/chat/': typeof AuthenticatedChatIndexRoute
 }
 
@@ -297,6 +318,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/connections/$id'
     | '/profile/$id'
+    | '/chat/$contact_id'
     | '/chat/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -307,6 +329,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/connections/$id'
     | '/profile/$id'
+    | '/chat/$contact_id'
     | '/chat'
   id:
     | '__root__'
@@ -321,6 +344,7 @@ export interface FileRouteTypes {
     | '/(authorization)/_auth/signup'
     | '/(public)/connections/$id'
     | '/(public)/profile/$id'
+    | '/_authenticated/chat/$contact_id'
     | '/_authenticated/chat/'
   fileRoutesById: FileRoutesById
 }
@@ -387,6 +411,7 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/chat.tsx",
       "parent": "/_authenticated",
       "children": [
+        "/_authenticated/chat/$contact_id",
         "/_authenticated/chat/"
       ]
     },
@@ -411,6 +436,10 @@ export const routeTree = rootRoute
     },
     "/(public)/profile/$id": {
       "filePath": "(public)/profile.$id.tsx"
+    },
+    "/_authenticated/chat/$contact_id": {
+      "filePath": "_authenticated/chat/$contact_id.tsx",
+      "parent": "/_authenticated/chat"
     },
     "/_authenticated/chat/": {
       "filePath": "_authenticated/chat/index.tsx",

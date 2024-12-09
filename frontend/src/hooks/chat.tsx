@@ -204,6 +204,7 @@ export function useChat({ user_id }: { user_id: number | undefined }) {
   const handleContactSelect = async (other_id: number) => {
     setSelectedContact(other_id);
     setIsChatLoading(true);
+    let ok = true;
 
     try {
       const response = await fetch(`/api/chat/${other_id}`);
@@ -220,15 +221,19 @@ export function useChat({ user_id }: { user_id: number | undefined }) {
 
       const result = ChatSpecificResponseSuccessSchema.safeParse(data);
       if (!result.success || !result.data.success) {
+        console.log(result.error);
         throw new Error("Failed to fetch messages");
       }
 
       setMessages(result.data.body);
     } catch (error) {
+      ok = false;
       toast.error(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setIsChatLoading(false);
     }
+    console.log("Returning ok:", ok);
+    return ok;
   };
 
   useEffect(() => {

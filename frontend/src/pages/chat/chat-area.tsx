@@ -128,7 +128,7 @@ export default function ChatArea({
   };
 
   return (
-    <div className={cn(`flex flex-col w-[70%]`, className)}>
+    <div className={cn(`flex flex-col lg:w-[70%] w-3/5`, className)}>
       <div className="bg-white border-b border-[#e0e0e0] p-4 flex items-center justify-between">
         <Link
           className="flex items-center"
@@ -137,7 +137,7 @@ export default function ChatArea({
             id: selectedContact.user_id.toString(),
           }}
         >
-          <Avatar className="h-12 w-12 mr-3">
+          <Avatar className="h-12 w-12 mr-3 flex justify-center items-center">
             <AvatarImage
               src={selectedContact.profile_photo_path}
               alt={selectedContact.full_name}
