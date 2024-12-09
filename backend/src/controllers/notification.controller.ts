@@ -138,11 +138,12 @@ export class NotificationController implements Controller {
 
     this.hono.app.openapi(route, async (c) => {
       try {
-        const { toUserId, message, sender } = await c.req.json();
+        const { toUserId, message, sender, senderId } = await c.req.json();
         await this.notificationService.sendChatNotification(
           toUserId,
           message,
-          sender
+          sender,
+          senderId,
         );
 
         return c.json(

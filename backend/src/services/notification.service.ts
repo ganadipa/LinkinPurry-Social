@@ -21,14 +21,14 @@ export class NotificationService {
     return await this.pushSubscriptionRepo.save(subscription);
   }
 
-  async sendChatNotification(toUserId: number, message: string, sender: string) {
+  async sendChatNotification(toUserId: number, message: string, sender: string, senderId: number) {
     const subscriptions = await this.pushSubscriptionRepo.findByUserId(toUserId);
 
     const payload = JSON.stringify({
       title: `Message from ${sender}`,
       body: message,
       data: {
-        url: "/chat",
+        url: `/chat/${senderId}`,
       }
     });
 

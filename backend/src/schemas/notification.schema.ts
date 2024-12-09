@@ -20,6 +20,7 @@ export const SendChatNotificationRequestSchema = z.object({
   toUserId: z.number(),
   message: z.string(),
   sender: z.string(),
+  senderId: z.number(),
 });
 
 export const SendChatNotificationResponseSchema = z.object({
