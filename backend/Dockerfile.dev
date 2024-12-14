@@ -1,0 +1,23 @@
+FROM node:20-alpine
+
+# Set the working directory
+WORKDIR /app/backend
+
+# Install dependencies
+COPY package*.json ./
+
+COPY prisma ./prisma
+RUN npm install
+
+# Copy source code and config
+COPY . .
+
+# TypeScript configuration
+COPY tsconfig.json ./
+
+
+ENV PORT=3000
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]

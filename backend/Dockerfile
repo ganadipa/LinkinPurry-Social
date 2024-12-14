@@ -1,21 +1,39 @@
-FROM node:20-alpine
+FROM node:20
 
-RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
+# Install necessary build dependencies
+RUN apk add --no-cache python3 make g++
 
-WORKDIR /home/node/app
+# Create app directory and set permissions
+WORKDIR /app/backend
 
-USER node
+# Copy package files first to leverage Docker cache
+COPY package*.json ./
 
-COPY --chown=node:node package*.json ./
+COPY prisma ./prisma
+# Install dependencies with full logs for debugging
+RUN npm ci --verbose
 
-RUN npm ci
+# Copy .env.example to .env
+COPY .env.example .env
 
-COPY --chown=node:node . .
+# Copy source code
+COPY . .
 
-COPY ./.env.example ./.env
+# Build the application
+RUN npm run build
 
+# Set environment and permissions
 ENV PORT=3000
+ENV NODE_ENV=production
+
+# Create and set proper permissions for upload directory
+RUN mkdir -p /var/www/uploads && \
+    chown -R node:node /var/www/uploads
+
+# Switch to non-root user
+USER node
 
 EXPOSE 3000
 
-CMD ["node", "index.js"]
+# Modify the start command to get more debugging info
+CMD ["node", "--trace-warnings", "--unhandled-rejections=strict", "dist/index.js"]

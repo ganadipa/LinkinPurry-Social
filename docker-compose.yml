@@ -1,7 +1,97 @@
 services:
-  backend:
-  frontend:
+  be-dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
+      - fe-dev
+    env_file:
+      - .env.docker
+    environment:
+      - ENVIRONMENT=docker
+    networks:
+      - internal-network
+    volumes:
+      - ./backend:/app/backend
+      - ./uploads:/var/www/uploads
+      - /app/backend/node_modules
+
+  fe-dev:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    env_file:
+      - .env.docker
+    environment:
+      - REACT_ENVIRONMENT=dev
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
+    networks:
+      - internal-network
+
   db:
-    image: postgres:latest
+    image: postgres:13
+    ports:
+      - "5433:5432"
+    env_file:
+      - .env.docker
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - internal-network
+
   redis:
     image: redis:latest
+
+  prod:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - internal-network
+    env_file:
+      - .env.docker
+    environment:
+      - ENVIRONMENT=docker
+    volumes:
+      - ./uploads:/var/www/uploads
+
+  prod-test:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.test
+    ports:
+      - "3000:3000"
+    depends_on:
+      - nicholasliem-db
+    networks:
+      - internal-network
+    env_file:
+      - ./backend/.env.test
+    environment:
+      - ENVIRONMENT=docker
+    volumes:
+      - ./uploads:/var/www/uploads
+
+  nicholasliem-db:
+    image: nicholasliem/wbd-m2-db-image:latest
+    ports:
+      - "5433:5432"
+    networks:
+      - internal-network
+
+networks:
+  internal-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
