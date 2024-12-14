@@ -23,10 +23,6 @@ RUN npm run build
 ENV PORT=3000
 ENV NODE_ENV=production
 
-# Create and set proper permissions for upload directory
-RUN mkdir -p /var/www/uploads && \
-    chown -R node:node /var/www/uploads
-
 # Switch to non-root user
 USER node
 
