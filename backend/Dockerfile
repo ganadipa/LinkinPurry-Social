@@ -1,8 +1,5 @@
 FROM node:20
 
-# Install necessary build dependencies
-RUN apk add --no-cache python3 make g++
-
 # Create app directory and set permissions
 WORKDIR /app/backend
 
